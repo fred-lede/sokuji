@@ -76,4 +76,13 @@ describe('manifest stays consistent with the platform registry', () => {
     }
     expect(manifest.host_permissions).toEqual(expect.arrayContaining(['wss://maas.qwencloudapi.com/*', 'wss://maas.qianwenaiapi.com/*']));
   });
+
+  // The OpenAI Compatible provider dials a user-named endpoint on either scheme:
+  // the extension's host_permissions and CSP connect-src carry global wildcards.
+  it('allows any http/https/ws/wss origin for the OpenAI Compatible endpoint', () => {
+    const origins = manifest.content_security_policy.extension_pages.split(/[ ;]+/);
+    expect(origins).toContain('ws://*/*');
+    expect(origins).toContain('wss://*/*');
+    expect(manifest.host_permissions).toEqual(expect.arrayContaining(['http://*/*', 'https://*/*']));
+  });
 });
