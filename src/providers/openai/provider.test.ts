@@ -73,18 +73,10 @@ describe('the OpenAI Realtime definition', () => {
     expect(openaiProvider.turns(REALTIME_DEFAULTS)).toEqual(['auto', 'manual']);
   });
 
-  it('sits after Doubao AST 2.0 and before OpenAI Translate, and OpenAI Compatible is registered nowhere (rulings 18, 1)', () => {
+  it('sits after Doubao AST 2.0 and before OpenAI Translate (ruling 18)', () => {
     const ids = PROVIDERS.map((p) => p.id);
     expect(ids.indexOf('openai')).toBe(ids.indexOf('volcengine_ast2') + 1);
     expect(ids.indexOf('openai')).toBe(ids.indexOf('openai_translate') - 1);
-    expect(ids).not.toContain('openai_compatible');
-  });
-
-  it('a stored OpenAI Compatible selection falls to the first provider offered, through the existing rule: nothing is written (ruling 1)', () => {
-    for (const platform of ['electron', 'extension', 'web'] as const) {
-      const offered = presentProviders({ platform, dev: false, enabled: new Set(), kizuna: true, switchOn: () => false }).map((p) => p.id);
-      expect(selectionFromStored('openai_compatible', offered, 'kizunaai_soniox'), platform).toEqual({ id: offered[0], fromStorage: false });
-    }
   });
 
   it("lets the participant speak when its switch is on, with Other's prompt and the user's own detection (rulings 4, 15), and refuses Both for Auto-detect (D20)", () => {

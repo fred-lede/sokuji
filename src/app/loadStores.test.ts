@@ -82,8 +82,8 @@ describe('loadSessionStores', () => {
   });
 
   it('falls back to the first offered provider when the stored one is not offered here, and never overwrites the stored value', async () => {
-    // OpenAI Compatible, retired (Stage 2 OpenAI Realtime, ruling 1): no build registers it.
-    stored.set('settings.common.provider', 'openai_compatible');
+    // local_native is retired: no build registers it, so a stored selection of it falls to the first offered.
+    stored.set('settings.common.provider', 'local_native');
     useSegmentationStore.setState({ refresh: vi.fn(async () => {}) });
 
     await loadSessionStores();

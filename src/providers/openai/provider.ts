@@ -27,9 +27,7 @@ const adapter = createRealtimeAdapter();
  * key rides in a subprotocol a browser sets itself, so it runs on every
  * platform, and the extension's manifest already lists its host and CSP
  * origin: no manifest or background change. Released between Doubao AST
- * 2.0 and OpenAI Translate, unflagged (ruling 18). OpenAI Compatible is
- * retired, not ported (ruling 1): a stored selection of it falls to the
- * first provider offered.
+ * 2.0 and OpenAI Translate, unflagged (ruling 18).
  */
 export const openaiProvider: Provider<RealtimeSettings, RealtimeCredentials, RealtimeConfig> & { id: 'openai' } = {
   id: 'openai',
