@@ -19,7 +19,12 @@ import type { CompatibleConfig, TurnDetection } from './config';
 import type { CompatibleCredentials } from './settings';
 
 export { base64ToPcm } from '../../lib/contract/pcm64';
-export { decodeServerEvent, errorCode, errorWords, type ServerEvent } from '../../lib/provider/openaiWire';
+export { decodeServerEvent, errorCode, type ServerEvent } from '../../lib/provider/openaiWire';
+import type { OpenAIError } from '../../lib/provider/openaiWire';
+/** A server `error` in the endpoint's own words: `[the endpoint <code, else type>] <message>`. */
+export function errorWords(e: OpenAIError): string {
+  return `[the endpoint ${e.code || e.type || 'error'}] ${e.message || 'the server reported an error'}`;
+}
 
 /**
  * The WebSocket URL to the user's endpoint's Realtime socket.
