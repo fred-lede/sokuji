@@ -6,11 +6,11 @@ import {
   compatibleCredentials,
   migrateCompatibleSettings,
   normalizeEndpoint,
-  type CompatibleSettings,
 } from './settings';
 
-const LEGACY: CompatibleSettings['endpoint' | 'asrModel' | 'translateModel' | 'voice' | 'participantVoice'] = undefined as any;
-const inputs = (legacy: readonly string[] = [] as never) => ({ legacy });
+import type { MigrationInputs } from '../../lib/provider/types';
+
+const inputs = (legacy: Readonly<Record<string, unknown>> = {}): MigrationInputs => ({ legacy, credentials: {} });
 
 describe('normalizeEndpoint', () => {
   it('returns empty string for empty input', () => {
@@ -54,7 +54,7 @@ describe('COMPATIBLE_DEFAULTS', () => {
 
 describe('migrateCompatibleSettings', () => {
   it('fills in defaults when nothing is stored', () => {
-    const s = migrateCompatibleSettings({}, inputs([] as never));
+    const s = migrateCompatibleSettings({}, inputs());
     expect(s.endpoint).toBe('');
     expect(s.asrModel).toBe('');
     expect(s.translateModel).toBe('');
@@ -62,37 +62,37 @@ describe('migrateCompatibleSettings', () => {
     expect(s.participantVoice).toBe('');
   });
   it('reads a stored endpoint string', () => {
-    const s = migrateCompatibleSettings({ endpoint: 'https://myhost.com' }, inputs([] as never));
+    const s = migrateCompatibleSettings({ endpoint: 'https://myhost.com' }, inputs());
     expect(s.endpoint).toBe('https://myhost.com');
   });
   it('falls back to "" for a non-string asrModel', () => {
-    const s = migrateCompatibleSettings({ asrModel: 42 }, inputs([] as never));
+    const s = migrateCompatibleSettings({ asrModel: 42 }, inputs());
     expect(s.asrModel).toBe('');
   });
   it('falls back to "" for a non-string voice', () => {
-    const s = migrateCompatibleSettings({ voice: 42 }, inputs([] as never));
+    const s = migrateCompatibleSettings({ voice: 42 }, inputs());
     expect(s.voice).toBe('');
   });
   it('turnDetectionMode outside the known modes falls to Normal', () => {
-    const s = migrateCompatibleSettings({ turnDetectionMode: 'Disabled' }, inputs([] as never));
+    const s = migrateCompatibleSettings({ turnDetectionMode: 'Disabled' }, inputs());
     expect(s.turnDetectionMode).toBe('Normal');
   });
   it('noiseReduction outside the list falls to None', () => {
-    const s = migrateCompatibleSettings({ noiseReduction: 'Weird' }, inputs([] as never));
+    const s = migrateCompatibleSettings({ noiseReduction: 'Weird' }, inputs());
     expect(s.noiseReduction).toBe('None');
   });
   it('preserves a stored maxTokens: "inf"', () => {
-    const s = migrateCompatibleSettings({ maxTokens: 'inf' }, inputs([] as never));
+    const s = migrateCompatibleSettings({ maxTokens: 'inf' }, inputs());
     expect(s.maxTokens).toBe('inf');
   });
   it('preserves a stored finite maxTokens', () => {
-    const s = migrateCompatibleSettings({ maxTokens: 4096 }, inputs([] as never));
+    const s = migrateCompatibleSettings({ maxTokens: 4096 }, inputs());
     expect(s.maxTokens).toBe(4096);
   });
   it('preserves a stored endpoint and model fields', () => {
     const s = migrateCompatibleSettings(
       { endpoint: 'https://host', asrModel: 'qwen3-asr', translateModel: 'qwen3-translate', voice: 'v1', participantVoice: 'v2' },
-      inputs([] as never),
+      inputs(),
     );
     expect(s.endpoint).toBe('https://host');
     expect(s.asrModel).toBe('qwen3-asr');
@@ -104,26 +104,27 @@ describe('migrateCompatibleSettings', () => {
 
 describe('compatibleLanguages', () => {
   it('offers AUTO as a source', () => {
-    const sources = compatibleLanguages.sources({} as any);
+    const sources = compatibleLanguages.sources(COMPATIBLE_DEFAULTS);
     expect(sources[0].value).toBe(AUTO);
   });
   it('offers 55 languages as targets (not including AUTO)', () => {
-    const targets = compatibleLanguages.targets(AUTO, {} as any);
+    const targets = compatibleLanguages.targets(AUTO, COMPATIBLE_DEFAULTS);
     expect(targets.length).toBe(55);
     expect(targets.map((t) => t.value)).not.toContain(AUTO);
   });
   it('initial pair is en → zh-CN', () => {
-    expect(compatibleLanguages.initial()).toEqual({ source: 'en', target: 'zh-CN' });
+    expect(compatibleLanguages.initial!(COMPATIBLE_DEFAULTS)).toEqual({ source: 'en', target: 'zh-CN' });
   });
 });
 
 describe('compatibleCredentials', () => {
+  const noAuth = { signedIn: false, getToken: async () => null };
   it('returns missing when key is empty', () => {
-    const result = compatibleCredentials.read({ apiKey: '' });
+    const result = compatibleCredentials.read({ apiKey: '' }, noAuth);
     expect('missing' in result).toBe(true);
   });
   it('returns the key when present', () => {
-    const result = compatibleCredentials.read({ apiKey: 'sk-abc' });
+    const result = compatibleCredentials.read({ apiKey: 'sk-abc' }, noAuth);
     expect(result).toEqual({ apiKey: 'sk-abc' });
   });
 });

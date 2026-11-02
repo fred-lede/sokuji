@@ -283,10 +283,6 @@ class CompatibleLeg implements AdapterSession {
       this.refuse(new AdapterStartError(refusal.message, refusal.code));
       return;
     }
-    if (refusal.code === 'segment_ended') {
-      this.end({ failed: refusal });
-      return;
-    }
     if (error.code !== ACTIVE_RESPONSE) this.lastError = { ...refusal, at: this.request.clock.now() };
     this.queue.refused(error.event_id, error.code);
   }

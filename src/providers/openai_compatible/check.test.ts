@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createVirtualClock } from '../../lib/contract/clock';
-import { checkCompatible, CHECK_TIMEOUT_MS } from './check';
+import { checkCompatible } from './check';
 import { COMPATIBLE_DEFAULTS, type CompatibleCredentials, type CompatibleSettings } from './settings';
 
 const KEY: CompatibleCredentials = { apiKey: 'sk-test' };

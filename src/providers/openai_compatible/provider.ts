@@ -43,11 +43,13 @@ export const openaiCompatibleProvider: Provider<CompatibleSettings, CompatibleCr
   },
   Settings: CompatibleSettingsView,
   VoiceSummary: CompatibleVoiceSummary,
+  // The OpenAI Realtime turn-detection components read the same field names as
+  // `CompatibleSettings` (structural match); the cast bridges the nominal `RealtimeSettings`.
   TurnDetection: {
     Summary: RealtimeTurnDetectionSummary,
     Controls: RealtimeTurnDetectionControls,
     Help: RealtimeTurnDetectionHelp,
-  },
+  } as never,
 
   credentials: compatibleCredentials,
   check: (k, s, ctx) => checkCompatible(k, s, ctx),

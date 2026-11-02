@@ -24,7 +24,6 @@ import { recordEvents } from '../../lib/contract/events';
 import { AUTO_CTX, KEY, configFor } from './testing';
 import { COMPATIBLE_DEFAULTS, compatibleCredentials, compatibleLanguages } from './settings';
 import { buildCompatible, describeCompatible } from './config';
-import { checkCompatible } from './check';
 import { CompatibleSettingsView, CompatibleVoiceSummary } from './RealtimeSettings';
 import { openaiCompatibleProvider } from './provider';
 

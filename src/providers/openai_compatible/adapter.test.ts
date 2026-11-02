@@ -11,8 +11,8 @@ import { recordEvents } from '../../lib/contract/events';
 import { flush } from '../../lib/contract/testing/drive';
 import { fakeSockets } from '../../lib/contract/testing/fakeSocket';
 import { ANCHOR_EVERY, createCompatibleAdapter, ERROR_WORDS_MS, NEVER_OPENED, START_TIMEOUT_MS } from './adapter';
-import type { CompatibleConfig } from './config';
-import type { CompatibleCredentials } from './settings';
+
+
 import { AUTO_CTX, configFor, exchange, KEY, liveCompatible, MANUAL_CTX, RefusingWebSocket, SERVER, startCompatible } from './testing';
 import { compatibleSessionUpdate, compatibleProtocols, compatibleUrl } from './wire';
 

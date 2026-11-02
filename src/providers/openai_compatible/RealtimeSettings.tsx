@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { InstructionsField } from '../../components/providers/fields/InstructionsField';
 import { ModelConfigurationField } from '../../components/providers/fields/ModelConfigurationField';
 import { NoiseReductionField } from '../../components/providers/fields/NoiseReductionField';
-import { presetVoice } from '../../components/providers/fields/PresetVoiceField';
 import { resolveInstructions } from '../../lib/provider/instructions';
 import { boundedFetch } from '../../lib/provider/boundedFetch';
 import { realClock } from '../../lib/contract/clock';
@@ -23,7 +22,7 @@ import {
 import { REALTIME_MAX_TOKENS_RANGE, NOISE_REDUCTIONS } from '../openai/settings';
 import {
   compatibleLanguageName, compatibleLanguages,
-  COMPATIBLE_DEFAULTS, normalizeEndpoint,
+  normalizeEndpoint,
   type CompatibleSettings,
 } from './settings';
 
@@ -140,10 +139,10 @@ export function CompatibleSettingsView({
   settings, update, disabled = false, pair, account,
 }: SettingsProps<CompatibleSettings>) {
   const { t } = useTranslation();
-  const apiKey = (account?.apiKey ?? '').trim();
+  const apiKey = ((account?.credentials.apiKey ?? '') as string).trim();
   const voices = useEndpointVoices(settings.endpoint, apiKey);
 
-  const initial = compatibleLanguages.initial?.();
+  const initial = compatibleLanguages.initial?.(settings);
   const source = pair?.source ?? initial?.source ?? '';
   const target = pair?.target ?? initial?.target ?? '';
   const preview = resolveInstructions(settings, { participant: false, source: compatibleLanguageName(source), target: compatibleLanguageName(target) });
@@ -208,8 +207,8 @@ export function CompatibleSettingsView({
       />
 
       {/* 6. Turn detection (the same components as OpenAI Realtime — they read the same field names). */}
-      <RealtimeTurnDetectionSummary settings={settings as never} />
-      <RealtimeTurnDetectionHelp settings={settings as never} />
+      <RealtimeTurnDetectionSummary settings={settings as never} update={() => {}} />
+      <RealtimeTurnDetectionHelp settings={settings as never} update={() => {}} />
       <RealtimeTurnDetectionControls
         settings={settings as never}
         update={(patch) => update(patch as Partial<CompatibleSettings>)}

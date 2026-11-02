@@ -19,11 +19,20 @@ import type { CompatibleConfig, TurnDetection } from './config';
 import type { CompatibleCredentials } from './settings';
 
 export { base64ToPcm } from '../../lib/contract/pcm64';
-export { decodeServerEvent, errorCode, type ServerEvent } from '../../lib/provider/openaiWire';
+export { decodeServerEvent, type ServerEvent } from '../../lib/provider/openaiWire';
 import type { OpenAIError } from '../../lib/provider/openaiWire';
 /** A server `error` in the endpoint's own words: `[the endpoint <code, else type>] <message>`. */
 export function errorWords(e: OpenAIError): string {
   return `[the endpoint ${e.code || e.type || 'error'}] ${e.message || 'the server reported an error'}`;
+}
+/** A server `error` as a notice code: the endpoint's codes for a bad key, a rate
+ * limit, a client's (our) request, and everything the endpoint itself reported. */
+export type ErrorCode = 'auth' | 'rate_limit' | 'client' | 'server';
+export function errorCode(e: OpenAIError): ErrorCode {
+  if (e.code === 'invalid_api_key' || e.code === 'permission_error') return 'auth';
+  if (e.code === 'rate_limit_exceeded') return 'rate_limit';
+  if (e.type === 'invalid_request_error') return 'client';
+  return 'server';
 }
 
 /**
@@ -157,5 +166,3 @@ export function unwrapTranslationText(text: string): string {
   }
   return trimmed;
 }
-
-export type ErrorCode = 'auth' | 'rate_limit' | 'client' | 'server' | 'segment_ended';

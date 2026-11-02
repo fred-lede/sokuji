@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, fireEvent, act } from '@testing-library/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -28,7 +28,7 @@ function props(patch: Partial<SettingsProps<CompatibleSettings>> = {}): Settings
     settings: COMPATIBLE_DEFAULTS,
     update: vi.fn(),
     pair: { source: 'en', target: 'zh-CN' },
-    account: { apiKey: 'sk-test' } as unknown as ProviderAccount,
+    account: { credentials: { apiKey: 'sk-test' }, auth: { signedIn: false, getToken: async () => null } } as unknown as ProviderAccount,
     ...patch,
   };
 }
@@ -89,7 +89,7 @@ describe('CompatibleSettingsView', () => {
     const p = props({
       update,
       settings: { ...COMPATIBLE_DEFAULTS, endpoint: 'https://host.com' },
-      account: { apiKey: 'sk-test' } as unknown as ProviderAccount,
+      account: { credentials: { apiKey: 'sk-test' }, auth: { signedIn: false, getToken: async () => null } } as unknown as ProviderAccount,
     });
     const { container, rerender } = render(<CompatibleSettingsView {...p} />);
 
