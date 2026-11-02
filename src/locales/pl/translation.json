@@ -585,7 +585,19 @@
       "name": "Nieznany",
       "description": "Nieznany dostawca"
     },
-    "poweredBy": "Napędzane przez <brand>{{name}}</brand>"
+    "poweredBy": "Napędzane przez <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Auto-przewijanie włączone",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Tłumaczenie, które słyszy druga strona, jest tylko tekstem: brak modelu mowy (język: {{target}}).",
     "participant_tts_missing": "Tłumaczenie, które słyszę, jest tylko tekstem: brak modelu mowy (język: {{target}}).",
     "participant_tts_over_budget": "Tłumaczenie, które słyszę, jest tylko tekstem: za mało pamięci, by wczytać także model mowy drugiej strony.",
-    "screen_context_lost": "Wybrany ekran nie jest już dostępny; tłumaczenie trwa dalej tylko na podstawie dźwięku."
+    "screen_context_lost": "Wybrany ekran nie jest już dostępny; tłumaczenie trwa dalej tylko na podstawie dźwięku.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Napisy Sokuji",

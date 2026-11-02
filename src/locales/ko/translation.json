@@ -585,7 +585,19 @@
       "name": "알 수 없음",
       "description": "알 수 없는 제공업체"
     },
-    "poweredBy": "<brand>{{name}}</brand> 제공"
+    "poweredBy": "<brand>{{name}}</brand> 제공",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "자동 스크롤 켜짐",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "상대방에게 들리는 번역은 텍스트로만 표시됩니다: {{target}}용 음성 모델이 없습니다.",
     "participant_tts_missing": "내가 듣는 번역은 텍스트로만 표시됩니다: {{target}}용 음성 모델이 없습니다.",
     "participant_tts_over_budget": "내가 듣는 번역은 텍스트로만 표시됩니다: 상대방 쪽 음성 모델까지 불러올 메모리가 부족합니다.",
-    "screen_context_lost": "선택한 화면을 더 이상 사용할 수 없습니다. 번역은 오디오만으로 계속됩니다."
+    "screen_context_lost": "선택한 화면을 더 이상 사용할 수 없습니다. 번역은 오디오만으로 계속됩니다.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji 자막",

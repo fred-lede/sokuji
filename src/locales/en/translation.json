@@ -585,7 +585,19 @@
       "name": "Unknown",
       "description": "Unknown provider"
     },
-    "poweredBy": "Powered by <brand>{{name}}</brand>"
+    "poweredBy": "Powered by <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Auto-scroll on",
@@ -1480,7 +1492,9 @@
     "speaker_tts_missing": "Translation the other side hears is text only: no speech model speaks {{target}}.",
     "participant_tts_missing": "Translation I hear is text only: no speech model speaks {{target}}.",
     "participant_tts_over_budget": "Translation I hear is text only: not enough memory to load the other side's speech model too.",
-    "screen_context_lost": "The screen you chose is no longer available; translation continues on audio alone."
+    "screen_context_lost": "The screen you chose is no longer available; translation continues on audio alone.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "captionShare": {
     "button": "Share captions",

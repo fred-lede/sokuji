@@ -585,7 +585,19 @@
       "name": "অজানা",
       "description": "অজানা প্রদানকারী"
     },
-    "poweredBy": "<brand>{{name}}</brand> দ্বারা চালিত"
+    "poweredBy": "<brand>{{name}}</brand> দ্বারা চালিত",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "অটো স্ক্রল চালু",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "অপর পক্ষ যে অনুবাদ শোনে তা শুধু লেখায় দেখানো হচ্ছে: কোনো বাক মডেল {{target}} বলতে পারে না।",
     "participant_tts_missing": "আমি যে অনুবাদ শুনি তা শুধু লেখায় দেখানো হচ্ছে: কোনো বাক মডেল {{target}} বলতে পারে না।",
     "participant_tts_over_budget": "আমি যে অনুবাদ শুনি তা শুধু লেখায় দেখানো হচ্ছে: অপর পক্ষের বাক মডেলও লোড করার মতো যথেষ্ট মেমরি নেই।",
-    "screen_context_lost": "আপনার বেছে নেওয়া স্ক্রিনটি আর পাওয়া যাচ্ছে না; অনুবাদ শুধু অডিও দিয়ে চলতে থাকবে।"
+    "screen_context_lost": "আপনার বেছে নেওয়া স্ক্রিনটি আর পাওয়া যাচ্ছে না; অনুবাদ শুধু অডিও দিয়ে চলতে থাকবে।",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji সাবটাইটেল",

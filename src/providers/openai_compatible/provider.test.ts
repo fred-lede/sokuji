@@ -75,8 +75,8 @@ describe('the OpenAI Compatible definition', () => {
 
   it('a stored openai_compatible selection stays on openai_compatible, fromStorage true', () => {
     for (const platform of ['electron', 'extension', 'web'] as const) {
-      const offered = presentProviders({ platform, dev: false, enabled: new Set(['openai_compatible']), kizuna: true, switchOn: () => false });
-      expect(selectionFromStored('openai_compatible', offered, 'kizunaai_soniox', platform), platform).toEqual({ id: 'openai_compatible', fromStorage: true });
+      const offered = presentProviders({ platform, dev: false, enabled: new Set(['openai_compatible']), kizuna: true, switchOn: () => false }).map((p) => p.id);
+      expect(selectionFromStored('openai_compatible', offered, 'kizunaai_soniox'), platform).toEqual({ id: 'openai_compatible', fromStorage: true });
     }
   });
 

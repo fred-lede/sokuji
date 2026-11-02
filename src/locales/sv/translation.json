@@ -585,7 +585,19 @@
       "name": "Okänd",
       "description": "Okänd leverantör"
     },
-    "poweredBy": "Drivs av <brand>{{name}}</brand>"
+    "poweredBy": "Drivs av <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Autoscroll på",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Översättning som motparten hör visas bara som text: ingen talmodell talar {{target}}.",
     "participant_tts_missing": "Översättning som jag hör visas bara som text: ingen talmodell talar {{target}}.",
     "participant_tts_over_budget": "Översättning som jag hör visas bara som text: inte tillräckligt med minne för att även läsa in motpartens talmodell.",
-    "screen_context_lost": "Skärmen du valde är inte längre tillgänglig; översättningen fortsätter med enbart ljud."
+    "screen_context_lost": "Skärmen du valde är inte längre tillgänglig; översättningen fortsätter med enbart ljud.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji-undertexter",

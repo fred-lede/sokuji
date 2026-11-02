@@ -585,7 +585,19 @@
       "name": "未知",
       "description": "未知提供商"
     },
-    "poweredBy": "<brand>{{name}}</brand> 驱动"
+    "poweredBy": "<brand>{{name}}</brand> 驱动",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "自动滚动 开",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "对方听到的翻译只显示文字：没有能说{{target}}的语音模型。",
     "participant_tts_missing": "我听到的翻译只显示文字：没有能说{{target}}的语音模型。",
     "participant_tts_over_budget": "我听到的翻译只显示文字：内存不够同时加载对方的语音模型。",
-    "screen_context_lost": "你选择的屏幕已不可用，翻译将仅凭音频继续。"
+    "screen_context_lost": "你选择的屏幕已不可用，翻译将仅凭音频继续。",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji 字幕",

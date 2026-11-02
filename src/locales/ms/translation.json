@@ -585,7 +585,19 @@
       "name": "Tidak Diketahui",
       "description": "Penyedia tidak diketahui"
     },
-    "poweredBy": "Dikuasakan oleh <brand>{{name}}</brand>"
+    "poweredBy": "Dikuasakan oleh <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Auto-skrol hidup",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Terjemahan yang didengar pihak lain hanya dalam bentuk teks: tiada model suara yang bertutur dalam {{target}}.",
     "participant_tts_missing": "Terjemahan yang saya dengar hanya dalam bentuk teks: tiada model suara yang bertutur dalam {{target}}.",
     "participant_tts_over_budget": "Terjemahan yang saya dengar hanya dalam bentuk teks: memori tidak mencukupi untuk memuatkan model suara pihak lain juga.",
-    "screen_context_lost": "Skrin yang anda pilih tidak lagi tersedia; terjemahan diteruskan dengan audio sahaja."
+    "screen_context_lost": "Skrin yang anda pilih tidak lagi tersedia; terjemahan diteruskan dengan audio sahaja.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sari kata Sokuji",

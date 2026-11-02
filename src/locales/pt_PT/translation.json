@@ -585,7 +585,19 @@
       "name": "Desconhecido",
       "description": "Fornecedor desconhecido"
     },
-    "poweredBy": "Com tecnologia <brand>{{name}}</brand>"
+    "poweredBy": "Com tecnologia <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Deslocamento automático ligado",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "A tradução que o outro lado ouve é apresentada apenas como texto: nenhum modelo de voz fala {{target}}.",
     "participant_tts_missing": "A tradução que eu ouço é apresentada apenas como texto: nenhum modelo de voz fala {{target}}.",
     "participant_tts_over_budget": "A tradução que eu ouço é apresentada apenas como texto: não há memória suficiente para carregar também o modelo de voz do outro lado.",
-    "screen_context_lost": "O ecrã que escolheu já não está disponível; a tradução continua apenas com o áudio."
+    "screen_context_lost": "O ecrã que escolheu já não está disponível; a tradução continua apenas com o áudio.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Legendas do Sokuji",

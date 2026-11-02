@@ -585,7 +585,19 @@
       "name": "ไม่ทราบ",
       "description": "ผู้ให้บริการที่ไม่ทราบ"
     },
-    "poweredBy": "ขับเคลื่อนโดย <brand>{{name}}</brand>"
+    "poweredBy": "ขับเคลื่อนโดย <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "เลื่อนอัตโนมัติเปิด",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "คำแปลที่อีกฝ่ายได้ยินแสดงเป็นข้อความเท่านั้น: ไม่มีโมเดลเสียงพูดที่พูด{{target}}ได้",
     "participant_tts_missing": "คำแปลที่ฉันได้ยินแสดงเป็นข้อความเท่านั้น: ไม่มีโมเดลเสียงพูดที่พูด{{target}}ได้",
     "participant_tts_over_budget": "คำแปลที่ฉันได้ยินแสดงเป็นข้อความเท่านั้น: หน่วยความจำไม่พอที่จะโหลดโมเดลเสียงพูดของอีกฝ่ายด้วย",
-    "screen_context_lost": "หน้าจอที่คุณเลือกไม่พร้อมใช้งานแล้ว การแปลจะดำเนินต่อด้วยเสียงเพียงอย่างเดียว"
+    "screen_context_lost": "หน้าจอที่คุณเลือกไม่พร้อมใช้งานแล้ว การแปลจะดำเนินต่อด้วยเสียงเพียงอย่างเดียว",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "คำบรรยาย Sokuji",

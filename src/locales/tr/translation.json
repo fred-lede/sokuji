@@ -585,7 +585,19 @@
       "name": "Bilinmeyen",
       "description": "Bilinmeyen sağlayıcı"
     },
-    "poweredBy": "<brand>{{name}}</brand> tarafından desteklenir"
+    "poweredBy": "<brand>{{name}}</brand> tarafından desteklenir",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Otomatik kaydırma açık",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Karşı tarafın duyduğu çeviri yalnızca metin: {{target}} konuşan bir ses modeli yok.",
     "participant_tts_missing": "Duyduğum çeviri yalnızca metin: {{target}} konuşan bir ses modeli yok.",
     "participant_tts_over_budget": "Duyduğum çeviri yalnızca metin: karşı tarafın ses modelini de yüklemeye yetecek bellek yok.",
-    "screen_context_lost": "Seçtiğiniz ekran artık kullanılamıyor; çeviri yalnızca sesle devam ediyor."
+    "screen_context_lost": "Seçtiğiniz ekran artık kullanılamıyor; çeviri yalnızca sesle devam ediyor.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji altyazıları",

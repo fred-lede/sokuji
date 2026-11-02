@@ -585,7 +585,19 @@
       "name": "தெரியாதது",
       "description": "தெரியாத வழங்குநர்"
     },
-    "poweredBy": "<brand>{{name}}</brand> மூலம் இயங்குகிறது"
+    "poweredBy": "<brand>{{name}}</brand> மூலம் இயங்குகிறது",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "தானியங்கு உருள் இயக்கத்தில்",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "எதிர்த்தரப்பு கேட்கும் மொழிபெயர்ப்பு உரையாக மட்டுமே காட்டப்படும்: {{target}} பேசும் குரல் மாடல் எதுவும் இல்லை.",
     "participant_tts_missing": "நான் கேட்கும் மொழிபெயர்ப்பு உரையாக மட்டுமே காட்டப்படும்: {{target}} பேசும் குரல் மாடல் எதுவும் இல்லை.",
     "participant_tts_over_budget": "நான் கேட்கும் மொழிபெயர்ப்பு உரையாக மட்டுமே காட்டப்படும்: எதிர்த்தரப்பின் குரல் மாடலையும் ஏற்ற போதுமான நினைவகம் இல்லை.",
-    "screen_context_lost": "நீங்கள் தேர்ந்தெடுத்த திரை இனி கிடைக்கவில்லை; மொழிபெயர்ப்பு ஆடியோவை மட்டும் கொண்டு தொடரும்."
+    "screen_context_lost": "நீங்கள் தேர்ந்தெடுத்த திரை இனி கிடைக்கவில்லை; மொழிபெயர்ப்பு ஆடியோவை மட்டும் கொண்டு தொடரும்.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji துணைத்தலைப்புகள்",

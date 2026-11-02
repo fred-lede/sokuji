@@ -585,7 +585,19 @@
       "name": "Неизвестно",
       "description": "Неизвестный провайдер"
     },
-    "poweredBy": "Работает на <brand>{{name}}</brand>"
+    "poweredBy": "Работает на <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Автопрокрутка включена",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Перевод, который слышит собеседник, показывается только текстом: нет модели синтеза речи для языка «{{target}}».",
     "participant_tts_missing": "Перевод, который слышу я, показывается только текстом: нет модели синтеза речи для языка «{{target}}».",
     "participant_tts_over_budget": "Перевод, который слышу я, показывается только текстом: не хватает памяти, чтобы загрузить ещё и модель синтеза речи собеседника.",
-    "screen_context_lost": "Выбранный экран больше недоступен; перевод продолжается только по звуку."
+    "screen_context_lost": "Выбранный экран больше недоступен; перевод продолжается только по звуку.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Субтитры Sokuji",

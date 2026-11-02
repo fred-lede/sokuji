@@ -585,7 +585,19 @@
       "name": "Desconocido",
       "description": "Proveedor desconocido"
     },
-    "poweredBy": "Con tecnología de <brand>{{name}}</brand>"
+    "poweredBy": "Con tecnología de <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Desplazamiento automático activado",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "La traducción que oye la otra parte se muestra solo como texto: ningún modelo de voz habla {{target}}.",
     "participant_tts_missing": "La traducción que yo oigo se muestra solo como texto: ningún modelo de voz habla {{target}}.",
     "participant_tts_over_budget": "La traducción que yo oigo se muestra solo como texto: no hay memoria suficiente para cargar también el modelo de voz de la otra parte.",
-    "screen_context_lost": "La pantalla que elegiste ya no está disponible; la traducción continúa solo con el audio."
+    "screen_context_lost": "La pantalla que elegiste ya no está disponible; la traducción continúa solo con el audio.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Subtítulos de Sokuji",

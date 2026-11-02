@@ -585,7 +585,19 @@
       "name": "نامشخص",
       "description": "ارائه‌دهنده نامشخص"
     },
-    "poweredBy": "قدرت‌گرفته از <brand>{{name}}</brand>"
+    "poweredBy": "قدرت‌گرفته از <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "اسکرول خودکار روشن",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "ترجمه‌ای که طرف مقابل می‌شنود فقط به‌صورت متن است: هیچ مدل گفتاری به زبان {{target}} صحبت نمی‌کند.",
     "participant_tts_missing": "ترجمه‌ای که من می‌شنوم فقط به‌صورت متن است: هیچ مدل گفتاری به زبان {{target}} صحبت نمی‌کند.",
     "participant_tts_over_budget": "ترجمه‌ای که من می‌شنوم فقط به‌صورت متن است: حافظه برای بارگذاری مدل گفتاری طرف مقابل هم کافی نیست.",
-    "screen_context_lost": "صفحه‌نمایشی که انتخاب کرده‌اید دیگر در دسترس نیست؛ ترجمه فقط با صدا ادامه می‌یابد."
+    "screen_context_lost": "صفحه‌نمایشی که انتخاب کرده‌اید دیگر در دسترس نیست؛ ترجمه فقط با صدا ادامه می‌یابد.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "زیرنویس Sokuji",

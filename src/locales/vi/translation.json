@@ -585,7 +585,19 @@
       "name": "Không rõ",
       "description": "Nhà cung cấp không rõ"
     },
-    "poweredBy": "Được hỗ trợ bởi <brand>{{name}}</brand>"
+    "poweredBy": "Được hỗ trợ bởi <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Tự động cuộn: Bật",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Bản dịch bên kia nghe chỉ hiển thị chữ: không có mô hình giọng nói nào nói được {{target}}.",
     "participant_tts_missing": "Bản dịch tôi nghe chỉ hiển thị chữ: không có mô hình giọng nói nào nói được {{target}}.",
     "participant_tts_over_budget": "Bản dịch tôi nghe chỉ hiển thị chữ: không đủ bộ nhớ để tải thêm mô hình giọng nói của bên kia.",
-    "screen_context_lost": "Màn hình bạn đã chọn không còn khả dụng; bản dịch tiếp tục chỉ bằng âm thanh."
+    "screen_context_lost": "Màn hình bạn đã chọn không còn khả dụng; bản dịch tiếp tục chỉ bằng âm thanh.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Phụ đề Sokuji",

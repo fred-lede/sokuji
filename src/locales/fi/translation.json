@@ -585,7 +585,19 @@
       "name": "Tuntematon",
       "description": "Tuntematon palveluntarjoaja"
     },
-    "poweredBy": "Moottorina <brand>{{name}}</brand>"
+    "poweredBy": "Moottorina <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "Automaattivieritys päällä",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "Käännös, jonka toinen osapuoli kuulee, näkyy vain tekstinä: mikään puhemalli ei puhu kieltä {{target}}.",
     "participant_tts_missing": "Käännös, jonka kuulen, näkyy vain tekstinä: mikään puhemalli ei puhu kieltä {{target}}.",
     "participant_tts_over_budget": "Käännös, jonka kuulen, näkyy vain tekstinä: muisti ei riitä lataamaan myös toisen osapuolen puhemallia.",
-    "screen_context_lost": "Valitsemasi näyttö ei ole enää käytettävissä; käännös jatkuu pelkällä äänellä."
+    "screen_context_lost": "Valitsemasi näyttö ei ole enää käytettävissä; käännös jatkuu pelkällä äänellä.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji-tekstitys",

@@ -585,7 +585,19 @@
       "name": "غير معروف",
       "description": "مقدم خدمة غير معروف"
     },
-    "poweredBy": "مدعوم من <brand>{{name}}</brand>"
+    "poweredBy": "مدعوم من <brand>{{name}}</brand>",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "التمرير التلقائي مفعل",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "الترجمة التي يسمعها الطرف الآخر نص فقط: لا يوجد نموذج صوتي يتحدث {{target}}.",
     "participant_tts_missing": "الترجمة التي أسمعها نص فقط: لا يوجد نموذج صوتي يتحدث {{target}}.",
     "participant_tts_over_budget": "الترجمة التي أسمعها نص فقط: الذاكرة لا تكفي لتحميل النموذج الصوتي للطرف الآخر أيضًا.",
-    "screen_context_lost": "الشاشة التي اخترتها لم تعد متاحة؛ تستمر الترجمة بالصوت وحده."
+    "screen_context_lost": "الشاشة التي اخترتها لم تعد متاحة؛ تستمر الترجمة بالصوت وحده.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "ترجمة Sokuji",

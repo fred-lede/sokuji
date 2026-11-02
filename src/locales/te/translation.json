@@ -585,7 +585,19 @@
       "name": "తెలియనిది",
       "description": "తెలియని ప్రదాత"
     },
-    "poweredBy": "<brand>{{name}}</brand> ద్వారా ఆధారితం"
+    "poweredBy": "<brand>{{name}}</brand> ద్వారా ఆధారితం",
+    "openai_compatible": {
+      "name": "OpenAI Compatible",
+      "description": "A custom OpenAI-compatible endpoint for realtime ASR, translation, and TTS",
+      "endpoint": "API Endpoint",
+      "endpointPlaceholder": "https://my-server.example.com",
+      "asrModel": "ASR Model",
+      "asrModelPlaceholder": "e.g. qwen3-asr",
+      "translateModel": "Translation Model",
+      "translateModelPlaceholder": "e.g. qwen3-translate",
+      "voice": "My Voice",
+      "participantVoice": "Other's Voice"
+    }
   },
   "logsPanel": {
     "autoScrollOn": "ఆటో-స్క్రోల్ ఆన్",
@@ -1468,7 +1480,9 @@
     "speaker_tts_missing": "అవతలి వైపు వినే అనువాదం వచనంగా మాత్రమే చూపబడుతుంది: {{target}} మాట్లాడే వాక్ మోడల్ ఏదీ లేదు.",
     "participant_tts_missing": "నేను వినే అనువాదం వచనంగా మాత్రమే చూపబడుతుంది: {{target}} మాట్లాడే వాక్ మోడల్ ఏదీ లేదు.",
     "participant_tts_over_budget": "నేను వినే అనువాదం వచనంగా మాత్రమే చూపబడుతుంది: అవతలి వైపు వాక్ మోడల్‌ను కూడా లోడ్ చేయడానికి తగినంత మెమరీ లేదు.",
-    "screen_context_lost": "మీరు ఎంచుకున్న స్క్రీన్ ఇకపై అందుబాటులో లేదు; అనువాదం ఆడియోతో మాత్రమే కొనసాగుతుంది."
+    "screen_context_lost": "మీరు ఎంచుకున్న స్క్రీన్ ఇకపై అందుబాటులో లేదు; అనువాదం ఆడియోతో మాత్రమే కొనసాగుతుంది.",
+    "model_not_listed": "The endpoint does not list this model.",
+    "endpoint_required": "Enter the endpoint URL."
   },
   "viewer": {
     "title": "Sokuji సబ్‌టైటిల్స్",
