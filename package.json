@@ -160,7 +160,7 @@
     "better-auth": "^1.6.13",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "electron": "44.5.1",
+    "electron": "^44.10.1",
     "electron-builder": "^26.16.1",
     "fake-indexeddb": "^6.2.5",
     "i18next": "^25.2.1",
