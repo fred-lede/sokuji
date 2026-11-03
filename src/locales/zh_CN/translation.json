@@ -332,7 +332,13 @@
     "voiceTheyHear": "对方听到的声音",
     "voiceIHear": "我听到的声音",
     "voiceIHearSame": "和对方听到的声音相同，朗读时改用 {{voice}}。",
-    "voiceCustom": "自定义声音"
+    "voiceCustom": "自定义声音",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint."
   },
   "simpleSettings": {
     "autoAuthenticated": "已通过您的账户自动认证",
@@ -505,6 +511,10 @@
     "openai": {
       "name": "OpenAI Realtime",
       "description": "通用 GPT Realtime 语音模型，可自由配置"
+    },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
     },
     "gemini": {
       "name": "Google Gemini",

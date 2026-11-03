@@ -332,7 +332,13 @@
     "voiceTheyHear": "Karşı tarafın duyduğu ses",
     "voiceIHear": "Duyduğum ses",
     "voiceIHearSame": "Karşı tarafın duyduğu sesle aynı, bu yüzden onun yerine {{voice}} okur.",
-    "voiceCustom": "Özel ses"
+    "voiceCustom": "Özel ses",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint."
   },
   "simpleSettings": {
     "autoAuthenticated": "Hesabınız üzerinden otomatik olarak doğrulandı",
@@ -505,6 +511,10 @@
     "openai": {
       "name": "OpenAI Realtime",
       "description": "Genel amaçlı GPT Realtime konuşma modeli, tamamen yapılandırılabilir"
+    },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
     },
     "gemini": {
       "name": "Google Gemini",

@@ -332,7 +332,13 @@
     "voiceTheyHear": "Stem die de ander hoort",
     "voiceIHear": "Stem die ik hoor",
     "voiceIHearSame": "Dezelfde stem als die de ander hoort, dus leest {{voice}} in plaats daarvan.",
-    "voiceCustom": "Aangepaste stem"
+    "voiceCustom": "Aangepaste stem",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint."
   },
   "simpleSettings": {
     "autoAuthenticated": "Automatisch geauthenticeerd via uw account",
@@ -506,6 +512,10 @@
       "name": "OpenAI Realtime",
       "description": "Algemeen GPT Realtime-spraakmodel, volledig instelbaar"
     },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
+    },
     "gemini": {
       "name": "Google Gemini",
       "description": "Google's AI technologie"
@@ -559,7 +569,7 @@
       "vocabularyTranslations": "Voorkeursvertalingen",
       "vocabularyTranslationsTooltip": "Beïnvloedt hoe specifieke termen worden vertaald — een voorkeur, geen gegarandeerde vervanging: namen met een gevestigde vertaling werken het best, terwijl gangbare woorden de eigen formulering van het model kunnen behouden. Items zijn eenrichtings; de omgekeerde richting bestaat alleen in de modus Beide, waar je een omgekeerde regel kunt toevoegen.",
       "vocabularyTranslationsPlaceholder": "Eén item bron=doel per regel",
-      "screenContext": "Scherm\u00adcontext",
+      "screenContext": "Scherm­context",
       "screenContextTooltip": "Laat het model één venster, tabblad of scherm zien dat je kiest, zodat de namen en termen erop worden herkend en vertaald zoals ze geschreven staan. Alles binnen dat gebied wordt als afbeeldingen verstuurd naar de Qwen-dienst van Alibaba Cloud, in de regio van deze sessie; Kizuna AI ontvangt ze nooit. Zolang het aan staat, komt er een bedrag bij op de kosten voor elke seconde spraak — op je Alibaba Cloud-rekening met je eigen sleutel, of volgens de prijspagina van je account met een Kizuna AI-account; in de modus Beide wordt de sessie van elke richting in rekening gebracht.",
       "screenContextPicked": "Het model ziet: {{name}}",
       "screenContextStill": "Beeld van het moment dat je het koos",

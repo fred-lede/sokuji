@@ -332,7 +332,13 @@
     "voiceTheyHear": "Suara yang didengar pihak lain",
     "voiceIHear": "Suara yang saya dengar",
     "voiceIHearSame": "Sama dengan suara yang didengar pihak lain, jadi {{voice}} yang membacakan.",
-    "voiceCustom": "Suara kustom"
+    "voiceCustom": "Suara kustom",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint."
   },
   "simpleSettings": {
     "autoAuthenticated": "Otomatis terautentikasi melalui akun Anda",
@@ -505,6 +511,10 @@
     "openai": {
       "name": "OpenAI Realtime",
       "description": "Model suara GPT Realtime serbaguna, dapat dikonfigurasi sepenuhnya"
+    },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
     },
     "gemini": {
       "name": "Google Gemini",

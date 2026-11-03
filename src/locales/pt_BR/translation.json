@@ -332,7 +332,13 @@
     "voiceTheyHear": "Voz que o outro lado ouve",
     "voiceIHear": "Voz que eu ouço",
     "voiceIHearSame": "É a mesma voz que o outro lado ouve, então {{voice}} lê no lugar dela.",
-    "voiceCustom": "Voz personalizada"
+    "voiceCustom": "Voz personalizada",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint."
   },
   "simpleSettings": {
     "autoAuthenticated": "Autenticado automaticamente através da sua conta",
@@ -505,6 +511,10 @@
     "openai": {
       "name": "OpenAI Realtime",
       "description": "Modelo de voz GPT Realtime de uso geral, totalmente configurável"
+    },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
     },
     "gemini": {
       "name": "Google Gemini",

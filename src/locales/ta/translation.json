@@ -332,7 +332,13 @@
     "voiceTheyHear": "எதிர்த்தரப்பு கேட்கும் குரல்",
     "voiceIHear": "நான் கேட்கும் குரல்",
     "voiceIHearSame": "எதிர்த்தரப்பு கேட்கும் குரலே இது, எனவே அதற்குப் பதிலாக {{voice}} வாசிக்கும்.",
-    "voiceCustom": "தனிப்பயன் குரல்"
+    "voiceCustom": "தனிப்பயன் குரல்",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint."
   },
   "simpleSettings": {
     "autoAuthenticated": "உங்கள் கணக்கு மூலம் தானாக அங்கீகரிக்கப்பட்டது",
@@ -505,6 +511,10 @@
     "openai": {
       "name": "OpenAI Realtime",
       "description": "பொதுப் பயன்பாட்டு GPT Realtime பேச்சு மாதிரி, முழுமையாக அமைக்கக்கூடியது"
+    },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
     },
     "gemini": {
       "name": "Google Gemini",

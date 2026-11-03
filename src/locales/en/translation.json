@@ -222,6 +222,12 @@
     },
     "translateInfoBanner": "This model stays silent when the speaker uses the same language as the target. Mixed-language speech may have gaps.",
     "translateModelNotAvailable": "API key works, but gpt-realtime-translate is not accessible with this key.",
+    "endpoint": "Endpoint",
+    "endpointTooltip": "The OpenAI-compatible API endpoint (e.g., https://api.example.com/v1). The path /v1 is added automatically if omitted.",
+    "asrModel": "ASR Model",
+    "asrModelTooltip": "The model ID for speech recognition (transcription). Must be available at the endpoint.",
+    "translateModel": "Translation Model",
+    "translateModelTooltip": "The model ID for translation. Must be available at the endpoint.",
     "participantSectionHeader": "Other's audio",
     "participantSectionDescriptionElectron": "Translate audio from any application playing on this system.",
     "participantSectionDescriptionExtension": "Translate audio from the active browser tab. The original audio plays through the default playback device you chose.",
@@ -505,6 +511,10 @@
     "openai": {
       "name": "OpenAI Realtime",
       "description": "General-purpose GPT Realtime speech model, fully configurable"
+    },
+    "openaiCompatible": {
+      "name": "OpenAI Compatible",
+      "description": "Any OpenAI-compatible endpoint with your own API key"
     },
     "gemini": {
       "name": "Google Gemini",
