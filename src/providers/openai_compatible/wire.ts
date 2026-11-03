@@ -52,9 +52,10 @@ export function compatibleSessionUpdate(c: CompatibleConfig): object {
   };
   if (c.maxTokens !== 'inf') session.max_output_tokens = c.maxTokens;
   if (c.voice) session.audio = { output: { voice: c.voice } };
-  if (c.turnDetection || c.asrModel || c.noiseReduction !== undefined) {
+  const hasAudioInput = c.turnDetection !== undefined || c.asrModel || c.noiseReduction !== undefined;
+  if (hasAudioInput) {
     const audioInput: Record<string, unknown> = {};
-    if (c.turnDetection) audioInput.turn_detection = turnDetectionOf(c.turnDetection);
+    if (c.turnDetection !== undefined) audioInput.turn_detection = turnDetectionOf(c.turnDetection);
     if (c.asrModel) audioInput.transcription = { model: c.asrModel };
     if (c.noiseReduction !== null && c.noiseReduction !== undefined) audioInput.noise_reduction = { type: c.noiseReduction };
     else if (c.noiseReduction === null) audioInput.noise_reduction = null;
@@ -131,4 +132,20 @@ export function unwrapTranslationText(text: string): string {
 export type ErrorCode = 'auth' | 'rate_limit' | 'client' | 'server' | 'segment_ended';
 
 /** Re-exports from openaiWire for convenience. */
-export { base64ToPcm, decodeServerEvent, errorCode, errorWords, type ServerEvent } from '../../lib/provider/openaiWire';
+export { base64ToPcm, decodeServerEvent, type ServerEvent } from '../../lib/provider/openaiWire';
+
+/** A server `error` as a notice code: the endpoint's codes for a bad key, a rate
+ * limit and an exhausted quota first, then an invalid request, else the
+ * service's. Also treats `session_expired` as `segment_ended`. */
+export function errorCode(e: { type?: string; code?: string | null }): ErrorCode {
+  if (e.code === 'invalid_api_key') return 'auth';
+  if (e.code === 'rate_limit_exceeded' || e.code === 'insufficient_quota') return 'rate_limit';
+  if (e.code === 'session_expired') return 'segment_ended';
+  if (e.type === 'invalid_request_error') return 'client';
+  return 'server';
+}
+
+/** A server `error` in the endpoint's own words: `[the endpoint <code, else type>] <message>`. */
+export function errorWords(e: { type?: string; code?: string | null; message?: string }): string {
+  return `[the endpoint ${e.code || e.type || 'error'}] ${e.message || 'the endpoint reported an error'}`;
+}

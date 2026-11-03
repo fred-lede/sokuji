@@ -60,10 +60,10 @@ describe('wire', () => {
       expect(update.session.audio.output).toBeUndefined();
     });
 
-    it('turnDetection: null → no turn_detection field', () => {
+    it('turnDetection: null → turn_detection: null', () => {
       const c: CompatibleConfig = { ...baseConfig, turnDetection: null, modalities: ['audio'] };
-      const update = compatibleSessionUpdate(c) as { session: { audio: { input: { turn_detection?: unknown } } } };
-      expect(update.session.audio.input.turn_detection).toBeUndefined();
+      const update = compatibleSessionUpdate(c) as { session: { audio: { input: { turn_detection: unknown } } } };
+      expect(update.session.audio.input.turn_detection).toBeNull();
     });
 
     it('turnDetection: server_vad → includes threshold, prefix_padding_ms, silence_duration_ms', () => {
