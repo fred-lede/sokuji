@@ -26,8 +26,8 @@ describe("OpenAI Compatible's settings", () => {
       endpoint: '',
       asrModel: '',
       translateModel: '',
-      voice: '',
-      participantVoice: '',
+      voice: 'alloy',
+      participantVoice: 'ash',
       turnDetectionMode: 'Normal',
       threshold: 0.49,
       prefixPadding: 0.5,
@@ -70,8 +70,8 @@ describe("OpenAI Compatible's settings", () => {
       noiseReduction: 'Far field',
       asrModel: '',
       translateModel: '',
-      voice: '',
-      participantVoice: '',
+      voice: 'alloy',
+      participantVoice: 'ash',
     });
   });
 

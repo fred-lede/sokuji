@@ -12,7 +12,9 @@ import { identityWire } from '../../lib/language/wire';
 import { INSTRUCTION_LEGACY_KEYS, INSTRUCTIONS_DEFAULTS, migrateInstructions, type InstructionsSettings } from '../../lib/provider/instructions';
 import type { CredentialsMissing, LanguageOption, MigrationInputs, ModelOption, Provider } from '../../lib/provider/types';
 import { distinctVoice } from '../../lib/provider/voices';
-import { REALTIME_LANGUAGES, REALTIME_THRESHOLD_RANGE, REALTIME_PREFIX_RANGE, REALTIME_SILENCE_RANGE, REALTIME_MAX_TOKENS_RANGE, TURN_DETECTION_MODES, SEMANTIC_EAGERNESSES, NOISE_REDUCTIONS, type TurnDetectionMode, type NoiseReduction, type SemanticEagerness } from '../openai/settings';
+import { REALTIME_LANGUAGES, REALTIME_VOICES, REALTIME_THRESHOLD_RANGE, REALTIME_PREFIX_RANGE, REALTIME_SILENCE_RANGE, REALTIME_MAX_TOKENS_RANGE, TURN_DETECTION_MODES, SEMANTIC_EAGERNESSES, NOISE_REDUCTIONS, realtimeLanguages, realtimeSpeakerVoice, realtimeParticipantVoice, realtimeLanguageName, REALTIME_DEFAULT_VOICE, REALTIME_PARTICIPANT_DEFAULT_VOICE, type TurnDetectionMode, type NoiseReduction, type SemanticEagerness } from '../openai/settings';
+
+export { REALTIME_VOICES, REALTIME_MAX_TOKENS_RANGE, NOISE_REDUCTIONS, TURN_DETECTION_MODES, SEMANTIC_EAGERNESSES, REALTIME_THRESHOLD_RANGE, REALTIME_PREFIX_RANGE, REALTIME_SILENCE_RANGE, realtimeLanguages, realtimeSpeakerVoice, realtimeParticipantVoice, realtimeLanguageName };
 
 /** The two model slots and the knobs shared with OpenAI Realtime, plus instructions. */
 export interface CompatibleSettings extends InstructionsSettings {
@@ -36,8 +38,8 @@ export const COMPATIBLE_DEFAULTS: CompatibleSettings = {
   endpoint: '',
   asrModel: '',
   translateModel: '',
-  voice: '',
-  participantVoice: '',
+  voice: REALTIME_DEFAULT_VOICE,
+  participantVoice: REALTIME_PARTICIPANT_DEFAULT_VOICE,
   turnDetectionMode: 'Normal',
   threshold: 0.49,
   prefixPadding: 0.5,
