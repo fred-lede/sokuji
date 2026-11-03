@@ -512,7 +512,7 @@
       "name": "OpenAI Realtime",
       "description": "பொதுப் பயன்பாட்டு GPT Realtime பேச்சு மாதிரி, முழுமையாக அமைக்கக்கூடியது"
     },
-    "openaiCompatible": {
+    "openai_compatible": {
       "name": "OpenAI Compatible",
       "description": "Any OpenAI-compatible endpoint with your own API key"
     },

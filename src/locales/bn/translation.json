@@ -512,7 +512,7 @@
       "name": "OpenAI Realtime",
       "description": "সাধারণ-উদ্দেশ্য GPT Realtime বাক মডেল, সম্পূর্ণ কনফিগারযোগ্য"
     },
-    "openaiCompatible": {
+    "openai_compatible": {
       "name": "OpenAI Compatible",
       "description": "Any OpenAI-compatible endpoint with your own API key"
     },

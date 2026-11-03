@@ -47,7 +47,7 @@ const noAuth = { signedIn: false, getToken: async () => null };
 describe('the OpenAI Compatible definition', () => {
   it('is OpenAI Compatible with your own key, on every platform, under its slice key, linking the setup guide', () => {
     expect(openaiCompatibleProvider).toMatchObject({
-      id: 'openaiCompatible',
+      id: 'openai_compatible',
       kind: 'own-key',
       platforms: ['electron', 'extension', 'web'],
       icon: OpenAICompatibleIcon,
@@ -73,10 +73,17 @@ describe('the OpenAI Compatible definition', () => {
     expect(openaiCompatibleProvider.turns(COMPATIBLE_DEFAULTS)).toEqual(['auto', 'manual']);
   });
 
-  it('sits after OpenAI Realtime and before nothing else (rulings 18, 1: OpenAI Compatible is unflagged and registered)', () => {
+  it('sits after OpenAI Live and before Soniox, unflagged and registered (rulings 18, 1)', () => {
     const ids = PROVIDERS.map((p) => p.id);
-    // Not registered yet (Task 8) - just check it's not registered
-    expect(ids).not.toContain('openaiCompatible');
+    expect(ids.indexOf('openai_compatible')).toBe(ids.indexOf('openai_live') + 1);
+    expect(ids.indexOf('openai_compatible')).toBe(ids.indexOf('soniox') - 1);
+  });
+
+  it('a stored openai_compatible selection stays on openai_compatible, fromStorage true (ruling 1, re-introduced 2026-11-03)', () => {
+    for (const platform of ['electron', 'extension', 'web'] as const) {
+      const offered = presentProviders({ platform, dev: false, enabled: new Set(), kizuna: true, switchOn: () => false }).map((p) => p.id);
+      expect(selectionFromStored('openai_compatible', offered, 'kizunaai_soniox'), platform).toEqual({ id: 'openai_compatible', fromStorage: true });
+    }
   });
 
   it("lets the participant speak when its switch is on, with Other's prompt and the user's own detection, and refuses Both for Auto-detect", () => {
@@ -119,7 +126,7 @@ describe('the OpenAI Compatible definition', () => {
     stored.set('settings.common.useTemplateMode', false);
     stored.set('settings.common.systemInstructions', 'Translate plainly.');
     await useProviderStore.getState().load(openaiCompatibleProvider);
-    const entry = useProviderStore.getState().entries.openaiCompatible;
+    const entry = useProviderStore.getState().entries.openai_compatible;
     expect(entry.settings as CompatibleSettings).toMatchObject({
       endpoint: 'https://my-endpoint.com', asrModel: 'whisper-1', translateModel: 'gpt-4o', voice: 'marin', participantVoice: 'coral',
       turnDetectionMode: 'Semantic', semanticEagerness: 'High', maxTokens: 2048, noiseReduction: 'Near field',
@@ -140,14 +147,14 @@ describe('the OpenAI Compatible definition', () => {
     store.setCredential(openaiCompatibleProvider, 'apiKey', 'sk-proj-readyKey0123');
     store.updateSettings(openaiCompatibleProvider, { endpoint: 'https://host', asrModel: 'qwen3-asr', translateModel: 'qwen3-translate' });
     await store.refreshReadiness(openaiCompatibleProvider, noAuth);
-    expect(useProviderStore.getState().readiness.openaiCompatible).toEqual({ state: 'ready', models: [] });
+    expect(useProviderStore.getState().readiness.openai_compatible).toEqual({ state: 'ready', models: [] });
     store.updateSettings(openaiCompatibleProvider, { threshold: 0.7 });
     store.updateSettings(openaiCompatibleProvider, { systemInstructions: 'A new prompt.' });
-    expect(useProviderStore.getState().readiness.openaiCompatible).toEqual({ state: 'ready', models: [] });
-    const entry = useProviderStore.getState().entries.openaiCompatible;
+    expect(useProviderStore.getState().readiness.openai_compatible).toEqual({ state: 'ready', models: [] });
+    const entry = useProviderStore.getState().entries.openai_compatible;
     await store.refreshReadiness(openaiCompatibleProvider, noAuth, { settings: entry.settings, credentials: entry.credentials, pair: entry.pair, legs: ['speaker'] });
     expect(fetch).toHaveBeenCalledTimes(1);
     store.setCredential(openaiCompatibleProvider, 'apiKey', 'sk-proj-otherKey0123');
-    expect(useProviderStore.getState().readiness.openaiCompatible).toEqual({ state: 'unknown' });
+    expect(useProviderStore.getState().readiness.openai_compatible).toEqual({ state: 'unknown' });
   });
 });

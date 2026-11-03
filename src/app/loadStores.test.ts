@@ -81,9 +81,20 @@ describe('loadSessionStores', () => {
     expect(setSetting).not.toHaveBeenCalledWith('settings.common.provider', expect.anything());
   });
 
-  it('falls back to the first offered provider when the stored one is not offered here, and never overwrites the stored value', async () => {
-    // OpenAI Compatible, retired (Stage 2 OpenAI Realtime, ruling 1): no build registers it.
+  it('selects a stored OpenAI Compatible selection, loads its entry, and never writes it back (re-introduced 2026-11-03)', async () => {
     stored.set('settings.common.provider', 'openai_compatible');
+    useSegmentationStore.setState({ refresh: vi.fn(async () => {}) });
+
+    await loadSessionStores();
+
+    expect(useProviderStore.getState().selected).toBe('openai_compatible');
+    expect(useProviderStore.getState().entries.openai_compatible).toBeDefined();
+    expect(setSetting).not.toHaveBeenCalledWith('settings.common.provider', expect.anything());
+  });
+
+  it('falls back to the first offered provider when the stored one is not offered here, and never overwrites the stored value', async () => {
+    // Local Native returns with Stage 2, so no build registers it.
+    stored.set('settings.common.provider', 'local_native');
     useSegmentationStore.setState({ refresh: vi.fn(async () => {}) });
 
     await loadSessionStores();

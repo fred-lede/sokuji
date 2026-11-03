@@ -71,10 +71,11 @@ describe('the OpenAI Live definition', () => {
     expect(openaiLiveProvider.turns(LIVE_DEFAULTS)).toEqual(['auto', 'manual']);
   });
 
-  it('sits after OpenAI Translate, before Soniox (ruling 9), and is offered on the desktop app and the extension, never on the web', () => {
+  it('sits after OpenAI Translate and before OpenAI Compatible, which sits before Soniox (ruling 9), and is offered on the desktop app and the extension, never on the web', () => {
     const ids = PROVIDERS.map((p) => p.id);
     expect(ids.indexOf('openai_live')).toBe(ids.indexOf('openai_translate') + 1);
-    expect(ids.indexOf('openai_live')).toBe(ids.indexOf('soniox') - 1);
+    expect(ids.indexOf('openai_compatible')).toBe(ids.indexOf('openai_live') + 1);
+    expect(ids.indexOf('openai_compatible')).toBe(ids.indexOf('soniox') - 1);
     expect(presentProviders(env('electron')).map((p) => p.id)).toContain('openai_live');
     expect(presentProviders(env('extension')).map((p) => p.id)).toContain('openai_live');
     expect(presentProviders(env('web')).map((p) => p.id)).not.toContain('openai_live');

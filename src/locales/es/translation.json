@@ -512,7 +512,7 @@
       "name": "OpenAI Realtime",
       "description": "Modelo de voz GPT Realtime de uso general, totalmente configurable"
     },
-    "openaiCompatible": {
+    "openai_compatible": {
       "name": "OpenAI Compatible",
       "description": "Any OpenAI-compatible endpoint with your own API key"
     },

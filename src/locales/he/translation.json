@@ -512,7 +512,7 @@
       "name": "OpenAI Realtime",
       "description": "מודל דיבור GPT Realtime לשימוש כללי, ניתן להגדרה מלאה"
     },
-    "openaiCompatible": {
+    "openai_compatible": {
       "name": "OpenAI Compatible",
       "description": "Any OpenAI-compatible endpoint with your own API key"
     },

@@ -512,7 +512,7 @@
       "name": "OpenAI Realtime",
       "description": "Yleiskäyttöinen GPT Realtime -puhemalli, täysin muokattavissa"
     },
-    "openaiCompatible": {
+    "openai_compatible": {
       "name": "OpenAI Compatible",
       "description": "Any OpenAI-compatible endpoint with your own API key"
     },

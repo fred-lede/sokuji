@@ -20,12 +20,13 @@ const adapter = createCompatibleAdapter();
 /**
  * OpenAI Compatible with the user's own key: a GPT Realtime-compatible endpoint
  * made a translator by its instructions, one WebSocket per leg, the only transport.
- * The old enum's id and slice (`openaiCompatible`), so a stored selection, the key,
- * the pair and every setting carry over. The key rides in a subprotocol a browser
- * sets itself, so it runs on every platform. Unflagged (ruling 18).
+ * The old enum's id (`openai_compatible`) and slice (`openaiCompatible`), so a
+ * stored selection, the key, the pair and every setting carry over. The key
+ * rides in a subprotocol a browser sets itself, so it runs on every platform.
+ * Unflagged (ruling 18).
  */
-export const openaiCompatibleProvider: Provider<CompatibleSettings, CompatibleCredentials, CompatibleConfig> & { id: 'openaiCompatible' } = {
-  id: 'openaiCompatible',
+export const openaiCompatibleProvider: Provider<CompatibleSettings, CompatibleCredentials, CompatibleConfig> & { id: 'openai_compatible' } = {
+  id: 'openai_compatible',
   kind: 'own-key',
   platforms: ['electron', 'extension', 'web'],
   icon: OpenAICompatibleIcon,

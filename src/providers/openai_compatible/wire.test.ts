@@ -27,6 +27,18 @@ describe('wire', () => {
     it('endpoint already normalized (no scheme stripping needed)', () => {
       expect(compatibleUrl({ ...baseConfig, endpoint: 'https://host', translateModel: 'm' })).toBe('wss://host/v1/realtime?model=m');
     });
+
+    it('http endpoint → ws:// (plain-HTTP server)', () => {
+      expect(compatibleUrl({ ...baseConfig, endpoint: 'http://122.116.209.1:8001', translateModel: 'm' })).toBe('ws://122.116.209.1:8001/v1/realtime?model=m');
+    });
+
+    it('bare host → wss://', () => {
+      expect(compatibleUrl({ ...baseConfig, endpoint: 'host', translateModel: '' })).toBe('wss://host/v1/realtime');
+    });
+
+    it('keeps a path prefix', () => {
+      expect(compatibleUrl({ ...baseConfig, endpoint: 'http://gw.example.com/openai', translateModel: 'm' })).toBe('ws://gw.example.com/openai/v1/realtime?model=m');
+    });
   });
 
   describe('compatibleProtocols', () => {

@@ -512,7 +512,7 @@
       "name": "OpenAI Realtime",
       "description": "సాధారణ-ప్రయోజన GPT Realtime వాక్ మోడల్, పూర్తిగా కాన్ఫిగర్ చేయదగినది"
     },
-    "openaiCompatible": {
+    "openai_compatible": {
       "name": "OpenAI Compatible",
       "description": "Any OpenAI-compatible endpoint with your own API key"
     },

@@ -67,10 +67,11 @@ describe('the OpenAI Translate definition', () => {
     expect(openaiTranslateProvider.turns(TRANSLATE_DEFAULTS)).toEqual(['auto', 'manual']);
   });
 
-  it('sits before Soniox (ruling 11), OpenAI Live between them (Stage 2 OpenAI Live, ruling 9)', () => {
+  it('sits before Soniox (ruling 11), OpenAI Live and OpenAI Compatible between them (Stage 2 OpenAI Live, ruling 9; OpenAI Compatible, spec 2026-11-03)', () => {
     const ids = PROVIDERS.map((p) => p.id);
     expect(ids.indexOf('openai_translate')).toBe(ids.indexOf('openai_live') - 1);
-    expect(ids.indexOf('openai_live')).toBe(ids.indexOf('soniox') - 1);
+    expect(ids.indexOf('openai_live')).toBe(ids.indexOf('openai_compatible') - 1);
+    expect(ids.indexOf('openai_compatible')).toBe(ids.indexOf('soniox') - 1);
   });
 
   it("lets the participant speak when its switch is on, into the pair's source (ruling 5), and a speaker on Text only not speak (ruling 4)", () => {

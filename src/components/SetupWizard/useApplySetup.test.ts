@@ -160,9 +160,8 @@ describe("useApplySetup's applyProvider (review Minor 4)", () => {
   it('throws before any write when the draft names a provider this build does not offer', async () => {
     const { result } = renderHook(() => useApplySetup());
 
-    // OpenAI Compatible, retired (Stage 2 OpenAI Realtime, ruling 1): no build offers it, and its id is
-    // only stored data now (Stage 2 deletion, ruling C1).
-    await expect(result.current(draft({ provider: 'openai_compatible' as ProviderType }))).rejects.toThrow(/This build does not offer/);
+    // Local Native returns with Stage 2: no build offers it, and its id is only stored data now.
+    await expect(result.current(draft({ provider: 'local_native' as ProviderType }))).rejects.toThrow(/This build does not offer/);
 
     expect(useProviderStore.getState().selected).toBeNull();
     expect(setSetting).not.toHaveBeenCalledWith('settings.common.provider', expect.anything());

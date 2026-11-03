@@ -17,13 +17,13 @@ import type {
   RealtimeSessionCreateRequest,
   ResponseCreateEvent,
 } from 'openai/resources/realtime/realtime';
-import { base64ToPcm, decodeServerEvent, errorCode, errorWords } from '../../lib/provider/openaiWire';
 
-/** Build the WebSocket URL: wss://<normalized-host>/v1/realtime?model=<translateModel>. */
+/** Build the WebSocket URL from the endpoint's scheme: ws:// for http://, wss:// for https:// (or a bare host). */
 export function compatibleUrl(c: CompatibleConfig): string {
+  const secure = !c.endpoint.startsWith('http://');
   const host = c.endpoint.replace(/^https?:\/\//, '');
   const model = c.translateModel ? `?model=${encodeURIComponent(c.translateModel)}` : '';
-  return `wss://${host}/v1/realtime${model}`;
+  return `${secure ? 'wss' : 'ws'}://${host}/v1/realtime${model}`;
 }
 
 /** Subprotocols: same as OpenAI Realtime. */
@@ -131,8 +131,9 @@ export function unwrapTranslationText(text: string): string {
 
 export type ErrorCode = 'auth' | 'rate_limit' | 'client' | 'server' | 'segment_ended';
 
-/** Re-exports from openaiWire for convenience. */
-export { base64ToPcm, decodeServerEvent, type ServerEvent } from '../../lib/provider/openaiWire';
+/** Re-exports for convenience: the shared PCM decoder and event reader. */
+export { base64ToPcm } from '../../lib/contract/pcm64';
+export { decodeServerEvent, type ServerEvent } from '../../lib/provider/openaiWire';
 
 /** A server `error` as a notice code: the endpoint's codes for a bad key, a rate
  * limit and an exhausted quota first, then an invalid request, else the
