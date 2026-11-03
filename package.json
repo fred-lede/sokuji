@@ -205,9 +205,9 @@
     "electron:dev": "vite",
     "electron:build": "npm run build && npm run make",
     "electron:start": "electron .",
-    "package": "npm run build && electron-forge package",
-    "make": "npm run build && electron-forge make",
-    "make:pkg": "npm run build && electron-builder --mac pkg --publish never -c.directories.output=out/make-mac",
+    "package": "npm run build:audio-host && npm run build && electron-forge package",
+    "make": "npm run build:audio-host && npm run build && electron-forge make",
+    "make:pkg": "npm run build:audio-host && npm run build && electron-builder --mac pkg --publish never -c.directories.output=out/make-mac",
     "postinstall": "electron-rebuild && bash scripts/copy-ort-wasm.sh",
     "extension:build": "cd extension && npx vite build",
     "extension:dev": "cd extension && npx vite build --watch --mode development",
@@ -249,9 +249,9 @@
     "fs-xattr@0.3.1": true,
     "fsevents@2.3.3": true,
     "macos-alias@0.2.12": true,
-    "electron-winstaller@5.4.4": true,
     "protobufjs@7.6.6": true,
     "protobufjs@7.6.5": true,
-    "protobufjs@8.7.1": true
+    "protobufjs@8.7.1": true,
+    "electron-winstaller@5.4.0": true
   }
 }
