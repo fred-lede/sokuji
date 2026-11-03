@@ -36,6 +36,25 @@ module.exports = {
     appId: 'ai.kizunaai.sokuji',
     executableName: 'sokuji',
     name: 'Sokuji',
+    // Local builds carry no certificate, so without this Forge leaves Electron's
+    // original ad-hoc signature broken: packaging rewrites Info.plist and adds
+    // resources/, and `codesign --verify` then says "invalid Info.plist". macOS
+    // refuses to prompt for TCC services on a bundle whose signature does not
+    // validate - askForMediaAccess('microphone') returns false with no dialog and
+    // getUserMedia fails with NotAllowedError. Sign ad-hoc here, with the same
+    // Hardened Runtime entitlements the release path uses (device.audio-input is
+    // the one that matters, #458), so a locally built .app can ask for the
+    // microphone. No certificate, no keychain.
+    osxSign: {
+      identity: '-',
+      identityValidation: false,
+      hardenedRuntime: true,
+      entitlements: 'electron/entitlements.mac.plist',
+      optionsForFile: () => ({
+        entitlements: 'electron/entitlements.mac.plist',
+        hardenedRuntime: true,
+      }),
+    },
     // Whitelist-based ignore: only include package.json, dist-electron/,
     // build/ (minus wasm/), and node_modules/ (pruned by Forge).
     // Everything else (src/, public/, model-packs/, extension/, etc.) is excluded.
