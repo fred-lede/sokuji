@@ -19,11 +19,14 @@ import type {
 } from 'openai/resources/realtime/realtime';
 
 /** Build the WebSocket URL from the endpoint's scheme: ws:// for http://, wss:// for https:// (or a bare host). */
-export function compatibleUrl(c: CompatibleConfig): string {
+export function compatibleUrl(c: CompatibleConfig, apiKey?: string): string {
   const secure = !c.endpoint.startsWith('http://');
   const host = c.endpoint.replace(/^https?:\/\//, '');
-  const model = c.translateModel ? `?model=${encodeURIComponent(c.translateModel)}` : '';
-  return `${secure ? 'wss' : 'ws'}://${host}/v1/realtime${model}`;
+  const params = new URLSearchParams();
+  if (c.translateModel) params.set('model', c.translateModel);
+  if (apiKey) params.set('api_key', apiKey);
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return `${secure ? 'wss' : 'ws'}://${host}/v1/realtime${query}`;
 }
 
 /** Subprotocols: same as OpenAI Realtime. */

@@ -68,6 +68,7 @@ module.exports = {
       // Allow runtime-essential top-level entries
       if (filePath === '/package.json') return false;
       if (filePath.startsWith('/dist-electron')) return false;
+      if (filePath.startsWith('/resources')) return false;
       if (filePath.startsWith('/node_modules')) {
         // Strip dev-only junk inside node_modules
         if (/\/((@testing-library|jest|eslint|babel)[^/]*|@parcel\/watcher)(\/|$)/.test(filePath)) return true;

@@ -130,7 +130,7 @@ class CompatibleLeg implements AdapterSession {
         queued: (asked, waiting) => this.frame('out', 'response.queued', { for: asked.kind, waiting }),
       },
     });
-    const url = compatibleUrl(config);
+    const url = compatibleUrl(config, request.credentials.apiKey);
     const protocols = compatibleProtocols(request.credentials);
     try {
       this.socket = openSocket(url, protocols);
