@@ -214,12 +214,14 @@ describe('the OpenAI Compatible adapter: opening', () => {
   it("a start that fails before the socket is asked for rejects with that failure as it was thrown, never in the browser's words", async () => {
     const sockets = fakeSockets();
     const { events, log } = recordEvents();
-    // A lone surrogate: `encodeURIComponent` refuses it, so the URL cannot be built.
+    // An endpoint that is not a string: the URL cannot be built. A model name
+    // cannot do it any more — `URLSearchParams` takes a lone surrogate as
+    // U+FFFD rather than refusing it.
     const error = await createCompatibleAdapter({ openSocket: sockets.create }).start(
-      { context: AUTO_CTX, config: { ...configFor(), translateModel: '\uD800' }, credentials: KEY, clock: createVirtualClock(0), signal: new AbortController().signal },
+      { context: AUTO_CTX, config: { ...configFor(), endpoint: 42 as unknown as string }, credentials: KEY, clock: createVirtualClock(0), signal: new AbortController().signal },
       events,
     ).then(() => null, (e: unknown) => e);
-    expect(error).toBeInstanceOf(URIError);
+    expect(error).toBeInstanceOf(TypeError);
     expect(error).not.toBeInstanceOf(AdapterStartError);
     expect(sockets.all).toEqual([]);
     expect(log).toEqual([]);
