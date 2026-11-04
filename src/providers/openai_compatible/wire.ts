@@ -18,13 +18,18 @@ import type {
   ResponseCreateEvent,
 } from 'openai/resources/realtime/realtime';
 
-/** Build the WebSocket URL from the endpoint's scheme: ws:// for http://, wss:// for https:// (or a bare host). */
-export function compatibleUrl(c: CompatibleConfig, apiKey?: string): string {
+/**
+ * Build the WebSocket URL from the endpoint's scheme: ws:// for http://, wss:// for https:// (or a bare host).
+ *
+ * The API key does not go here. It travels in the `openai-insecure-api-key`
+ * subprotocol, which keeps it out of the URL that proxy and access logs
+ * record.
+ */
+export function compatibleUrl(c: CompatibleConfig): string {
   const secure = !c.endpoint.startsWith('http://');
   const host = c.endpoint.replace(/^https?:\/\//, '');
   const params = new URLSearchParams();
   if (c.translateModel) params.set('model', c.translateModel);
-  if (apiKey) params.set('api_key', apiKey);
   const query = params.toString() ? `?${params.toString()}` : '';
   return `${secure ? 'wss' : 'ws'}://${host}/v1/realtime${query}`;
 }

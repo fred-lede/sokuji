@@ -72,10 +72,13 @@ describe('the OpenAI Compatible adapter: conformance', () => {
 });
 
 describe('the OpenAI Compatible adapter: opening', () => {
-  it('dials the endpoint with the model and api_key in its query and the key in a subprotocol, reads binary frames as ArrayBuffers, and sends nothing until the session exists', () => {
+  it('dials the endpoint with the model in its query and the key only in a subprotocol, reads binary frames as ArrayBuffers, and sends nothing until the session exists', () => {
     const h = startCompatible();
-    expect(h.socket().url).toBe(compatibleUrl(h.config, KEY.apiKey));
+    expect(h.socket().url).toBe(compatibleUrl(h.config));
+    expect(h.socket().url).not.toContain(KEY.apiKey);
+    expect(h.socket().url).not.toContain('api_key');
     expect(h.socket().protocols).toEqual(compatibleProtocols(KEY));
+    expect(h.socket().protocols).toContain(`openai-insecure-api-key.${KEY.apiKey}`);
     expect(h.socket().binaryType).toBe('arraybuffer');
     h.socket().open('realtime');
     expect(h.sent()).toEqual([]);

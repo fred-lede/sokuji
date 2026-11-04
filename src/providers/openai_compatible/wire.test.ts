@@ -29,8 +29,11 @@ describe('wire', () => {
         .toBe('wss://host/v1/realtime?model=qwen+3%2Ftranslate');
     });
 
-    it('with model and apiKey → wss://host/v1/realtime?model=...&api_key=...', () => {
-      expect(compatibleUrl({ ...baseConfig, endpoint: 'https://host', translateModel: 'qwen3-translate' }, 'sk-abc')).toBe('wss://host/v1/realtime?model=qwen3-translate&api_key=sk-abc');
+    it('never carries the API key in the URL', () => {
+      const url = compatibleUrl({ ...baseConfig, endpoint: 'https://host', translateModel: 'qwen3-translate' });
+      expect(url).toBe('wss://host/v1/realtime?model=qwen3-translate');
+      expect(url).not.toContain('api_key');
+      expect(url).not.toContain('sk-');
     });
 
     it('endpoint already normalized (no scheme stripping needed)', () => {
@@ -41,8 +44,10 @@ describe('wire', () => {
       expect(compatibleUrl({ ...baseConfig, endpoint: 'http://122.116.209.1:8001', translateModel: 'm' })).toBe('ws://122.116.209.1:8001/v1/realtime?model=m');
     });
 
-    it('http endpoint with apiKey → ws://...?model=...&api_key=...', () => {
-      expect(compatibleUrl({ ...baseConfig, endpoint: 'http://122.116.209.1:8001', translateModel: 'm' }, 'sk-xyz')).toBe('ws://122.116.209.1:8001/v1/realtime?model=m&api_key=sk-xyz');
+    it('keeps a key out of the query for a plain-HTTP endpoint too', () => {
+      const url = compatibleUrl({ ...baseConfig, endpoint: 'http://122.116.209.1:8001', translateModel: 'm' });
+      expect(url).toBe('ws://122.116.209.1:8001/v1/realtime?model=m');
+      expect(url).not.toContain('api_key');
     });
 
     it('bare host → wss://', () => {
