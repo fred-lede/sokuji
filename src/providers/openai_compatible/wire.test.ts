@@ -16,12 +16,16 @@ const baseConfig: CompatibleConfig = {
 
 describe('wire', () => {
   describe('compatibleUrl', () => {
-    it('no model → wss://host/v1/realtime', () => {
+    it('no model, no apiKey → wss://host/v1/realtime', () => {
       expect(compatibleUrl({ ...baseConfig, endpoint: 'https://host', translateModel: '' })).toBe('wss://host/v1/realtime');
     });
 
-    it('with model → wss://host/v1/realtime?model=...', () => {
+    it('with model, no apiKey → wss://host/v1/realtime?model=...', () => {
       expect(compatibleUrl({ ...baseConfig, endpoint: 'https://host', translateModel: 'qwen3-translate' })).toBe('wss://host/v1/realtime?model=qwen3-translate');
+    });
+
+    it('with model and apiKey → wss://host/v1/realtime?model=...&api_key=...', () => {
+      expect(compatibleUrl({ ...baseConfig, endpoint: 'https://host', translateModel: 'qwen3-translate' }, 'sk-abc')).toBe('wss://host/v1/realtime?model=qwen3-translate&api_key=sk-abc');
     });
 
     it('endpoint already normalized (no scheme stripping needed)', () => {
@@ -30,6 +34,10 @@ describe('wire', () => {
 
     it('http endpoint → ws:// (plain-HTTP server)', () => {
       expect(compatibleUrl({ ...baseConfig, endpoint: 'http://122.116.209.1:8001', translateModel: 'm' })).toBe('ws://122.116.209.1:8001/v1/realtime?model=m');
+    });
+
+    it('http endpoint with apiKey → ws://...?model=...&api_key=...', () => {
+      expect(compatibleUrl({ ...baseConfig, endpoint: 'http://122.116.209.1:8001', translateModel: 'm' }, 'sk-xyz')).toBe('ws://122.116.209.1:8001/v1/realtime?model=m&api_key=sk-xyz');
     });
 
     it('bare host → wss://', () => {
