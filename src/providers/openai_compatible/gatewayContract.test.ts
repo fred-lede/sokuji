@@ -90,6 +90,24 @@ function speakTurn(session: { beginTurn(): void; appendAudio(pcm: Int16Array): v
 }
 
 /**
+ * One spoken turn under automatic turns: a loud burst and then the quiet
+ * that ends it.
+ *
+ * A voice detector answers to sound, not to silence: it has to hear
+ * something before the quiet after it means anything. So the turn carries
+ * a tone — loud enough to be speech, quiet enough to end it.
+ */
+function speakLoudTurn(session: { appendAudio(pcm: Int16Array): void }) {
+  const loud = new Int16Array(4_800);
+  for (let i = 0; i < loud.length; i += 1) {
+    loud[i] = Math.round(Math.sin((i / 48) * 2 * Math.PI) * 8_000);
+  }
+  session.appendAudio(loud);
+  // A second of quiet, so a detector that waits for it has it.
+  session.appendAudio(new Int16Array(24_000));
+}
+
+/**
  * The gateway under test: sokuji's own socket, the live endpoint. The
  * adapter is the real one — no mock stands between them.
  */
@@ -137,7 +155,7 @@ describe.skipIf(!live)('a live OpenAI Compatible gateway', () => {
     const seen = collector();
     const { session } = await liveLeg(AUTO_CTX, seen.events);
     try {
-      speakTurn(session);
+      speakLoudTurn(session);
       // Under automatic turns the client asks for nothing: the endpoint has
       // to detect the end of the turn and begin the response itself.
       await waitFor(

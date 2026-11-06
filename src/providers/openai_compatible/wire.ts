@@ -18,7 +18,10 @@ import type {
   ResponseCreateEvent,
 } from 'openai/resources/realtime/realtime';
 
-/** Build the WebSocket URL from the endpoint's scheme: ws:// for http://, wss:// for https:// (or a bare host). */
+/**
+ * Build the WebSocket URL from the endpoint's scheme: ws:// for http://, wss:// for https:// (or a bare host).
+ * The API key is appended as `api_key` query parameter (required by some OpenAI-compatible endpoints).
+ */
 export function compatibleUrl(c: CompatibleConfig, apiKey?: string): string {
   const secure = !c.endpoint.startsWith('http://');
   const host = c.endpoint.replace(/^https?:\/\//, '');
