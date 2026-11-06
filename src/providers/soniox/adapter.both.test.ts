@@ -25,7 +25,7 @@ const CLONE = '7c1d2e3f-0000-4000-8000-00000000c10e';
 /** The app's rule (`shared.ts`): the participant's direction is the pair's reverse. */
 const BOTH_SHARED: SharedSettings = { ...SHARED, reversed: (direction) => direction.source === 'ja' };
 
-function both(o: { sharedBoth?: boolean; participantSpeaks?: boolean; abortFirst?: boolean; faceToFace?: boolean; speakerSource?: string; settings?: Partial<SonioxSettings> } = {}) {
+function both(o: { sharedBoth?: boolean; participantSpeaks?: boolean; abortFirst?: boolean; faceToFace?: boolean; speaks?: boolean; speakerSource?: string; settings?: Partial<SonioxSettings> } = {}) {
   const sockets = fakeSockets();
   const { clock, timers } = trackedClock();
   const controller = new AbortController();
@@ -36,7 +36,7 @@ function both(o: { sharedBoth?: boolean; participantSpeaks?: boolean; abortFirst
     participant: { direction: { source: 'ja', target: o.speakerSource ?? 'en' }, speech: o.participantSpeaks ?? false, turns: 'auto' },
   };
   const rec = { speaker: recordEvents(), participant: recordEvents() };
-  const shared = o.faceToFace ? { ...BOTH_SHARED, faceToFace: true } : BOTH_SHARED;
+  const shared = { ...BOTH_SHARED, ...(o.faceToFace ? { faceToFace: true } : {}), ...(o.speaks ? { speaks: true } : {}) };
   const request = (leg: LegName, credentials: SonioxCredentials): StartRequest<SonioxConfig, SonioxCredentials> =>
     ({ context: contexts[leg], config: buildSoniox(contexts[leg], s, shared), credentials, clock, signal: controller.signal });
   const starting = createSonioxAdapter({ openSocket: sockets.create }).startBoth(
@@ -167,6 +167,34 @@ describe('Soniox startBoth: split', () => {
   });
 });
 
+describe('Soniox startBoth: agent text (spec 2026-11-05 §4.3)', () => {
+  it('split: no socket asks for agent text even when the run speaks, the participant speaking alone included (measured 2026-11-05)', async () => {
+    const h = both({ sharedBoth: false, participantSpeaks: true, speaks: true });
+    h.openAll(); await h.starting;
+    expect(h.sttSockets()).toHaveLength(2);
+    for (const s of h.sttSockets()) expect(s.sentJson<Json>()[0]).not.toHaveProperty('enable_agent_text_input');
+  });
+  it('shared and face-to-face: the one socket asks', async () => {
+    for (const o of [{ speaks: true }, { faceToFace: true, speaks: true }]) {
+      const h = both(o);
+      h.openAll(); await h.starting;
+      expect(h.sttSockets()).toHaveLength(1);
+      expect(h.sttSockets()[0].sentJson<Json>()[0]).toMatchObject({ enable_agent_text_input: true });
+    }
+  });
+  it('without shared.speaks no socket asks', async () => {
+    const h = both({ sharedBoth: false });
+    h.openAll(); await h.starting;
+    for (const s of h.sttSockets()) expect(s.sentJson<Json>()[0]).not.toHaveProperty('enable_agent_text_input');
+  });
+  it('shared, with the setting off: the one socket does not ask, though the run speaks', async () => {
+    const h = both({ speaks: true, settings: { agentText: false } });
+    h.openAll(); await h.starting;
+    expect(h.sttSockets()).toHaveLength(1);
+    expect(h.sttSockets()[0].sentJson<Json>()[0]).not.toHaveProperty('enable_agent_text_input');
+  });
+});
+
 describe('Soniox startBoth: shared', () => {
   it("shared: the participant speaks in its own voice, never the speaker's", async () => {
     const h = await live({ participantSpeaks: true });
@@ -259,7 +287,7 @@ describe('Soniox startBoth: shared', () => {
   it("shared: the speaker's leg carries no person label, the participant's keeps its people", async () => {
     const h = await live();
     const stt = h.sttSockets()[0];
-    // Two labels on my leg (a misattribution, or a resume's new epoch) would number me as two people.
+    // Two labels on my leg (a misattribution, or a reconnect's new epoch) would number me as two people.
     stt.receive(msg({ ...orig('Hello.'), language: 'en', speaker: '1' }, tr('こんにちは。'), END));
     stt.receive(msg({ ...orig('Konnichiwa.'), language: 'ja', speaker: '2' }, tr('Hello.', 'en'), END));
     stt.receive(msg({ ...orig('Again.'), language: 'en', speaker: '3' }, tr('また。'), END));
@@ -365,7 +393,8 @@ describe('Soniox startBoth: shared', () => {
 
   it('shared: a socket failure fails both legs', async () => {
     const h = await live();
-    h.sttSockets()[0].serverClose(1011);
+    // A close the table ends (spec 2026-11-05 reconnect §4.1): a 1011 would reconnect.
+    h.sttSockets()[0].serverClose(1008);
     await flush();
     for (const leg of ['speaker', 'participant'] as const) {
       expect(h.of(leg, 'failed')).toHaveLength(1);
@@ -373,7 +402,7 @@ describe('Soniox startBoth: shared', () => {
     }
   });
 
-  it('shared: a resume shows both legs reconnecting, then reconnected, and forgets the speaker labels', async () => {
+  it('shared: a reconnect shows both legs reconnecting, then reconnected, and forgets the speaker labels', async () => {
     const h = await live();
     establishTwoAsParticipant(h);
     h.sttSockets()[0].receive(ERROR_503);
@@ -397,7 +426,7 @@ describe('Soniox startBoth: shared', () => {
     first.receive(ERROR_503);
     first.serverClose(1011);
     await flush();
-    // Down: the resume's first attempt is still connecting. A second of the
+    // Down: the reconnect's first attempt is still connecting. A second of the
     // speaker's voice mixes into frames that nothing sends or records.
     const resumed = h.sttSockets()[1];
     expect(resumed.readyState).toBe(FakeSocket.CONNECTING);
@@ -414,6 +443,25 @@ describe('Soniox startBoth: shared', () => {
     resumed.receive(msg({ ...bare, start_ms: 0, end_ms: 900 }));
     expect(opened(h, 'participant')).toEqual([1]);
     expect(opened(h, 'speaker')).toEqual([]);
+  });
+
+  it("shared: audio that comes during the gap is dropped, not queued for the new socket, even before the mixer's next tick (§4.3)", async () => {
+    const h = await live();
+    const [first] = h.sttSockets();
+    first.serverClose(1011);
+    await flush();
+    const resumed = h.sttSockets()[1];
+    expect(resumed.readyState).toBe(FakeSocket.CONNECTING);
+    // No tick passes: a mixer that queued this would send it on the next socket.
+    h.sessions.speaker.appendAudio(level(4000));
+    h.sessions.participant.appendAudio(level(4000));
+    h.openAll();
+    await flush();
+    expect(h.kinds('speaker')).toContain('reconnected');
+    h.clock.advance(100);
+    const frames = resumed.sent.filter((d): d is Int16Array => d instanceof Int16Array);
+    expect(frames).toHaveLength(1);
+    expect(frames[0].every((v) => v === 0)).toBe(true);
   });
 
   it("shared: only the speaker's endTurn finalizes, on the shared socket", async () => {

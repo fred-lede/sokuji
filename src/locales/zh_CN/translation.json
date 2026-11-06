@@ -348,6 +348,9 @@
       "mirrorHear": "对方说 {{their}} → 我听到 {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "面对面对话始终使用同一个共享会话：两个人对着同一个麦克风说话。",
+    "sonioxAgentText": "利用朗读的文字改进语音识别",
+    "sonioxAgentTextTooltip": "把即将朗读的内容告诉语音识别服务，这样它能更准确地识别回答，并且在扬声器的声音传进麦克风时，不把朗读的内容写进转录文本。在本机播放语音时，会产生少量费用。",
+    "sonioxAgentTextSplitBoth": "在每个方向各用一个独立会话的双向模式下关闭：此时它没能阻止朗读的译音混入语音识别，反而让朗读时同时说话的人更难被识别。你的设置会保留。",
     "sonioxSpeakerLabels": "说话人标签",
     "sonioxSpeakerLabelsTooltip": "为对方的人编号（说话人 1、说话人 2…），听到不止一个声音时显示。\n\n可能会把一个人误认成几个人。禁用：不显示编号。\n\n将在下次会话生效。",
     "voiceTheyHear": "对方听到的声音",
@@ -800,7 +803,8 @@
     "error": "连接错误",
     "noApiKey": "需要API密钥",
     "noMic": "需要麦克风",
-    "reconnecting": "重新连接中..."
+    "reconnecting": "重新连接中...",
+    "reconnectingAttempt": "重新连接中... (第 {{attempt}} 次尝试，{{seconds}} 秒)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "无法加载配额信息",
@@ -1466,6 +1470,7 @@
     "leg_closed": "提供商已结束会话。",
     "source_ended": "音频来源已消失（已拔出、关闭或停止）。",
     "still_stopping": "上一个会话仍在停止中，请稍后再试。",
+    "connection_restored": "连接已中断并已恢复",
     "session_in_use": "另一个窗口或设备正在使用此账户。请在那里停止会话；如果 Sokuji 刚刚意外关闭，请 1 分钟后重试。",
     "previous_session_ending": "您的上一个会话仍在结束中。请 1 分钟后重试。",
     "app_capture_lost_using_system_audio": "应用采集已停止，现在改为翻译整个系统的声音。",

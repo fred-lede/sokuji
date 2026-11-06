@@ -348,6 +348,9 @@
       "mirrorHear": "Ils parlent {{their}} → j'entends {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "Le face à face utilise toujours une session partagée : les deux personnes parlent dans le même micro.",
+    "sonioxAgentText": "Utiliser le texte lu à voix haute pour améliorer la reconnaissance vocale",
+    "sonioxAgentTextTooltip": "Indique au service de reconnaissance vocale ce qui va être lu à voix haute, pour qu'il reconnaisse mieux les réponses et laisse le texte lu à voix haute hors de la transcription si le son de vos haut-parleurs atteint le micro. Quand la voix est diffusée sur cet ordinateur, cela ajoute un léger coût.",
+    "sonioxAgentTextSplitBoth": "Désactivé en mode bidirectionnel avec une session distincte par direction : la traduction lue à voix haute n’y était pas exclue de la reconnaissance vocale, et il devenait plus difficile de reconnaître quelqu’un qui parle par-dessus. Votre réglage est conservé.",
     "sonioxSpeakerLabels": "Étiquettes d'intervenant",
     "sonioxSpeakerLabelsTooltip": "Numérote les personnes de l'autre côté — Intervenant 1, Intervenant 2… — dès que plus d'une voix est entendue.\n\nIl peut prendre une seule personne pour plusieurs. Désactivé : aucun numéro n'est affiché.\n\nS'applique à partir de la prochaine session.",
     "voiceTheyHear": "Voix entendue par l'autre",
@@ -800,7 +803,8 @@
     "error": "Erreur de Connexion",
     "noApiKey": "Clé API Requise",
     "noMic": "Microphone Requis",
-    "reconnecting": "Reconnexion..."
+    "reconnecting": "Reconnexion...",
+    "reconnectingAttempt": "Reconnexion... (tentative {{attempt}}, {{seconds}} s)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Impossible de charger les informations de quota",
@@ -1466,6 +1470,7 @@
     "leg_closed": "Le fournisseur a mis fin à la session.",
     "source_ended": "La source audio a disparu (débranchée, fermée ou arrêtée).",
     "still_stopping": "La dernière session est encore en cours d'arrêt ; réessayez dans un instant.",
+    "connection_restored": "Connexion interrompue puis rétablie",
     "session_in_use": "Une autre fenêtre ou un autre appareil utilise ce compte. Arrêtez-y la session, ou si Sokuji vient de se fermer de manière inattendue, réessayez dans une minute.",
     "previous_session_ending": "Votre session précédente est encore en train de se terminer. Veuillez réessayer dans une minute.",
     "app_capture_lost_using_system_audio": "La capture de l'application s'est arrêtée ; tout l'audio du système est donc traduit à la place.",

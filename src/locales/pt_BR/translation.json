@@ -348,6 +348,9 @@
       "mirrorHear": "Eles falam {{their}} → eu ouço {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "O cara a cara sempre usa uma sessão compartilhada: as duas pessoas falam no mesmo microfone.",
+    "sonioxAgentText": "Usar o texto lido em voz alta para melhorar o reconhecimento de fala",
+    "sonioxAgentTextTooltip": "Informa ao serviço de reconhecimento de fala o que está prestes a ser lido em voz alta, para que ele reconheça melhor as respostas e deixe o que é lido em voz alta fora da transcrição se o som dos seus alto-falantes chegar ao microfone. Quando a fala é reproduzida neste computador, isso gera uma pequena cobrança.",
+    "sonioxAgentTextSplitBoth": "Desativado no modo bidirecional com uma sessão separada por direção: ali não mantinha a tradução lida em voz alta fora do reconhecimento de fala e dificultava reconhecer alguém falando por cima. Sua configuração é mantida.",
     "sonioxSpeakerLabels": "Rótulos de falante",
     "sonioxSpeakerLabelsTooltip": "Numera as pessoas do outro lado — Falante 1, Falante 2… — assim que mais de uma voz é ouvida.\n\nPode confundir uma pessoa com várias. Desabilitado: nenhum número é exibido.\n\nAplica-se a partir da próxima sessão.",
     "voiceTheyHear": "Voz que o outro lado ouve",
@@ -800,7 +803,8 @@
     "error": "Erro de Conexão",
     "noApiKey": "Chave da API Necessária",
     "noMic": "Microfone Necessário",
-    "reconnecting": "Reconectando..."
+    "reconnecting": "Reconectando...",
+    "reconnectingAttempt": "Reconectando... (tentativa {{attempt}}, {{seconds}} s)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Não foi possível carregar as informações de cota",
@@ -1466,6 +1470,7 @@
     "leg_closed": "O provedor encerrou a sessão.",
     "source_ended": "A fonte de áudio desapareceu (desconectada, fechada ou interrompida).",
     "still_stopping": "A última sessão ainda está sendo encerrada; tente novamente em instantes.",
+    "connection_restored": "A conexão foi interrompida e restabelecida",
     "session_in_use": "Outra janela ou outro dispositivo está usando esta conta. Encerre a sessão lá ou, se o Sokuji acabou de fechar inesperadamente, tente novamente em um minuto.",
     "previous_session_ending": "Sua sessão anterior ainda está sendo encerrada. Tente novamente em um minuto.",
     "app_capture_lost_using_system_audio": "A captura do aplicativo parou, então todo o áudio do sistema está sendo traduzido no lugar.",

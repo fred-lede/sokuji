@@ -40,7 +40,7 @@ export interface RunShape {
   faceToFace?: boolean;
   keepReplayAudio: boolean;
   /** What every builder may read, less `models`, which the run adds from its own readiness answer (F2). */
-  shared: Omit<SharedSettings, 'models'>;
+  shared: Omit<SharedSettings, 'models' | 'speaks'>;
   auth: AuthContext;
   /** The account's wallet at start, for a managed provider's floor (ruling 5). Null or absent when signed out, or where no account is wired (tests, the preview): then the sign-in check speaks, not the gate. */
   account?: AccountState | null;
@@ -133,6 +133,12 @@ export interface RunEnd {
 
 export type LegState = 'opening' | 'live' | 'reconnecting';
 
+/** A leg reconnecting under an adapter that counts its attempts: the attempt now, and when the drop came on the run's clock. */
+export interface ReconnectProgress {
+  attempt: number;
+  since: number;
+}
+
 /** A leg loading its models while it opens: the `loading` event, as the starting surfaces show it. */
 export interface LoadingProgress {
   leg: LegName;
@@ -144,5 +150,6 @@ export interface LoadingProgress {
 export type RunState =
   | { phase: 'idle'; lastEnd?: RunEnd }
   | { phase: 'starting'; participantSpeech: boolean; step: 'checking' | 'preparing' | 'opening' | 'waiting'; loading?: LoadingProgress }
-  | { phase: 'running'; participantSpeech: boolean; since: number; legs: Partial<Record<LegName, LegState>>; budget?: Budget }
+  /** `reconnect`: the reconnecting legs whose adapter reports attempts (the status line's); absent when there are none. */
+  | { phase: 'running'; participantSpeech: boolean; since: number; legs: Partial<Record<LegName, LegState>>; budget?: Budget; reconnect?: Partial<Record<LegName, ReconnectProgress>> }
   | { phase: 'stopping'; participantSpeech: boolean };

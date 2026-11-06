@@ -348,6 +348,9 @@
       "mirrorHear": "Loro parlano {{their}} → io sento {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "Il faccia a faccia usa sempre una sessione condivisa: le due persone parlano nello stesso microfono.",
+    "sonioxAgentText": "Usa il testo letto ad alta voce per migliorare il riconoscimento vocale",
+    "sonioxAgentTextTooltip": "Indica al servizio di riconoscimento vocale cosa sta per essere letto ad alta voce, così riconosce meglio le risposte e lascia fuori dalla trascrizione il testo letto ad alta voce se il suono dei tuoi altoparlanti arriva al microfono. Quando la voce viene riprodotta su questo computer, comporta un piccolo costo.",
+    "sonioxAgentTextSplitBoth": "Disattivato in modalità bidirezionale con una sessione separata per direzione: lì non teneva fuori dal riconoscimento vocale la traduzione letta ad alta voce e rendeva più difficile riconoscere chi parla sopra di essa. La tua impostazione viene conservata.",
     "sonioxSpeakerLabels": "Etichette interlocutore",
     "sonioxSpeakerLabelsTooltip": "Numera le persone dall'altra parte — Interlocutore 1, Interlocutore 2… — non appena si sente più di una voce.\n\nPuò scambiare una persona per più persone. Disabilitato: nessun numero viene mostrato.\n\nSi applica dalla prossima sessione.",
     "voiceTheyHear": "Voce che sente l'altra parte",
@@ -800,7 +803,8 @@
     "error": "Errore di Connessione",
     "noApiKey": "Chiave API Richiesta",
     "noMic": "Microfono Richiesto",
-    "reconnecting": "Riconnessione in corso..."
+    "reconnecting": "Riconnessione in corso...",
+    "reconnectingAttempt": "Riconnessione in corso... (tentativo {{attempt}}, {{seconds}} s)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Impossibile caricare le informazioni sulla quota",
@@ -1466,6 +1470,7 @@
     "leg_closed": "Il fornitore ha terminato la sessione.",
     "source_ended": "La sorgente audio è scomparsa (scollegata, chiusa o interrotta).",
     "still_stopping": "L'ultima sessione si sta ancora chiudendo; riprova tra un momento.",
+    "connection_restored": "Connessione interrotta e ripristinata",
     "session_in_use": "Un'altra finestra o un altro dispositivo sta usando questo account. Interrompi lì la sessione oppure, se Sokuji si è appena chiuso in modo imprevisto, riprova tra un minuto.",
     "previous_session_ending": "La tua sessione precedente si sta ancora chiudendo. Riprova tra un minuto.",
     "app_capture_lost_using_system_audio": "La cattura dell'app si è interrotta, quindi ora viene tradotto tutto l'audio di sistema.",

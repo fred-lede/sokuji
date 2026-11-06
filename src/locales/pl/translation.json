@@ -348,6 +348,9 @@
       "mirrorHear": "Oni mówią {{their}} → ja słyszę {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "Rozmowa twarzą w twarz zawsze używa jednej współdzielonej sesji: obie osoby mówią do tego samego mikrofonu.",
+    "sonioxAgentText": "Używaj odczytywanego tekstu, aby poprawić rozpoznawanie mowy",
+    "sonioxAgentTextTooltip": "Przekazuje usłudze rozpoznawania mowy, co zaraz zostanie odczytane, dzięki czemu usługa lepiej rozpoznaje odpowiedzi i pomija odczytywany tekst w transkrypcji, jeśli dźwięk z Twoich głośników trafia do mikrofonu. Gdy mowa jest odtwarzana na tym komputerze, wiąże się to z niewielką opłatą.",
+    "sonioxAgentTextSplitBoth": "Wyłączone w trybie dwukierunkowym z osobną sesją dla każdego kierunku: tam odczytywane tłumaczenie i tak trafiało do rozpoznawania mowy, a osobę mówiącą w trakcie odczytu trudniej było rozpoznać. Twoje ustawienie zostaje zachowane.",
     "sonioxSpeakerLabels": "Etykiety mówców",
     "sonioxSpeakerLabelsTooltip": "Numeruje osoby po drugiej stronie — Mówca 1, Mówca 2… — gdy słychać więcej niż jeden głos.\n\nMoże wziąć jedną osobę za kilka. Wyłączony: numery nie są wyświetlane.\n\nZaczyna obowiązywać od następnej sesji.",
     "voiceTheyHear": "Głos, który słyszy druga strona",
@@ -800,7 +803,8 @@
     "error": "Błąd Połączenia",
     "noApiKey": "Wymagany Klucz API",
     "noMic": "Wymagany Mikrofon",
-    "reconnecting": "Ponowne łączenie..."
+    "reconnecting": "Ponowne łączenie...",
+    "reconnectingAttempt": "Ponowne łączenie... (próba {{attempt}}, {{seconds}} s)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Nie można załadować informacji o limicie",
@@ -1466,6 +1470,7 @@
     "leg_closed": "Dostawca zakończył sesję.",
     "source_ended": "Źródło dźwięku zniknęło (odłączone, zamknięte lub zatrzymane).",
     "still_stopping": "Poprzednia sesja wciąż się zatrzymuje; spróbuj ponownie za chwilę.",
+    "connection_restored": "Połączenie zostało przerwane i przywrócone",
     "session_in_use": "Inne okno lub urządzenie korzysta z tego konta. Zatrzymaj tam sesję, a jeśli Sokuji właśnie nieoczekiwanie się zamknął, spróbuj ponownie za minutę.",
     "previous_session_ending": "Twoja poprzednia sesja wciąż się kończy. Spróbuj ponownie za minutę.",
     "app_capture_lost_using_system_audio": "Przechwytywanie aplikacji zostało przerwane, więc tłumaczony jest teraz cały dźwięk systemowy.",

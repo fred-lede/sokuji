@@ -348,6 +348,9 @@
       "mirrorHear": "Onlar {{their}} konuşuyor → ben {{mine}} duyuyorum"
     },
     "sonioxSharedSessionFaceToFace": "Yüz yüze modu her zaman tek bir paylaşılan oturum kullanır: iki kişi de aynı mikrofona konuşur.",
+    "sonioxAgentText": "Konuşma tanımayı iyileştirmek için sesli okunan metni kullan",
+    "sonioxAgentTextTooltip": "Konuşma tanıma hizmetine neyin sesli okunmak üzere olduğunu bildirir; böylece hizmet yanıtları daha iyi tanır ve hoparlörlerinizin sesi mikrofona ulaşırsa sesli okunanı metin dökümünün dışında tutar. Ses bu bilgisayarda çalındığında küçük bir ek ücret alınır.",
+    "sonioxAgentTextSplitBoth": "Her yön için ayrı oturum kullanan çift yönlü modda kapalıdır: orada sesli okunan çevirinin konuşma tanımaya karışmasını önlemedi ve okumanın üzerine konuşan birini tanımayı zorlaştırdı. Ayarınız korunur.",
     "sonioxSpeakerLabels": "Konuşmacı etiketleri",
     "sonioxSpeakerLabelsTooltip": "Birden fazla ses duyulduğunda karşı taraftaki kişileri numaralandırır — Konuşmacı 1, Konuşmacı 2…\n\nTek bir kişiyi birkaç kişi sanabilir. Devre dışı: numara gösterilmez.\n\nBir sonraki oturumdan itibaren geçerli olur.",
     "voiceTheyHear": "Karşı tarafın duyduğu ses",
@@ -800,7 +803,8 @@
     "error": "Bağlantı Hatası",
     "noApiKey": "API Anahtarı Gerekli",
     "noMic": "Mikrofon Gerekli",
-    "reconnecting": "Yeniden bağlanıyor..."
+    "reconnecting": "Yeniden bağlanıyor...",
+    "reconnectingAttempt": "Yeniden bağlanıyor... (deneme {{attempt}}, {{seconds}} sn)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Kota bilgileri yüklenemiyor",
@@ -1466,6 +1470,7 @@
     "leg_closed": "Sağlayıcı oturumu sonlandırdı.",
     "source_ended": "Ses kaynağı ortadan kayboldu (bağlantısı kesildi, kapatıldı veya durduruldu).",
     "still_stopping": "Son oturum hâlâ durduruluyor; birazdan tekrar deneyin.",
+    "connection_restored": "Bağlantı kesildi ve yeniden kuruldu",
     "session_in_use": "Bu hesabı başka bir pencere veya cihaz kullanıyor. Oturumu orada durdurun ya da Sokuji az önce beklenmedik şekilde kapandıysa bir dakika sonra tekrar deneyin.",
     "previous_session_ending": "Önceki oturumunuz hâlâ sonlandırılıyor. Lütfen bir dakika sonra tekrar deneyin.",
     "app_capture_lost_using_system_audio": "Uygulama yakalaması durdu, bu yüzden artık tüm sistem sesi çevriliyor.",

@@ -348,6 +348,9 @@
       "mirrorHear": "He puhuvat {{their}} → kuulen {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "Kasvokkain-tila käyttää aina yhtä jaettua istuntoa: molemmat puhuvat samaan mikrofoniin.",
+    "sonioxAgentText": "Käytä ääneen luettavaa tekstiä puheentunnistuksen parantamiseen",
+    "sonioxAgentTextTooltip": "Kertoo puheentunnistuspalvelulle, mitä pian luetaan ääneen, jotta se tunnistaa vastaukset paremmin ja jättää ääneen luetun pois litteroinnista, jos kaiuttimien ääni kuuluu mikrofoniin. Kun puhe toistetaan tällä tietokoneella, tästä aiheutuu pieni lisämaksu.",
+    "sonioxAgentTextSplitBoth": "Pois käytöstä kaksisuuntaisessa tilassa, jossa kumpaankin suuntaan on erillinen istunto: siellä se ei pitänyt ääneen luettua käännöstä poissa puheentunnistuksesta ja vaikeutti päälle puhuvan tunnistamista. Asetuksesi säilyy.",
     "sonioxSpeakerLabels": "Puhujatunnisteet",
     "sonioxSpeakerLabelsTooltip": "Numeroi toisen osapuolen ihmiset – Puhuja 1, Puhuja 2… – kun kuuluu useampi kuin yksi ääni.\n\nSe voi luulla yhtä ihmistä useaksi. Pois käytöstä: numeroita ei näytetä.\n\nOtetaan käyttöön vasta seuraavasta istunnosta alkaen.",
     "voiceTheyHear": "Ääni, jonka toinen osapuoli kuulee",
@@ -800,7 +803,8 @@
     "error": "Yhteysvirhe",
     "noApiKey": "API-avain vaaditaan",
     "noMic": "Mikrofoni vaaditaan",
-    "reconnecting": "Yhdistetään uudelleen..."
+    "reconnecting": "Yhdistetään uudelleen...",
+    "reconnectingAttempt": "Yhdistetään uudelleen... (yritys {{attempt}}, {{seconds}} s)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Kiintiötietoja ei voitu ladata",
@@ -1466,6 +1470,7 @@
     "leg_closed": "Tarjoaja lopetti istunnon.",
     "source_ended": "Äänilähde katosi (irrotettu, suljettu tai pysäytetty).",
     "still_stopping": "Edellistä istuntoa lopetetaan vielä; yritä hetken päästä uudelleen.",
+    "connection_restored": "Yhteys katkesi ja palautui",
     "session_in_use": "Toinen ikkuna tai laite käyttää tätä tiliä. Lopeta istunto siellä, tai jos Sokuji sulkeutui juuri odottamatta, yritä uudelleen minuutin kuluttua.",
     "previous_session_ending": "Edellinen istuntosi on vielä päättymässä. Yritä uudelleen minuutin kuluttua.",
     "app_capture_lost_using_system_audio": "Sovelluksen kaappaus pysähtyi, joten nyt käännetään kaikki järjestelmän ääni.",

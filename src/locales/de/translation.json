@@ -348,6 +348,9 @@
       "mirrorHear": "Sie sprechen {{their}} → ich höre {{mine}}"
     },
     "sonioxSharedSessionFaceToFace": "Bei Gesprächen von Angesicht zu Angesicht wird immer eine gemeinsame Sitzung verwendet: Beide sprechen in dasselbe Mikrofon.",
+    "sonioxAgentText": "Vorgelesenen Text nutzen, um die Spracherkennung zu verbessern",
+    "sonioxAgentTextTooltip": "Teilt dem Spracherkennungsdienst mit, was gleich vorgelesen wird, damit er Antworten besser erkennt und das Vorgelesene aus dem Transkript heraushält, wenn der Ton deiner Lautsprecher ins Mikrofon gelangt. Wenn die Sprache auf diesem Computer abgespielt wird, fällt dafür eine kleine Gebühr an.",
+    "sonioxAgentTextSplitBoth": "Aus im Modus „Beides“ mit einer separaten Sitzung pro Richtung: Dort hielt es die vorgelesene Übersetzung nicht aus der Spracherkennung heraus und machte es schwerer, jemanden zu erkennen, der in die Wiedergabe hineinspricht. Deine Einstellung bleibt erhalten.",
     "sonioxSpeakerLabels": "Sprecherkennzeichnung",
     "sonioxSpeakerLabelsTooltip": "Nummeriert die Personen auf der anderen Seite – Sprecher 1, Sprecher 2 … –, sobald mehr als eine Stimme zu hören ist.\n\nDabei kann eine Person für mehrere gehalten werden. Deaktiviert: Es werden keine Nummern angezeigt.\n\nWirkt sich erst ab der nächsten Sitzung aus.",
     "voiceTheyHear": "Stimme, die das Gegenüber hört",
@@ -800,7 +803,8 @@
     "error": "Verbindungsfehler",
     "noApiKey": "API-Schlüssel Erforderlich",
     "noMic": "Mikrofon Erforderlich",
-    "reconnecting": "Verbindung wird wiederhergestellt..."
+    "reconnecting": "Verbindung wird wiederhergestellt...",
+    "reconnectingAttempt": "Verbindung wird wiederhergestellt... (Versuch {{attempt}}, {{seconds}} s)"
   },
   "tokenUsage": {
     "unableToLoadQuota": "Kontingentinformationen können nicht geladen werden",
@@ -1466,6 +1470,7 @@
     "leg_closed": "Der Anbieter hat die Sitzung beendet.",
     "source_ended": "Die Audioquelle ist nicht mehr verfügbar (getrennt, geschlossen oder gestoppt).",
     "still_stopping": "Die letzte Sitzung wird noch beendet; versuchen Sie es gleich noch einmal.",
+    "connection_restored": "Verbindung unterbrochen und wiederhergestellt",
     "session_in_use": "Ein anderes Fenster oder Gerät verwendet dieses Konto. Beenden Sie die Sitzung dort, oder versuchen Sie es in einer Minute erneut, falls Sokuji gerade unerwartet geschlossen wurde.",
     "previous_session_ending": "Ihre vorherige Sitzung wird noch beendet. Bitte versuchen Sie es in einer Minute erneut.",
     "app_capture_lost_using_system_audio": "Die App-Erfassung wurde beendet, daher wird stattdessen das gesamte Systemaudio übersetzt.",
