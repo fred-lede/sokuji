@@ -79,6 +79,24 @@ it('http endpoint with apiKey → ws://...?model=...&api_key=...', () => {
       expect(update.session.audio.output).toEqual({ voice: 'custom-voice' });
     });
 
+    it('targetLanguage → payload has audio.output.language', () => {
+      const c: CompatibleConfig = { ...baseConfig, targetLanguage: 'zh-CN', modalities: ['audio'] };
+      const update = compatibleSessionUpdate(c) as { session: { audio: { output: { language: string } } } };
+      expect(update.session.audio.output).toEqual({ language: 'zh-CN' });
+    });
+
+    it('targetLanguage with voice → audio.output carries both, voice first', () => {
+      const c: CompatibleConfig = { ...baseConfig, voice: 'custom-voice', targetLanguage: 'zh-CN', modalities: ['audio'] };
+      const update = compatibleSessionUpdate(c) as { session: { audio: { output: { voice: string; language: string } } } };
+      expect(update.session.audio.output).toEqual({ voice: 'custom-voice', language: 'zh-CN' });
+    });
+
+    it('no targetLanguage → audio.output has no language', () => {
+      const c: CompatibleConfig = { ...baseConfig, voice: 'custom-voice', modalities: ['audio'] };
+      const update = compatibleSessionUpdate(c) as { session: { audio: { output: { language?: string } } } };
+      expect(update.session.audio.output.language).toBeUndefined();
+    });
+
     it('without voice → no audio.output', () => {
       const c: CompatibleConfig = { ...baseConfig, modalities: ['audio'] };
       const update = compatibleSessionUpdate(c) as { session: { audio: { output?: { voice: string } } } };

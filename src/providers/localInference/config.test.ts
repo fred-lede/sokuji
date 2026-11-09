@@ -194,7 +194,7 @@ describe('buildLocalInference', () => {
   it('carries a set VAD negative threshold into vad.negativeThreshold, and leaves it out when unset', () => {
     resolved({ 'ja>en': { asr: 'a', translation: 't' } });
     const withIt = buildLocalInference(ctx({ source: 'ja', target: 'en' }), settings({ vadNegativeThreshold: 0.15 }), shared()) as LocalInferenceConfig;
-    expect(withIt.vad).toEqual({ threshold: 0.3, negativeThreshold: 0.15, minSilenceDuration: 1.4, minSpeechDuration: 0.4, maxSpeechDuration: 30, preSpeechPadDuration: 0.8 });
+    expect(withIt.vad).toEqual({ threshold: 0.3, negativeThreshold: 0.15, minSilenceDuration: 0.7, minSpeechDuration: 0.4, maxSpeechDuration: 10, preSpeechPadDuration: 0.8 });
     const without = buildLocalInference(ctx({ source: 'ja', target: 'en' }), settings(), shared()) as LocalInferenceConfig;
     expect(without.vad).not.toHaveProperty('negativeThreshold');
   });

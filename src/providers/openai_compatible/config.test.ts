@@ -38,6 +38,11 @@ describe('buildCompatible', () => {
     expect(c.translateModel).toBe('qwen3-translate');
   });
 
+  it('the direction\'s target language rides the config, for the session\'s output language', () => {
+    const c = configFor(AUTO_CTX, { endpoint: 'https://host', translateModel: 'qwen3-translate' });
+    expect(c.targetLanguage).toBe('zh-CN');
+  });
+
   it('manual turns → turnDetection: null', () => {
     const c = configFor(MANUAL_CTX, { endpoint: 'https://host' });
     expect(c.turnDetection).toBeNull();

@@ -67,10 +67,10 @@ describe('SessionSettingsGeneral', () => {
     expect(labels).toEqual(['I speak', 'they hear']);
   });
 
-  // The owner, 2026-10-01: hidden, with segmentation kept Off.
-  it('does not render the sentence segmentation section', () => {
+  // The section shows: its block renders under the turn-detection section.
+  it('renders the sentence segmentation section', () => {
     const { container } = render(<SessionSettingsGeneral locked={false} layout="advanced" onOpenSlot={vi.fn()} />);
-    expect(container.querySelector('#sentence-segmentation-section')).toBeNull();
+    expect(container.querySelector('#sentence-segmentation-section')).toBeTruthy();
   });
 
   it('a chip calls onOpenSlot with its slot', () => {
@@ -102,7 +102,7 @@ describe('SessionSettingsGeneral', () => {
       const { container } = render(<SessionSettingsGeneral locked={false} layout="simple" onOpenSlot={vi.fn()} />);
       const speech = container.querySelector('#turn-detection-section')!;
       const button = speech.querySelector('button.turn-detection-link')!;
-      expect(button.textContent).toBe('VAD Settings · Min Silence Duration: 1.40s');
+      expect(button.textContent).toBe('VAD Settings · Min Silence Duration: 0.70s');
       fireEvent.click(button);
       expect(setUIMode).toHaveBeenCalledWith('advanced');
       expect(useSettingsStore.getState().settingsNavigationTarget).toBe('turn-detection-tuning');
@@ -118,7 +118,7 @@ describe('SessionSettingsGeneral', () => {
     const { container } = render(<SessionSettingsGeneral locked={false} layout="advanced" onOpenSlot={vi.fn()} />);
     const speech = container.querySelector('#turn-detection-section')!;
     const button = speech.querySelector('button.turn-detection-link')!;
-    expect(button.textContent).toBe('VAD Settings · Min Silence Duration: 1.40s');
+    expect(button.textContent).toBe('VAD Settings · Min Silence Duration: 0.70s');
     fireEvent.click(button);
     expect(useSettingsStore.getState().settingsNavigationTarget).toBe('turn-detection-tuning');
     expect(speech.querySelectorAll('input[type="range"]')).toHaveLength(0);

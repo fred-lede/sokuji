@@ -439,6 +439,37 @@ describe('the OpenAI Compatible adapter: what comes down', () => {
     expect(h.frames('response.done')).toEqual([{ responseId: 'resp_1', status: 'completed', statusDetails: null, outOfBand: false, usage: expect.objectContaining({ total_tokens: 1_200 }) }]);
   });
 
+  it('frames the endpoint\'s own transcript deltas under their own names, and writes that text once, from the response', async () => {
+    const h = await liveCompatible();
+    h.receive(SERVER.committed('item_in_1'), SERVER.itemAdded('item_in_1', 'user'));
+    h.receive(SERVER.inputTranscript(1, 'こんにちは。'), SERVER.outputTranscript(1, 'Hello.'));
+    h.receive(SERVER.responseCreated('resp_1'), SERVER.outputItemAdded('resp_1', 'item_out_1'), SERVER.itemAdded('item_out_1', 'assistant', 'item_in_1'));
+    h.receive(SERVER.textDelta('resp_1', 'item_out_1', 'Hello.'), SERVER.textDone('resp_1', 'item_out_1', 'Hello.'), SERVER.outputItemDone('resp_1', 'item_out_1'), SERVER.responseDone('resp_1'));
+    expect(h.of('segmentText').map((e) => e.payload)).toEqual([{ ref: 2, text: 'Hello.' }]);
+    expect(h.frames('session.unknown')).toEqual([]);
+    expect(h.frames('session.input_transcript.delta')).toEqual([{ seg: 1, delta: 'こんにちは。', text: 'こんにちは。' }]);
+    expect(h.frames('session.output_transcript.delta')).toEqual([{ seg: 1, delta: 'Hello.', text: 'Hello.' }]);
+  });
+
+  it('frames conversation.item.created, the standard announcement, under its own name and opens each item once', async () => {
+    const h = await liveCompatible();
+    h.receive(SERVER.committed('item_in_1'), SERVER.itemCreated('item_in_1', 'user'), SERVER.itemAdded('item_in_1', 'user'));
+    h.receive(SERVER.responseCreated('resp_1'), SERVER.outputItemAdded('resp_1', 'item_out_1'), SERVER.itemCreated('item_out_1', 'assistant', 'item_in_1'), SERVER.itemAdded('item_out_1', 'assistant', 'item_in_1'));
+    h.receive(SERVER.textDelta('resp_1', 'item_out_1', 'Hello.'), SERVER.textDone('resp_1', 'item_out_1', 'Hello.'), SERVER.outputItemDone('resp_1', 'item_out_1'), SERVER.responseDone('resp_1'));
+    expect(h.of('segmentOpened').map((e) => e.payload)).toEqual([{ ref: 1, side: 'source', origin: 'item_in_1' }, { ref: 2, side: 'translation', origin: 'item_in_1' }]);
+    expect(h.of('segmentText').map((e) => e.payload)).toEqual([{ ref: 2, text: 'Hello.' }]);
+    expect(h.frames('session.unknown')).toEqual([]);
+  });
+
+  it('frames response.text.delta, which an endpoint sends beside response.output_text.delta for the very same text, without writing it twice', async () => {
+    const h = await liveCompatible();
+    h.receive(SERVER.committed('item_in_1'), SERVER.itemAdded('item_in_1', 'user'));
+    h.receive(SERVER.responseCreated('resp_1'), SERVER.outputItemAdded('resp_1', 'item_out_1'), SERVER.itemAdded('item_out_1', 'assistant', 'item_in_1'));
+    h.receive(SERVER.rawTextDelta('resp_1', 'item_out_1', 'Hello there.'), SERVER.textDelta('resp_1', 'item_out_1', 'Hello there.'), SERVER.rawTextDone('resp_1', 'item_out_1', 'Hello there.'), SERVER.textDone('resp_1', 'item_out_1', 'Hello there.'));
+    expect(h.of('segmentText').map((e) => e.payload)).toEqual([{ ref: 2, text: 'Hello there.' }]);
+    expect(h.frames('session.unknown')).toEqual([]);
+  });
+
   it('pairs each exchange as stated through the projection; an utterance spoken over a playing translation that no response answers stays a row of its own', async () => {
     const h = await liveCompatible();
     const conv = new Conversation({ leg: 'speaker', session: 'realtime', languages: AUTO_CTX.direction, clock: h.clock });

@@ -130,7 +130,7 @@ describe('SpeechSection', () => {
 });
 
 describe("SpeechSection — the provider's turn-detection tuning", () => {
-  const SUMMARY = 'VAD Settings · Min Silence Duration: 1.40s';
+  const SUMMARY = 'VAD Settings · Min Silence Duration: 0.70s';
   const section = (container: HTMLElement) => container.querySelector('#turn-detection-section')!;
   const sliders = (container: HTMLElement) => section(container).querySelectorAll('input[type="range"]');
   const link = (container: HTMLElement) => section(container).querySelector<HTMLButtonElement>('button.turn-detection-link');

@@ -240,17 +240,24 @@ describe('settingsStore', () => {
   });
 
   describe('segmentationMode', () => {
-    // The owner, 2026-10-01: the section is hidden and segmentation stays
-    // Off for every provider, so a mode saved while it showed — By
-    // sentences, or By pause, the old default — must not run unseen. The
-    // saved value is left as it was, not rewritten.
-    it.each(['sentences', 'pause', 'off', 'enabled', undefined])('is Off while the section is hidden, with %s saved', async (saved) => {
+    // The section shows: the saved mode loads and clamps (a stored value that
+    // is not one of the three — an older build's `enabled`, a hand edit —
+    // falls to the default, By pause), and a missing one takes the default
+    // 'pause'.
+    it.each(['sentences', 'pause', 'off'])('loads a saved %s', async (saved) => {
+      useSettingsStore.setState({ segmentationMode: 'off' });
+      mockGetSetting.mockImplementation(async (key: string, fallback: unknown) =>
+        key === 'settings.common.segmentationMode' ? saved : fallback);
+      await useSettingsStore.getState().loadSettings();
+      expect(useSettingsStore.getState().segmentationMode).toBe(saved);
+    });
+
+    it('clamps an unknown stored value to the default, By pause', async () => {
       useSettingsStore.setState({ segmentationMode: 'sentences' });
       mockGetSetting.mockImplementation(async (key: string, fallback: unknown) =>
-        key === 'settings.common.segmentationMode' && saved !== undefined ? saved : fallback);
+        key === 'settings.common.segmentationMode' ? 'enabled' : fallback);
       await useSettingsStore.getState().loadSettings();
-      expect(useSettingsStore.getState().segmentationMode).toBe('off');
-      expect(mockSetSetting).not.toHaveBeenCalledWith('settings.common.segmentationMode', expect.anything());
+      expect(useSettingsStore.getState().segmentationMode).toBe('pause');
     });
 
     it('persists a change', async () => {

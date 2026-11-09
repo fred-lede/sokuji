@@ -26,7 +26,7 @@ export function compatibleUrl(c: CompatibleConfig, apiKey?: string): string {
   const secure = !c.endpoint.startsWith('http://');
   const host = c.endpoint.replace(/^https?:\/\//, '');
   const params = new URLSearchParams();
-  if (c.translateModel) params.set('model', encodeURIComponent(c.translateModel));
+  if (c.translateModel) params.set('model', c.translateModel);
   if (apiKey) params.set('api_key', apiKey);
   const query = params.toString() ? `?${params.toString()}` : '';
   return `${secure ? 'wss' : 'ws'}://${host}/v1/realtime${query}`;
@@ -57,7 +57,10 @@ export function compatibleSessionUpdate(c: CompatibleConfig): object {
     tools: [],
   };
   if (c.maxTokens !== 'inf') session.max_output_tokens = c.maxTokens;
-  if (c.voice) session.audio = { output: { voice: c.voice } };
+  const output: Record<string, unknown> = {};
+  if (c.voice) output.voice = c.voice;
+  if (c.targetLanguage) output.language = c.targetLanguage;
+  if (Object.keys(output).length > 0) session.audio = { output };
   const hasAudioInput = c.turnDetection !== undefined || c.asrModel || c.noiseReduction !== undefined;
   if (hasAudioInput) {
     const audioInput: Record<string, unknown> = {};

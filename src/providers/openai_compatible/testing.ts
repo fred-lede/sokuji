@@ -104,6 +104,14 @@ export const SERVER = {
   error: (e: { type?: string; code?: string | null; message?: string; event_id?: string | null } = {}) =>
     event({ type: 'error', error: { type: 'invalid_request_error', code: null, message: 'Something was wrong.', param: null, event_id: null, ...e } }),
   rateLimits: () => event({ type: 'rate_limits.updated', rate_limits: [{ name: 'tokens', limit: 40_000, remaining: 39_000, reset_seconds: 1.5 }] }),
+  /** `conversation.item.created`: the same announcement under the name the standard protocol uses. */
+  itemCreated: (itemId: string, role: 'user' | 'assistant', previous: string | null = null) => event({ type: 'conversation.item.created', ...(previous ? { previous_item_id: previous } : {}), item: item(itemId, role) }),
+  /** The translation protocol's own transcript events, `seg` numbering the segments. */
+  inputTranscript: (seg: number, delta: string) => event({ type: 'session.input_transcript.delta', delta, text: delta, seg, is_final: false }),
+  outputTranscript: (seg: number, delta: string) => event({ type: 'session.output_transcript.delta', delta, text: delta, seg, is_final: false }),
+  /** A response's text under the names some endpoints send beside `response.output_text.delta` for the very same text. */
+  rawTextDelta: (responseId: string, itemId: string, delta: string) => event({ type: 'response.text.delta', response_id: responseId, item_id: itemId, delta }),
+  rawTextDone: (responseId: string, itemId: string, text: string) => event({ type: 'response.text.done', response_id: responseId, item_id: itemId, text }),
   /** An event by its type alone. */
   bare: (type: string) => event({ type }),
 };

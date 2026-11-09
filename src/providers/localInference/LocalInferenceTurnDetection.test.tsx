@@ -81,7 +81,7 @@ describe('LocalInferenceTurnDetectionSummary', () => {
     const { container } = render(
       <LocalInferenceTurnDetectionSummary settings={{ ...LOCAL_INFERENCE_DEFAULTS, vadEndOfTurn: 'smart' }} update={() => {}} pair={pair} />,
     );
-    expect(container.textContent).toBe('VAD Settings · Smart · Max Wait 1.40s');
+    expect(container.textContent).toBe('VAD Settings · Smart · Max Wait 0.70s');
   });
 
   it('summarizes a stored Smart whose model is gone as Normal', () => {
@@ -89,7 +89,7 @@ describe('LocalInferenceTurnDetectionSummary', () => {
     const { container } = render(
       <LocalInferenceTurnDetectionSummary settings={{ ...LOCAL_INFERENCE_DEFAULTS, vadEndOfTurn: 'smart' }} update={() => {}} pair={pair} />,
     );
-    expect(container.textContent).toBe('VAD Settings · Min Silence Duration: 1.40s');
+    expect(container.textContent).toBe('VAD Settings · Min Silence Duration: 0.70s');
   });
 
   it('summarizes Smart as Normal when Max Wait leaves no room for Turn Check After', () => {
@@ -453,7 +453,7 @@ describe('LocalInferenceTurnDetectionControls — Smart Turn', () => {
       expect(screen.queryByText('Turn Check After')).toBeNull();
       cleanup();
       render(<LocalInferenceTurnDetectionSummary settings={smart} update={() => {}} pair={pair} />);
-      expect(screen.getByText('VAD Settings · Min Silence Duration: 1.40s')).toBeTruthy();
+      expect(screen.getByText('VAD Settings · Min Silence Duration: 0.70s')).toBeTruthy();
     });
 
     it('offers it under push-to-talk when the participant leg runs an ASR in scope', () => {

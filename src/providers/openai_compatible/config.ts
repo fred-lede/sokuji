@@ -26,6 +26,8 @@ export interface CompatibleConfig {
   asrModel: string;
   /** This leg's voice: '' = endpoint default. */
   voice?: string;
+  /** This direction's target language, for endpoints that read the session's output language. */
+  targetLanguage?: string;
   /** This direction's prompt. */
   instructions: string;
   modalities: ['audio'] | ['text'];
@@ -98,6 +100,7 @@ export function buildCompatible(
     transport: 'websocket',
   };
   if (voice) config.voice = voice;
+  if (target) config.targetLanguage = target;
 
   return config;
 }

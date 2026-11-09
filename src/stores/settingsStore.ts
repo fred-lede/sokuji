@@ -149,7 +149,7 @@ function clampSegmentationPause(value: unknown): number {
  * the default it had — cannot run unseen; the saved value is left as it was,
  * not rewritten. Showing it again is this line.
  */
-export const SENTENCE_SEGMENTATION_SHOWN = false;
+export const SENTENCE_SEGMENTATION_SHOWN = true;
 
 function clampSegmentationMode(value: unknown): SegmentationMode {
   return value === 'off' || value === 'sentences' || value === 'pause' ? value : 'pause';

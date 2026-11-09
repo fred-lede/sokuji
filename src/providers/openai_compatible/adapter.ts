@@ -75,6 +75,10 @@ export const ANCHOR_EVERY = 5;
 const QUIET = new Set([
   'conversation.item.done', 'conversation.item.deleted', 'conversation.item.truncated', 'conversation.item.input_audio_transcription.segment',
   'input_audio_buffer.timeout_triggered', 'response.content_part.added', 'response.content_part.done',
+  // Some endpoints send a response's text under these names beside `response.output_text.delta`
+  // or `response.output_audio_transcript.delta`, for the very same deltas: writing both would
+  // write the translation twice.
+  'response.text.delta', 'response.text.done',
 ]);
 
 export interface CompatibleAdapterDeps {
@@ -221,7 +225,10 @@ class CompatibleLeg implements AdapterSession {
         return this.frame('in', e.type, { itemId: s.item_id ?? null, audioEndMs: s.audio_end_ms ?? null });
       }
       case 'input_audio_buffer.cleared': return this.frame('in', e.type);
-      case 'conversation.item.added': return this.itemAdded(e as unknown as ConversationItemAdded);
+      case 'conversation.item.added':
+      case 'conversation.item.created': return this.itemAdded(e as unknown as ConversationItemAdded);
+      case 'session.input_transcript.delta':
+      case 'session.output_transcript.delta': return this.transcriptDelta(e);
       case 'conversation.item.input_audio_transcription.delta': return this.inputDelta(e as unknown as ConversationItemInputAudioTranscriptionDeltaEvent);
       case 'conversation.item.input_audio_transcription.completed': return this.inputDone(e as unknown as ConversationItemInputAudioTranscriptionCompletedEvent);
       case 'conversation.item.input_audio_transcription.failed': return this.inputFailed(e as unknown as ConversationItemInputAudioTranscriptionFailedEvent);
@@ -297,6 +304,13 @@ class CompatibleLeg implements AdapterSession {
     if (this.phase !== 'live' || id === undefined) return;
     if (role === 'user') this.items.inputAdded(id);
     else if (role === 'assistant') this.items.assistantAdded(id, e.previous_item_id);
+  }
+
+  /** An endpoint's own transcript event, `seg` numbering its segments: a Logs line, nothing more.
+   * The same text arrives as a transcript or text delta of a response, which is what writes the segments. */
+  private transcriptDelta(e: ServerEvent): void {
+    const t = e as unknown as { delta?: unknown; text?: unknown; seg?: unknown };
+    this.frame('in', e.type, { seg: t.seg ?? null, delta: t.delta ?? null, text: t.text ?? null });
   }
 
   private inputDelta(e: ConversationItemInputAudioTranscriptionDeltaEvent): void {
