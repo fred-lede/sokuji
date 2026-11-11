@@ -640,6 +640,11 @@
   },
   "mainPanel": {
     "subtitleTakeover": "Terjemahan dipaparkan di tindanan sari kata",
+    "payer": {
+      "paidBy": "Dibayar oleh {{name}}",
+      "paidByYou": "Dibayar oleh anda",
+      "useOwnBalance": "Guna baki saya sendiri"
+    },
     "function": "Fungsi",
     "noChannelConfigured": "Dayakan mikrofon atau audio pihak lain sebelum bermula.",
     "release": "lepaskan",
@@ -808,7 +813,29 @@
   },
   "tokenUsage": {
     "unableToLoadQuota": "Tidak dapat memuatkan maklumat kuota",
-    "upgradeToPremium": "Naik taraf ke Premium"
+    "upgradeToPremium": "Naik taraf ke Premium",
+    "orgBalance": "Baki {{name}}",
+    "yourBalance": "Baki anda",
+    "yourOrganization": "organisasi anda",
+    "orgHeld": "{{held}} daripadanya ditahan oleh sesi yang sedang berjalan; bahagian yang tidak digunakan dikembalikan apabila sesi tamat.",
+    "paused": "Dijeda",
+    "runPayer": "Sesi ini dibayar oleh {{name}}",
+    "balance": "Baki",
+    "availableBalance": "Tersedia",
+    "sessionHeld": "Ditahan oleh sesi",
+    "heldHint": "Sesi yang sedang berjalan atau baru selesai menahan sebahagian baki. Selepas pengiraan akhir selesai, bahagian yang tidak digunakan akan dikembalikan ke dalam baki tersedia.",
+    "runwayLabel": "Anggaran masa penggunaan yang tinggal",
+    "runwayHint": "Baki tersedia dibahagikan dengan purata perbelanjaan anda bagi setiap jam audio dalam tempoh 30 hari terakhir — biasanya baki ini akan bertahan lebih lama daripada itu.",
+    "aboutDuration": "kira-kira {{amount}} {{unit}}",
+    "unitHours": "jam",
+    "unitDays": "hari",
+    "unitMonths": "bulan",
+    "self30d": "Penggunaan saya · 30 hari terakhir",
+    "org30d": "Penggunaan saya dalam organisasi ini · 30 hari terakhir",
+    "spent": "Dibelanjakan",
+    "usageUnavailable": "Data penggunaan tidak tersedia",
+    "noUsage": "Belum ada penggunaan",
+    "total30d": "Jumlah bagi 30 hari"
   },
   "logs": {
     "webrtcFallback": "Sambungan WebRTC gagal, menggunakan WebSocket sebagai gantinya"
@@ -1082,6 +1109,8 @@
   "titleBar": {
     "account": {
       "label": "Akaun",
+      "personal": "Peribadi",
+      "payerUnknown": "Akaun",
       "lowBalance": "Akaun — baki terlalu rendah untuk memulakan sesi",
       "unverified": "Akaun — e-mel belum disahkan"
     },
@@ -1504,7 +1533,17 @@
     "speaker_tts_missing": "Terjemahan yang didengar pihak lain hanya dalam bentuk teks: tiada model suara yang bertutur dalam {{target}}.",
     "participant_tts_missing": "Terjemahan yang saya dengar hanya dalam bentuk teks: tiada model suara yang bertutur dalam {{target}}.",
     "participant_tts_over_budget": "Terjemahan yang saya dengar hanya dalam bentuk teks: memori tidak mencukupi untuk memuatkan model suara pihak lain juga.",
-    "screen_context_lost": "Skrin yang anda pilih tidak lagi tersedia; terjemahan diteruskan dengan audio sahaja."
+    "screen_context_lost": "Skrin yang anda pilih tidak lagi tersedia; terjemahan diteruskan dengan audio sahaja.",
+    "org_balance_held": "Baki organisasi anda sedang ditahan oleh sesi yang sedang berjalan. Cuba lagi apabila salah satu tamat, atau gunakan baki peribadi anda.",
+    "org_insufficient_balance": "Minta pemilik organisasi menambah nilai, atau gunakan baki peribadi anda.",
+    "org_insufficient_balance_owner": "Tambah nilai {{organization}}, atau gunakan baki peribadi anda.",
+    "org_insufficient_balance_owner_unnamed": "Tambah nilai organisasi anda, atau gunakan baki peribadi anda.",
+    "not_org_member": "Anda bukan lagi ahli {{organization}}.",
+    "not_org_member_unnamed": "Anda bukan lagi ahli organisasi anda.",
+    "org_wallet_frozen": "Akaun {{organization}} digantung. Hubungi pemiliknya, atau gunakan baki peribadi anda.",
+    "org_wallet_frozen_unnamed": "Akaun organisasi digantung. Hubungi pemiliknya, atau gunakan baki peribadi anda.",
+    "org_wallet_frozen_owner": "Akaun {{organization}} digantung. Hubungi sokongan Sokuji, atau gunakan baki peribadi anda.",
+    "org_wallet_frozen_owner_unnamed": "Akaun organisasi digantung. Hubungi sokongan Sokuji, atau gunakan baki peribadi anda."
   },
   "viewer": {
     "title": "Sari kata Sokuji",

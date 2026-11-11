@@ -640,6 +640,11 @@
   },
   "mainPanel": {
     "subtitleTakeover": "As traduções estão sendo exibidas na sobreposição de legendas",
+    "payer": {
+      "paidBy": "Pago por {{name}}",
+      "paidByYou": "Pago por você",
+      "useOwnBalance": "Usar meu próprio saldo"
+    },
     "function": "Função",
     "noChannelConfigured": "Ative o microfone ou o áudio do outro antes de começar.",
     "release": "soltar",
@@ -808,7 +813,29 @@
   },
   "tokenUsage": {
     "unableToLoadQuota": "Não foi possível carregar as informações de cota",
-    "upgradeToPremium": "Atualizar para Premium"
+    "upgradeToPremium": "Atualizar para Premium",
+    "orgBalance": "Saldo de {{name}}",
+    "yourBalance": "Seu saldo",
+    "yourOrganization": "sua organização",
+    "orgHeld": "{{held}} estão retidos por sessões em andamento; qualquer parte não utilizada volta quando elas terminam.",
+    "paused": "Pausado",
+    "runPayer": "Esta sessão é paga por {{name}}",
+    "balance": "Saldo",
+    "availableBalance": "Disponível",
+    "sessionHeld": "Retido por sessões",
+    "heldHint": "Sessões em andamento ou recém-encerradas retêm parte do saldo. Após a liquidação, a parte não utilizada retorna ao saldo disponível.",
+    "runwayLabel": "Tempo restante estimado",
+    "runwayHint": "Saldo disponível dividido pelo seu gasto médio por hora nos últimos 30 dias. O resultado está em tempo de áudio; normalmente, você consegue usar por mais tempo.",
+    "aboutDuration": "cerca de {{amount}} {{unit}}",
+    "unitHours": "horas",
+    "unitDays": "dias",
+    "unitMonths": "meses",
+    "self30d": "Meu uso · últimos 30 dias",
+    "org30d": "Meu uso nesta organização · últimos 30 dias",
+    "spent": "Gasto",
+    "usageUnavailable": "Dados de uso indisponíveis",
+    "noUsage": "Nenhum uso ainda",
+    "total30d": "Total de 30 dias"
   },
   "logs": {
     "webrtcFallback": "Falha na conexão WebRTC, usando WebSocket em vez disso"
@@ -1082,6 +1109,8 @@
   "titleBar": {
     "account": {
       "label": "Conta",
+      "personal": "Pessoal",
+      "payerUnknown": "Conta",
       "lowBalance": "Conta — saldo insuficiente para iniciar uma sessão",
       "unverified": "Conta — e-mail não verificado"
     },
@@ -1504,7 +1533,17 @@
     "speaker_tts_missing": "A tradução que o outro lado ouve aparece só como texto: nenhum modelo de voz fala {{target}}.",
     "participant_tts_missing": "A tradução que eu ouço aparece só como texto: nenhum modelo de voz fala {{target}}.",
     "participant_tts_over_budget": "A tradução que eu ouço aparece só como texto: não há memória suficiente para carregar também o modelo de voz do outro lado.",
-    "screen_context_lost": "A tela que você escolheu não está mais disponível; a tradução continua só com o áudio."
+    "screen_context_lost": "A tela que você escolheu não está mais disponível; a tradução continua só com o áudio.",
+    "org_balance_held": "O saldo da sua organização está retido por sessões em andamento. Tente novamente quando uma terminar ou use seu próprio saldo.",
+    "org_insufficient_balance": "Peça ao proprietário da organização para recarregar o saldo ou use seu próprio saldo.",
+    "org_insufficient_balance_owner": "Recarregue o saldo de {{organization}} ou use seu próprio saldo.",
+    "org_insufficient_balance_owner_unnamed": "Recarregue o saldo da sua organização ou use seu próprio saldo.",
+    "not_org_member": "Você não faz mais parte de {{organization}}.",
+    "not_org_member_unnamed": "Você não faz mais parte da sua organização.",
+    "org_wallet_frozen": "A conta de {{organization}} está pausada. Entre em contato com o proprietário ou use seu próprio saldo.",
+    "org_wallet_frozen_unnamed": "A conta da organização está pausada. Entre em contato com o proprietário ou use seu próprio saldo.",
+    "org_wallet_frozen_owner": "A conta de {{organization}} está pausada. Entre em contato com o suporte do Sokuji ou use seu próprio saldo.",
+    "org_wallet_frozen_owner_unnamed": "A conta da organização está pausada. Entre em contato com o suporte do Sokuji ou use seu próprio saldo."
   },
   "viewer": {
     "title": "Legendas do Sokuji",

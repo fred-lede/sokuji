@@ -7,11 +7,10 @@
  */
 import { getAppAudio, type AppAudio } from '../lib/audio/appAudio';
 import { createAppCapture, type AppCapture } from '../lib/audio/appCapture';
-import { createFormFactorLog } from '../lib/audio/formFactorLog';
 import type { Playback } from '../lib/audio/playback';
 import { realClock, type Clock } from '../lib/contract/clock';
 import { redact } from '../lib/diagnostics/redact';
-import { describeCause, reportInfo, reportWarning } from '../lib/diagnostics/report';
+import { describeCause, reportWarning } from '../lib/diagnostics/report';
 import { autoSaveConversation } from '../lib/export/appAutoSave';
 import type { AuthContext } from '../lib/provider/types';
 import { openDesktopCapture } from '../lib/screen/desktopFrames';
@@ -29,7 +28,6 @@ import { appProjectionSettings } from '../lib/view/appViewSettings';
 import { createConversationView, type ConversationViewState, type Readable } from '../lib/view/conversationView';
 import { createKaraoke, type KaraokeState } from '../lib/view/karaoke';
 import { presentProviders } from '../providers/registry';
-import useAudioStore from '../stores/audioStore';
 import { useProviderStore } from '../stores/providerStore';
 import { getEnvironment, isElectron } from '../utils/environment';
 import { trackBusy } from './busy';
@@ -40,6 +38,7 @@ import { registerRunPhase } from './runPhase';
 import { prepareScreenContext, releaseScreenContext, screenContextWanted, type PickedSource, type PickReason } from './screenContext';
 import { registerSubtitleFeed } from './subtitleFeed';
 import { appStartInputs, createFrameLog, decorateSessionAnalytics, teeFrames, type FrameLog } from './telemetry';
+import { ORG_REFUSAL_CODES } from '../lib/session/orgNotice';
 
 /** What only React can reach, handed in by `useAppSessionBridges`. */
 export interface AppBridges {
@@ -312,13 +311,6 @@ export function createAppSession(options: AppSessionOptions = {}): AppSession {
         return () => {};
       }
       attached = true;
-      // The form factor of each outlet, for the diagnostic log only. Forms are static unknown where no native reader runs (the extension),
-      // so only Electron's answer can be stale: current once a listing has joined it, as the lookup itself counts it, asked at each call.
-      const formLog = createFormFactorLog(
-        (line) => reportInfo('OutputForm', line),
-        () => !(isElectron() && window.electron) || useAudioStore.getState().nativeFormsCurrent,
-        faceToFaceFromStores,
-      );
       const offs: Array<() => void> = [
         // The panel's readiness is about the legs a start would open: the audio mode's.
         watchLegsFromStores(),
@@ -333,12 +325,6 @@ export function createAppSession(options: AppSessionOptions = {}): AppSession {
       const lock = () => useProviderStore.getState().setSelectionLocked(runner.state.getState().phase !== 'idle');
       lock();
       offs.push(runner.state.subscribe(lock), () => useProviderStore.getState().setSelectionLocked(false));
-      offs.push(
-        runner.state.subscribe((now, before) => {
-          if (now.phase === 'starting' && before.phase === 'idle') formLog.baseline(useAudioStore.getState());
-        }),
-        useAudioStore.subscribe((audio) => formLog.update(audio)),
-      );
       // The extension overlay's publisher reaches the session through this
       // leaf, for as long as the page is attached: the side panel's surface
       // class cannot import the root (plan 1e-4 ruling 1).
@@ -367,12 +353,16 @@ export function createAppSession(options: AppSessionOptions = {}): AppSession {
       // a wallet frozen since the last fetch): the wallet the gate and the
       // account button read is stale, so fetch it now — as the old app's
       // failed-start teardown did — rather than let every press meet the same
-      // refusal until the idle poll. A run that went live refetches in
-      // `onRunEnded` instead.
+      // refusal until the idle poll. A run that went live also refetches in
+      // `onRunEnded`.
       offs.push(runner.state.subscribe((now, before) => {
-        if (now.phase !== 'idle' || before.phase === 'idle' || now.lastEnd?.reason !== 'start-failed') return;
-        const code = now.lastEnd.notice?.code;
-        if (code === 'insufficient_balance' || code === 'wallet_frozen') refetchQuota();
+        if (now.phase !== 'idle' || before.phase === 'idle') return;
+        const reason = now.lastEnd?.reason;
+        const code = now.lastEnd?.notice?.code;
+        if (code === undefined) return;
+        if (reason === 'start-failed' && (code === 'insufficient_balance' || code === 'wallet_frozen' || ORG_REFUSAL_CODES.has(code))) refetchQuota();
+        // A run the organization's wallet ended mid-session (frozen, removed, held, spent): its status is stale too.
+        else if (reason === 'leg-failed' && ORG_REFUSAL_CODES.has(code)) refetchQuota();
       }));
       // A reload, the window or side panel closing, a page frozen into the
       // back/forward cache: close every leg and capture now; nothing is saved

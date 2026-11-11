@@ -11,6 +11,7 @@ vi.mock('../../services/ServiceFactory', () => ({
 }));
 
 import { SONIOX_DEFAULTS } from '../../providers/soniox/settings';
+import { setUseOwnBalance } from '../../lib/session/payerChoice';
 import { useAccountStore } from '../../stores/accountStore';
 import useAudioStore from '../../stores/audioStore';
 import { useProviderStore } from '../../stores/providerStore';
@@ -41,14 +42,49 @@ describe('useBalanceShortfall', () => {
     });
     useAudioStore.setState({ mode: 'speaker' });
     useSettingsStore.setState({ textOnly: false });
-    useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: 41_666, frozen: false } });
+    useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: 12_499, frozen: false } });
     const { result } = renderHook(() => useBalanceShortfall());
     expect(result.current).toBe(true);
 
     act(() => {
-      useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: 41_667, frozen: false } });
+      useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: 12_500, frozen: false } });
     });
     expect(result.current).toBe(false);
+  });
+
+  it("follows a member's payer switch", () => {
+    useProviderStore.setState({
+      selected: 'kizunaai_soniox',
+      entries: { kizunaai_soniox: { settings: SONIOX_DEFAULTS, credentials: {}, pair: { source: 'ja', target: 'en' } } },
+    });
+    localStorage.clear();
+    useAccountStore.setState({ account: {
+      status: 'known', balanceMicroUsd: 0, frozen: false,
+      organization: { name: 'Acme', availableMicroUsd: 0, frozen: false }, personal: { balanceMicroUsd: 5_000_000, frozen: false },
+    } });
+    const { result } = renderHook(() => useBalanceShortfall());
+    expect(result.current).toBe(true);
+    act(() => setUseOwnBalance(true));
+    expect(result.current).toBe(false);
+    act(() => setUseOwnBalance(false));
+    expect(result.current).toBe(true);
+    localStorage.clear();
+  });
+
+  it('does not flag a low balance for a personal payer whose wallet is not known', () => {
+    useProviderStore.setState({
+      selected: 'kizunaai_soniox',
+      entries: { kizunaai_soniox: { settings: SONIOX_DEFAULTS, credentials: {}, pair: { source: 'ja', target: 'en' } } },
+    });
+    localStorage.clear();
+    setUseOwnBalance(true);
+    useAccountStore.setState({ account: {
+      status: 'known', balanceMicroUsd: 0, frozen: false,
+      organization: { name: 'Acme', availableMicroUsd: 0, frozen: false },
+    } });
+    const { result } = renderHook(() => useBalanceShortfall());
+    expect(result.current).toBe(false);
+    localStorage.clear();
   });
 
   it('follows text only and the mode', () => {
@@ -57,7 +93,8 @@ describe('useBalanceShortfall', () => {
       entries: { kizunaai_soniox: { settings: SONIOX_DEFAULTS, credentials: {}, pair: { source: 'ja', target: 'en' } } },
     });
     useAudioStore.setState({ mode: 'speaker' });
-    useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: 20_000, frozen: false } });
+    // Between the text-only floor (8 334) and the speaking floor (12 500); split Both text only is 16 667.
+    useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: 10_000, frozen: false } });
     const { result, rerender } = renderHook(() => useBalanceShortfall());
     expect(result.current).toBe(true);
 
@@ -89,9 +126,11 @@ describe('useBalanceShortfall', () => {
       selected: 'kizunaai_soniox',
       entries: { kizunaai_soniox: { settings: { ...SONIOX_DEFAULTS, bothModeSharedSession: false }, credentials: {}, pair: { source: 'ja', target: 'en' } } },
     });
+    // Both sets reach the $1.00/h cap, so their floors are equal; the boundary
+    // below is what pins face-to-face to its own set.
     const faceToFace = sonioxRolesFloorMicroUsd(['mix_stt', 'mix_tts', 'par_tts']);
     const meeting = sonioxRolesFloorMicroUsd(['spk_stt', 'spk_tts', 'par_stt']);
-    expect(faceToFace).toBeGreaterThan(meeting);
+    expect(faceToFace).toBe(meeting);
     useAudioStore.setState({ mode: 'both', otherSide: 'meeting' });
     useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: meeting, frozen: false } });
     const { result } = renderHook(() => useBalanceShortfall());
@@ -100,9 +139,15 @@ describe('useBalanceShortfall', () => {
 
     act(() => {
       useAudioStore.setState({ otherSide: 'beside' });
+      useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: faceToFace - 1, frozen: false } });
     });
     expect(result.current).toBe(true);
     expect(liveGate('electron')).not.toBeNull();
+
+    act(() => {
+      useAccountStore.setState({ account: { status: 'known', balanceMicroUsd: faceToFace, frozen: false } });
+    });
+    expect(result.current).toBe(false);
   });
 
   it('is never short signed out, for a wallet loading or unknown, an own-key provider, or a frozen wallet', () => {

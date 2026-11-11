@@ -24,6 +24,10 @@
   <a href="../README.md">English</a> | 日本語 | <a href="README.zh.md">中文</a>
 </p>
 
+<p align="center">
+  <img src="../screenshots/demo.gif" alt="Sokuji デモ：Google Meet での日本語⇄英語の双方向翻訳" width="960">
+</p>
+
 ---
 
 ## なぜSokujiなのか？
@@ -67,7 +71,7 @@ graph LR
 
 ## デモ
 
-https://github.com/user-attachments/assets/1eaaa333-a7ce-4412-a295-16b7eb2310de
+https://github.com/user-attachments/assets/f48e2bee-4cad-4b40-b551-8ba59fb5652a
 
 ---
 

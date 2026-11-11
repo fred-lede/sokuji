@@ -640,6 +640,11 @@
   },
   "mainPanel": {
     "subtitleTakeover": "Översättningar visas i undertextöverlägget",
+    "payer": {
+      "paidBy": "Betalas av {{name}}",
+      "paidByYou": "Betalas av dig",
+      "useOwnBalance": "Använd mitt eget saldo"
+    },
     "function": "Funktion",
     "noChannelConfigured": "Aktivera mikrofon eller den andras ljud innan du börjar.",
     "release": "släpp",
@@ -808,7 +813,29 @@
   },
   "tokenUsage": {
     "unableToLoadQuota": "Kunde inte ladda kvotinformation",
-    "upgradeToPremium": "Uppgradera till Premium"
+    "upgradeToPremium": "Uppgradera till Premium",
+    "orgBalance": "Saldo för {{name}}",
+    "yourBalance": "Ditt saldo",
+    "yourOrganization": "din organisation",
+    "orgHeld": "{{held}} av beloppet är reserverat av pågående sessioner; oanvänd del återgår när de avslutas.",
+    "paused": "Pausad",
+    "runPayer": "Den här sessionen betalas av {{name}}",
+    "balance": "Saldo",
+    "availableBalance": "Tillgängligt",
+    "sessionHeld": "Reserverat av sessioner",
+    "heldHint": "Pågående eller nyligen avslutade sessioner reserverar en del av saldot. När de har avräknats återgår den oanvända delen till det tillgängliga saldot.",
+    "runwayLabel": "Beräknad återstående tid",
+    "runwayHint": "Tillgängligt saldo dividerat med din genomsnittliga kostnad per ljudtimme under de senaste 30 dagarna — det brukar räcka längre än så.",
+    "aboutDuration": "cirka {{amount}} {{unit}}",
+    "unitHours": "timmar",
+    "unitDays": "dagar",
+    "unitMonths": "månader",
+    "self30d": "Min användning · senaste 30 dagarna",
+    "org30d": "Min användning i den här organisationen · senaste 30 dagarna",
+    "spent": "Spenderat",
+    "usageUnavailable": "Användningsuppgifterna är inte tillgängliga",
+    "noUsage": "Ingen användning ännu",
+    "total30d": "Totalt för 30 dagar"
   },
   "logs": {
     "webrtcFallback": "WebRTC-anslutningen misslyckades, använder WebSocket istället"
@@ -1082,6 +1109,8 @@
   "titleBar": {
     "account": {
       "label": "Konto",
+      "personal": "Personligt",
+      "payerUnknown": "Konto",
       "lowBalance": "Konto — saldot är för lågt för att starta en session",
       "unverified": "Konto — e-post inte verifierad"
     },
@@ -1504,7 +1533,17 @@
     "speaker_tts_missing": "Översättning som motparten hör visas bara som text: ingen talmodell talar {{target}}.",
     "participant_tts_missing": "Översättning som jag hör visas bara som text: ingen talmodell talar {{target}}.",
     "participant_tts_over_budget": "Översättning som jag hör visas bara som text: inte tillräckligt med minne för att även läsa in motpartens talmodell.",
-    "screen_context_lost": "Skärmen du valde är inte längre tillgänglig; översättningen fortsätter med enbart ljud."
+    "screen_context_lost": "Skärmen du valde är inte längre tillgänglig; översättningen fortsätter med enbart ljud.",
+    "org_balance_held": "Din organisations saldo hålls av pågående sessioner. Försök igen när en avslutas, eller använd ditt eget saldo.",
+    "org_insufficient_balance": "Be organisationens ägare att fylla på saldot, eller använd ditt eget saldo.",
+    "org_insufficient_balance_owner": "Fyll på saldot för {{organization}} eller använd ditt eget saldo.",
+    "org_insufficient_balance_owner_unnamed": "Fyll på saldot för din organisation eller använd ditt eget saldo.",
+    "not_org_member": "Du ingår inte längre i {{organization}}.",
+    "not_org_member_unnamed": "Du ingår inte längre i din organisation.",
+    "org_wallet_frozen": "Kontot för {{organization}} är pausat. Kontakta ägaren eller använd ditt eget saldo.",
+    "org_wallet_frozen_unnamed": "Organisationens konto är pausat. Kontakta ägaren eller använd ditt eget saldo.",
+    "org_wallet_frozen_owner": "Kontot för {{organization}} är pausat. Kontakta Sokujis support eller använd ditt eget saldo.",
+    "org_wallet_frozen_owner_unnamed": "Organisationens konto är pausat. Kontakta Sokujis support eller använd ditt eget saldo."
   },
   "viewer": {
     "title": "Sokuji-undertexter",
