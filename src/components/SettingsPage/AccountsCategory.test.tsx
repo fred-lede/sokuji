@@ -115,7 +115,10 @@ describe('accounts and keys', () => {
 
   it('one OpenAI row with one key for the three OpenAI providers, and one Kizuna AI sign-in for both hosted ones', () => {
     render(<AccountsCategory locked={false} />);
-    expect(screen.getAllByRole('group', { name: /OpenAI/ })).toHaveLength(1);
+    // OpenAI Compatible is a fourth OpenAI-branded provider with a key of its own,
+    // since its endpoint is whatever the user names (spec 2026-11-03).
+    expect(screen.getAllByRole('group', { name: /^OpenAI$/ })).toHaveLength(1);
+    expect(screen.getAllByRole('group', { name: /OpenAI Compatible/ })).toHaveLength(1);
     expect(screen.getAllByRole('group', { name: /Kizuna AI/ })).toHaveLength(1);
     expect(screen.queryByRole('group', { name: /OpenAI Live/ })).toBeNull();
     expect(document.getElementById('provider-section')).not.toBeNull();

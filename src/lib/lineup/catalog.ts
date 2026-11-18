@@ -24,6 +24,7 @@ export const CAPS: readonly ProviderCaps[] = [
   endToEnd('openai', 'key'),
   endToEnd('openai_translate', 'key'),
   endToEnd('openai_live', 'key'),
+  endToEnd('openai_compatible', 'key'),
   endToEnd('qwen_livetranslate', 'key'),
   endToEnd('palabraai', 'key'),
   // The E2E build (`--mode e2e`) runs its sessions on the fake providers, so there a line-up may name them.

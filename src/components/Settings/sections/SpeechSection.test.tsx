@@ -276,7 +276,7 @@ describe('SpeechSection — the box under the modes, as the mock lists it', () =
     const { container } = render(<SpeechSection locked={false} />);
     const row = box(container)!.querySelector('.turn-mode-box__row')!;
     expect(row.firstElementChild?.textContent).toBe('Turn end');
-    expect(within(row as HTMLElement).getByRole('button').textContent).toBe('VAD Settings · Min Silence Duration: 1.40s');
+    expect(within(row as HTMLElement).getByRole('button').textContent).toBe('VAD Settings · Min Silence Duration: 0.70s');
   });
 
   it('Push-to-Talk: the key, and what letting go does', () => {
