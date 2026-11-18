@@ -76,7 +76,8 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    h3 { margin: vars.$space-2 0 vars.$space-1; font-size: vars.$font-caption; font-weight: vars.$weight-medium; color: vars.$text-muted; }
+    // On the line of the Back arrow and the search glass (owner, 2026-11-19); its items one step in from it.
+    h3 { margin: vars.$space-2 0 vars.$space-1; padding-inline: vars.$space-3; font-size: vars.$font-caption; font-weight: vars.$weight-medium; color: vars.$text-muted; }
   }
 
   &__item {
@@ -84,7 +85,9 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
-    padding: 6px 8px;
+    // The text one step in from its group's heading, which is on the line of the Back arrow and the search glass (owner,
+    // 2026-11-19: the headings and their items keep their levels); the highlight still starts at the search box's edge.
+    padding: 6px vars.$space-3 6px vars.$space-6;
     border: none;
     border-radius: vars.$radius-md;
     background: transparent;
@@ -161,8 +164,54 @@
     // The chosen language sits in the middle of the box: padding gives the height, not a fixed one.
     .language-select { height: auto; min-height: 30px; padding: 5px 26px 5px 8px; line-height: 18px; font-size: 12.5px; border-radius: 6px; }
     .language-swap-btn { padding: 6px; border: none; }
+    // Both: the other side's leg is a second row like the first (owner, 2026-11-18).
+    & + .language-pair-row { margin-top: 8px; }
   }
-  .language-mirror-line { font-size: 11.5px; color: vars.$text-muted; }
+  // Both's second line; its hear-or-read half is a choice inline with it.
+  .language-mirror-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 11.5px; color: vars.$text-muted; }
+  // The sentence's "hear / read" words as choices (owner, 2026-11-18, design 1): a word, not a field — the label's
+  // size and colour, a dashed underline and a small chevron (drawn in the text's own colour) to show it can be changed.
+  // The word's sentence around its choice (owner, 2026-11-19: only the verb is the choice). Its spaces are the
+  // language's own ("they hear"), kept at the edges of the text either side of the choice.
+  .language-receive-label { display: inline-flex; align-items: baseline; margin-bottom: 4px; white-space: pre; }
+  .language-receive {
+    appearance: none;
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    padding-inline-end: 16px;
+    border: none;
+    border-bottom: 1px dashed vars.$border-default;
+    border-radius: 0;
+    background:
+      linear-gradient(45deg, transparent 50%, currentColor 50%) no-repeat right 6px center / 4px 4px,
+      linear-gradient(135deg, currentColor 50%, transparent 50%) no-repeat right 2px center / 4px 4px;
+    background-color: transparent;
+    color: vars.$text-secondary;
+    font: inherit;
+    font-size: 12px;
+    line-height: 18px;
+    cursor: pointer;
+    &:hover { color: vars.$text-primary; border-bottom-color: vars.$text-secondary; }
+    &:focus-visible { @include vars.focus-ring; }
+    &:dir(rtl) { background-position: left 2px center, left 6px center; }
+    // Its list is the app's own, as every other select's (Settings.scss: the picker, its options, the check) — not the
+    // system's (owner, 2026-11-19, #124). The word keeps its small chevron above, so the picker's own icon is left out.
+    @supports (appearance: base-select) {
+      &, &::picker(select) { appearance: base-select; }
+      &::picker-icon { display: none; }
+    }
+  }
+  // Why a word cannot be changed now, and the way to the audio settings.
+  .language-receive-reason {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 4px 0 0;
+    font-size: 11.5px; color: vars.$text-muted;
+  }
+  .language-receive-reason__link {
+    padding: 0; border: none; background: none; font: inherit; color: vars.$color-primary; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+    &:focus-visible { @include vars.focus-ring; }
+  }
   .turn-detection-section .setting-item { margin: 0; }
   .turn-detection-options.settings-seg {
     display: inline-flex;
@@ -220,7 +269,9 @@
   // A card holding several bound stages: a part per stage (its name and state, its own options), split by a thin line.
   &__part { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid vars.$border-subtle; }
   &__name { font-size: 13px; font-weight: vars.$weight-semibold; color: vars.$text-primary; }
-  &__state { margin-left: auto; white-space: nowrap; font-style: normal; font-size: 11.5px; color: vars.$color-warning; &.is-ready { color: vars.$color-primary; } }
+  &__state { margin-left: auto; white-space: nowrap; font-style: normal; font-size: 11.5px; color: vars.$color-warning; &.is-ready { color: vars.$color-primary; } &.is-unused { color: vars.$text-muted; } }
+  // Speech not used this time (owner, 2026-11-18): why, readable — the choice above it stays as it was.
+  &__unused { margin: 6px 0 0; font-size: 11.5px; color: vars.$text-muted; span + span { margin-inline-start: 0.25em; } }
   // A key it lacks or that does not work (B-11): the state is the way to the key.
   &__state--link {
     padding: 0; border: none; background: none; font-family: inherit; cursor: pointer;
@@ -301,6 +352,8 @@
   border-bottom: 1px solid vars.$border-subtle;
   &:first-child { border-top: 1px solid vars.$border-subtle; }
   &__head { display: flex; align-items: center; gap: vars.$space-3; }
+  // The service's logo, as in the line-up's picker: a fixed box, so the names line up whatever the logo's shape.
+  &__icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: vars.$text-muted; }
   &__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
   // The name with the account's tags beside it; the tags wrap under the name in a narrow window.
   &__title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
@@ -727,8 +780,8 @@
   &__caption { margin: 8px 0 0; padding-top: 8px; border-top: 1px dashed vars.$border-subtle; font-size: 11.5px; color: vars.$text-muted; }
   .models-group__fold { border-top: none; }
   .models-stage__shown + .models-group__fold { border-top: 1px solid vars.$border-subtle; }
-  // Where an engine slot's "Browse library…" lands (B-20): the sections' pulse, on that stage's group.
-  &.highlight { animation: pulse-highlight 2s ease-out; border-radius: vars.$radius-md; }
+  // Where an engine slot's "Browse library…" lands (B-20): the sections' jump locator, on that stage's group.
+  &.highlight { @include vars.jump-hint; }
   // The model library's cards (B-20), a little apart; a card's "Delete …?" right under it.
   .models-card { margin-top: 6px; }
   .models-card > .model-row__confirm { margin-top: 6px; }
@@ -912,7 +965,10 @@
   }
 }
 .settings-page--narrow .sound-flow { display: none; }
-// A row the page went to (B-27: from the drawing above): the sections' pulse, on that row alone.
-// A target's landing: the row a link named (an account's row), pulsing once as the sections do.
+// A row the page went to (B-27: from the drawing above), or the row a link named (an account's row): the sections'
+// jump locator, on that row alone.
 .settings-page .setting-row.highlight,
-.settings-page .accounts-row.highlight { animation: pulse-highlight 2s ease-out; border-radius: vars.$radius-md; }
+.settings-page .accounts-row.highlight { @include vars.jump-hint; }
+
+// The jump locator's run (vars.jump-hint), for this stylesheet's targets.
+@include vars.jump-hint-keyframes;

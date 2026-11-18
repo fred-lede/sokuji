@@ -15,7 +15,10 @@
     "dismiss": "Abaikan",
     "none": "Tidak ada",
     "retry": "Coba lagi",
-    "topUp": "Isi ulang"
+    "topUp": "Isi ulang",
+    "translatedInto": "diterjemahkan ke",
+    "translatedFrom": "diterjemahkan dari",
+    "translatedBothWays": "diterjemahkan dua arah"
   },
   "settings": {
     "title": "Pengaturan",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "Saya berbicara",
       "iRead": "Saya membaca",
+      "theyReceiveHear": "mereka {{verb}}",
+      "theyReceiveRead": "mereka {{verb}}",
+      "theyHearVerb": "mendengar",
+      "theyReadVerb": "membaca",
+      "iReceiveHear": "Saya {{verb}}",
+      "iReceiveRead": "Saya {{verb}}",
+      "iHearVerb": "mendengar",
+      "iReadVerb": "membaca",
       "iHear": "Saya mendengar",
       "theyHear": "mereka mendengar",
       "theyRead": "mereka membaca",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "Tidak ada kunci yang berfungsi untuk {{region}}",
         "keyRefused": "Kunci ditolak",
         "keyNotVerified": "Kunci belum diverifikasi",
-        "checkingKey": "Memeriksa kunci…"
+        "checkingKey": "Memeriksa kunci…",
+        "notUsed": "Tidak dipakai kali ini"
       },
       "speechModeHint": "Kapan potongan ucapan dikirim untuk diterjemahkan; tetap selama sesi",
       "hint": "Layanan mana yang mengerjakan tiap tahap",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI menulis catatan melalui Kizuna AI, dibayar dari saldo Anda.",
       "notesOpenAiLine": "Menulis catatan dengan kunci OpenAI Anda sendiri.",
       "notesNeedSignInOrChoose": "Masuk, atau pilih OpenAI di sini, agar catatan ditulis.",
-      "notesNeedSignInOrKeyAndChoose": "Masuk, atau tambahkan kunci OpenAI di “Akun dan kunci” lalu pilih OpenAI di sini, agar catatan ditulis."
+      "notesNeedSignInOrKeyAndChoose": "Masuk, atau tambahkan kunci OpenAI di “Akun dan kunci” lalu pilih OpenAI di sini, agar catatan ditulis.",
+      "speechNotUsed": "Kali ini tidak ada yang dibacakan: terjemahan hanya tampil sebagai teks.",
+      "speechHowToHear": "Agar dibacakan, pilih “mendengar” di kalimat di atas."
     },
     "display": {
       "surface": "Tampilan mana",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Simpan (Enter)",
     "editCancelHint": "Batal (Esc)",
     "speakersHint": "Klik nama untuk mengganti nama pembicara. Untuk memberikan satu kalimat kepada orang lain, gunakan tombol “Ganti pembicara” di sebelahnya dalam transkrip.",
-    "sidePanel": "Panel samping",
-    "openSidePanel": "Buka panel samping",
-    "closeSidePanel": "Tutup panel samping",
+    "sidePanel": "Edit",
+    "resizeNotes": "Ubah ukuran catatan",
+    "resizeSidePanel": "Ubah ukuran panel edit",
+    "openSidePanel": "Tampilkan panel edit",
+    "closeSidePanel": "Sembunyikan panel edit",
     "selectRecords": "Pilih rekaman",
     "hideNotes": "Sembunyikan catatan",
     "showNotes": "Tampilkan catatan"

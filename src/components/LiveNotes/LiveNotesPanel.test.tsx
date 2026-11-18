@@ -11,6 +11,7 @@ import type { LiveState } from '../../lib/notes/live/state';
 import useSettingsStore from '../../stores/settingsStore';
 import { useLineUpStore } from '../../stores/lineUpStore';
 import LiveNotesPanel from './LiveNotesPanel';
+import { FOLLOW_DOCK_DELAY_MS } from '../Conversation/useFollowLatest';
 import { readLiveNotesLayout, useLiveNotesLayout } from '../../lib/notes/live/livePanel';
 
 const notesPricing = vi.hoisted(() => ({ value: { inputPerMTok: 0.2, cachedInputPerMTok: 0.02, outputPerMTok: 1, liveUsdPerHour: 0.04, afterSessionUsdPerHour: 0.012 } as null | Record<string, number> }));
@@ -36,7 +37,7 @@ afterEach(() => { cleanup(); localStorage.clear(); vi.unstubAllGlobals(); useLiv
 
 describe('the live notes panel', () => {
   it('with Kizuna AI, shows what the live notes have used so far, and says when the balance is low', () => {
-    useLineUpStore.setState({ lineUp: { transcription: 'soniox', translation: 'soniox', speech: 'soniox', summarisation: 'kizunaai' } } as never);
+    useLineUpStore.setState({ lineUp: { transcription: 'soniox', translation: 'soniox', speech: 'soniox', summarisation: 'kizunaai_openai' } } as never);
     act(() => {
       // 1000 × 0.2 + 8000 × 0.02 + 3000 × 1 per million: $0.00336.
       useLiveNotes.getState().addUsage('run-0001-aaaa', { prompt_tokens: 9000, completion_tokens: 3000, prompt_tokens_details: { cached_tokens: 8000 } });
@@ -249,11 +250,270 @@ describe('the live notes panel', () => {
       act(() => useLiveNotesLayout.getState().setLayout('conversation'));
       act(() => { useLiveNotes.getState().end('run-0001-aaaa'); useLiveNotes.getState().begin('run-0002-bbbb'); useLiveNotes.getState().update('run-0002-bbbb', notes); });
       act(() => useLiveNotesLayout.getState().setLayout('both'));
-      expect(body.scrollTop).toBe(0);
+      // The body is drawn anew for the new session.
+      expect((document.querySelector('.live-notes__body') as HTMLElement).scrollTop).toBe(0);
     });
   });
+  // Owner, 2026-11-19: the notes follow the newest as they come in, as the conversation's list does (useFollowLatest),
+  // unless the reader scrolled up to read back.
+  describe('following the newest notes', () => {
+    const more = (n: number): LiveState => ({
+      ...notes,
+      topics: [...notes.topics, ...Array.from({ length: n }, (_, i) => ({ n: 10 + i, title: `Topic ${i}`, summary: 's', points: [{ n: 100 + i, text: `Point ${i}`, kinds: [] }] }))],
+    });
+    /** jsdom has no layout: the body's box is a stand-in, scrollTop clamps to it, and a box change is told as a browser's ResizeObserver tells it. */
+    function mountBody() {
+      const watched: (() => void)[] = [];
+      vi.stubGlobal('ResizeObserver', class { private cb: () => void; constructor(cb: () => void) { this.cb = cb; } observe() { watched.push(this.cb); } disconnect() {} });
+      act(() => useLiveNotes.getState().update('run-0001-aaaa', notes));
+      render(<LiveNotesPanel onOpenHistory={vi.fn()} />);
+      const body = document.querySelector('.live-notes__body') as HTMLElement;
+      const box = { height: 1000, client: 300, top: 0, hidden: false };
+      Object.defineProperty(body, 'scrollHeight', { configurable: true, get: () => (box.hidden ? 0 : box.height) });
+      Object.defineProperty(body, 'clientHeight', { configurable: true, get: () => (box.hidden ? 0 : box.client) });
+      Object.defineProperty(body, 'scrollTop', {
+        configurable: true,
+        get: () => box.top,
+        set: (v: number) => { box.top = Math.max(0, Math.min(v, (box.hidden ? 0 : box.height - box.client))); },
+      });
+      body.scrollTo = vi.fn() as typeof body.scrollTo;
+      /** New notes come in: the body grows to `height`. */
+      const update = (height: number, n: number) => { box.height = height; act(() => useLiveNotes.getState().update('run-0001-aaaa', more(n))); };
+      const resized = () => act(() => watched.forEach((cb) => cb()));
+      /** The reader scrolls up to `top`, and stays there long enough for "Back to latest" to show. */
+      const readBack = (top: number) => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        try {
+          fireEvent.wheel(body, { deltaY: -10 });
+          box.top = top;
+          fireEvent.scroll(body);
+          act(() => { vi.advanceTimersByTime(FOLLOW_DOCK_DELAY_MS); });
+        } finally {
+          vi.useRealTimers();
+        }
+      };
+      return { body, box, update, resized, readBack };
+    }
+
+    it('keeps the newest notes in view while the reader is at the bottom', () => {
+      const { box, update } = mountBody();
+      update(1200, 1);
+      expect(box.top).toBe(900);
+      update(1500, 2);
+      expect(box.top).toBe(1200);
+    });
+
+    it('leaves the reader where they are once they scroll up, and follows again back at the bottom', () => {
+      const { body, box, update } = mountBody();
+      update(1200, 1);
+      fireEvent.wheel(body, { deltaY: -10 });
+      box.top = 400;
+      fireEvent.scroll(body);
+      update(1500, 2);
+      expect(box.top).toBe(400);
+      // Back down to the newest: following again.
+      fireEvent.wheel(body, { deltaY: 10 });
+      box.top = 1200;
+      fireEvent.scroll(body);
+      update(1800, 3);
+      expect(box.top).toBe(1500);
+    });
+
+    // Owner, 2026-11-19: "Back to latest" under the notes, as under the conversation.
+    it('shows "Back to latest" below the notes while the reader is reading back, which takes them to the newest', () => {
+      const { box, update, readBack } = mountBody();
+      update(1200, 1);
+      const dock = () => screen.queryByRole('button', { name: 'Back to latest' });
+      expect(dock()).toBeNull();
+      readBack(400);
+      expect(dock()).not.toBeNull();
+      // Below the notes, in the panel.
+      expect(document.querySelector('.live-notes__body + .follow-dock')).toBe(dock());
+      fireEvent.click(dock()!);
+      expect(box.top).toBe(900);
+      expect(dock()).toBeNull();
+      update(1500, 2);
+      expect(box.top).toBe(1200);
+    });
+
+    // Review: a session that starts and gets its first notes at once still starts following, whatever the last was.
+    it('starts each session following, with no "Back to latest", however the last one was left', () => {
+      const { update, readBack } = mountBody();
+      update(1200, 1);
+      readBack(400);
+      expect(screen.queryByRole('button', { name: 'Back to latest' })).not.toBeNull();
+      act(() => { useLiveNotes.getState().end('run-0001-aaaa'); useLiveNotes.getState().begin('run-0002-bbbb'); useLiveNotes.getState().update('run-0002-bbbb', notes); });
+      expect(screen.queryByRole('button', { name: 'Back to latest' })).toBeNull();
+      const next = document.querySelector('.live-notes__body') as HTMLElement;
+      const box2 = { height: 600, client: 300, top: 0 };
+      Object.defineProperty(next, 'scrollHeight', { configurable: true, get: () => box2.height });
+      Object.defineProperty(next, 'clientHeight', { configurable: true, get: () => box2.client });
+      Object.defineProperty(next, 'scrollTop', { configurable: true, get: () => box2.top, set: (v: number) => { box2.top = Math.max(0, Math.min(v, box2.height - box2.client)); } });
+      act(() => useLiveNotes.getState().update('run-0002-bbbb', more(1)));
+      expect(box2.top).toBe(300);
+    });
+
+    // Review (PR #787): the cost line can come in with nothing else changing (Kizuna AI chosen, or its rates loaded late).
+    it('keeps following when the cost line comes in on its own', () => {
+      const { box, update } = mountBody();
+      act(() => useLiveNotes.getState().addUsage('run-0001-aaaa', { prompt_tokens: 9000, completion_tokens: 3000 }));
+      update(1200, 1);
+      expect(box.top).toBe(900);
+      box.height = 1250;
+      act(() => useLineUpStore.setState({ lineUp: { transcription: 'soniox', translation: 'soniox', speech: 'soniox', summarisation: 'kizunaai_openai' } } as never));
+      expect(screen.getByText(/Live notes so far/)).toBeInTheDocument();
+      expect(box.top).toBe(950);
+    });
+
+    it('hidden and shown again, is at the newest if it was following, and where the reader was if not', () => {
+      const { body, box, update, resized } = mountBody();
+      update(1200, 1);
+      act(() => useLiveNotesLayout.getState().setLayout('conversation'));
+      box.hidden = true;
+      update(1500, 2);
+      box.hidden = false;
+      act(() => useLiveNotesLayout.getState().setLayout('both'));
+      resized();
+      expect(box.top).toBe(1200);
+      // Reading back, hidden and shown: where they were.
+      fireEvent.wheel(body, { deltaY: -10 });
+      box.top = 500;
+      fireEvent.scroll(body);
+      act(() => useLiveNotesLayout.getState().setLayout('conversation'));
+      box.hidden = true;
+      // A scroll landing while hidden reads 0 from the box with no layout.
+      body.scrollTop = 0;
+      fireEvent.scroll(body);
+      box.hidden = false;
+      act(() => useLiveNotesLayout.getState().setLayout('both'));
+      resized();
+      expect(box.top).toBe(500);
+    });
+  });
+
   // Owner, 2026-11-18: the panel's width can be dragged, at a divider on its left between it and the conversation, and
   // is kept for the next session (liveNotesWidth.ts).
+  // Owner, 2026-11-19: above the conversation in a narrow window, the divider under the notes drags their height, kept
+  // for the next session (liveNotesHeight.ts); never dragged, they take what they need (up to 40%, MainPanel.scss).
+  describe('its height, above the conversation in a narrow window', () => {
+    let column = 600;
+    let tall = 150;
+    let watchers: Array<() => void> = [];
+    /** The area grows or shrinks (the window resized), as a ResizeObserver tells it. */
+    const resizeColumn = (px: number) => { column = px; act(() => watchers.forEach((tell) => tell())); };
+    const press = (divider: Element, type: string, clientY: number, target: EventTarget = window) =>
+      (type === 'pointerdown' ? divider : target).dispatchEvent(Object.assign(new MouseEvent(type, { bubbles: true, clientY, button: 0 }), { pointerType: 'mouse' }));
+    function renderStacked(columnPx = 600, tallPx = 150) {
+      column = columnPx;
+      tall = tallPx;
+      vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(max-width: 767px)', media: query, addEventListener: () => {}, removeEventListener: () => {} }));
+      vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains('conversation-area') ? column : 0;
+      });
+      vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains('live-notes') ? tall : 0;
+      });
+      watchers = [];
+      vi.stubGlobal('ResizeObserver', class {
+        constructor(private readonly told: () => void) { watchers.push(() => this.told()); }
+        observe() {}
+        disconnect() {}
+      });
+      return render(<div className="conversation-area"><div className="conversation-column" /><LiveNotesPanel onOpenHistory={vi.fn()} /></div>);
+    }
+    const aside = () => document.querySelector('.live-notes') as HTMLElement;
+    afterEach(() => vi.restoreAllMocks());
+
+    it('has a divider across the area, under the notes, at the height they have; none for the width', () => {
+      renderStacked();
+      const divider = screen.getByRole('separator');
+      expect(divider).toHaveAttribute('aria-orientation', 'horizontal');
+      expect(divider).toHaveAttribute('aria-valuenow', '150');
+      expect(divider).toHaveAttribute('aria-valuemin', '80');
+      // The conversation keeps 120px and the divider's 1.
+      expect(divider).toHaveAttribute('aria-valuemax', '479');
+      // Never dragged: sized by what it holds.
+      expect(aside()).not.toHaveClass('live-notes--sized');
+      expect(aside().style.getPropertyValue('--live-notes-height')).toBe('');
+    });
+
+    it('moved, takes the new height and keeps it for the next session', () => {
+      renderStacked();
+      fireEvent.keyDown(screen.getByRole('separator'), { key: 'ArrowDown' });
+      expect(aside()).toHaveClass('live-notes--sized');
+      expect(aside().style.getPropertyValue('--live-notes-height')).toBe('166px');
+      expect(localStorage.getItem('liveNotes.height')).toBe('166');
+      cleanup();
+      renderStacked();
+      expect(aside().style.getPropertyValue('--live-notes-height')).toBe('166px');
+    });
+
+    it('stops where the conversation keeps its 120px, and keeps a taller height for a taller window', () => {
+      localStorage.setItem('liveNotes.height', '700');
+      renderStacked(600);
+      expect(aside().style.getPropertyValue('--live-notes-height')).toBe('479px');
+      expect(localStorage.getItem('liveNotes.height')).toBe('700');
+    });
+
+    it('a click on the divider, never dragged, leaves the notes sized by what they hold', () => {
+      renderStacked();
+      const divider = screen.getByRole('separator');
+      divider.dispatchEvent(Object.assign(new MouseEvent('pointerdown', { bubbles: true, clientY: 300, button: 0 }), { pointerType: 'mouse' }));
+      window.dispatchEvent(new MouseEvent('pointerup', { clientY: 300 }));
+      expect(aside()).not.toHaveClass('live-notes--sized');
+      expect(localStorage.getItem('liveNotes.height')).toBeNull();
+    });
+
+    // Review: notes holding less than the least height (before a session) are no reason for a click to keep one.
+    it('a click on the divider leaves notes shorter than the least height sized by what they hold', () => {
+      renderStacked(600, 50);
+      expect(screen.getByRole('separator')).toHaveAttribute('aria-valuenow', '50');
+      const divider = screen.getByRole('separator');
+      divider.dispatchEvent(Object.assign(new MouseEvent('pointerdown', { bubbles: true, clientY: 300, button: 0 }), { pointerType: 'mouse' }));
+      window.dispatchEvent(new MouseEvent('pointerup', { clientY: 300 }));
+      expect(aside()).not.toHaveClass('live-notes--sized');
+      expect(localStorage.getItem('liveNotes.height')).toBeNull();
+    });
+
+    // Review (PR #789): from notes shorter than the least height, a key that makes them taller gives them the least.
+    it('from notes shorter than the least height, ArrowDown gives them the least, and ArrowUp changes nothing', () => {
+      renderStacked(600, 50);
+      fireEvent.keyDown(screen.getByRole('separator'), { key: 'ArrowUp' });
+      expect(localStorage.getItem('liveNotes.height')).toBeNull();
+      fireEvent.keyDown(screen.getByRole('separator'), { key: 'ArrowDown' });
+      expect(localStorage.getItem('liveNotes.height')).toBe('80');
+      expect(aside().style.getPropertyValue('--live-notes-height')).toBe('80px');
+    });
+
+    // Review (PR #789): a release where the drag began is a click, whatever the window did meanwhile.
+    it('a release where the drag began keeps the height kept from a taller window, even if the window grew meanwhile', () => {
+      localStorage.setItem('liveNotes.height', '700');
+      renderStacked(600);
+      const divider = screen.getByRole('separator');
+      expect(divider).toHaveAttribute('aria-valuenow', '479');
+      press(divider, 'pointerdown', 300);
+      resizeColumn(900);
+      press(divider, 'pointerup', 300);
+      expect(localStorage.getItem('liveNotes.height')).toBe('700');
+      expect(aside().style.getPropertyValue('--live-notes-height')).toBe('700px');
+    });
+
+    it('a key at the limit keeps the height kept from a taller window', () => {
+      localStorage.setItem('liveNotes.height', '700');
+      renderStacked(600);
+      fireEvent.keyDown(screen.getByRole('separator'), { key: 'ArrowDown' });
+      expect(localStorage.getItem('liveNotes.height')).toBe('700');
+    });
+
+    it('alone in the area, or hidden, has no divider', () => {
+      renderStacked();
+      act(() => useLiveNotesLayout.getState().setLayout('notes'));
+      expect(screen.queryByRole('separator')).toBeNull();
+      act(() => useLiveNotesLayout.getState().setLayout('conversation'));
+      expect(screen.queryByRole('separator')).toBeNull();
+    });
+  });
+
   describe('its width', () => {
     /** The row's width, and what is told when it changes (the window resized, a side panel opened). */
     let rowWidth = 1400;

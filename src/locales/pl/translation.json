@@ -15,7 +15,10 @@
     "dismiss": "Odrzuć",
     "none": "Brak",
     "retry": "Ponów",
-    "topUp": "Doładuj"
+    "topUp": "Doładuj",
+    "translatedInto": "tłumaczone na",
+    "translatedFrom": "tłumaczone z",
+    "translatedBothWays": "tłumaczone w obie strony"
   },
   "settings": {
     "title": "Ustawienia",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "Ja mówię",
       "iRead": "Ja czytam",
+      "theyReceiveHear": "oni {{verb}}",
+      "theyReceiveRead": "oni {{verb}}",
+      "theyHearVerb": "słyszą",
+      "theyReadVerb": "czytają",
+      "iReceiveHear": "Ja {{verb}}",
+      "iReceiveRead": "Ja {{verb}}",
+      "iHearVerb": "słyszę",
+      "iReadVerb": "czytam",
       "iHear": "Ja słyszę",
       "theyHear": "oni słyszą",
       "theyRead": "oni czytają",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "Brak działającego klucza dla {{region}}",
         "keyRefused": "Klucz odrzucony",
         "keyNotVerified": "Klucz niezweryfikowany",
-        "checkingKey": "Sprawdzanie klucza…"
+        "checkingKey": "Sprawdzanie klucza…",
+        "notUsed": "Tym razem nieużywane"
       },
       "speechModeHint": "Kiedy fragment mowy idzie do tłumaczenia; stałe w trakcie sesji",
       "hint": "Która usługa wykonuje każdy etap",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI pisze notatki przez Kizuna AI, płatne z Twojego salda.",
       "notesOpenAiLine": "Pisze notatki z Twoim własnym kluczem OpenAI.",
       "notesNeedSignInOrChoose": "Zaloguj się albo wybierz tutaj OpenAI, aby notatki były pisane.",
-      "notesNeedSignInOrKeyAndChoose": "Zaloguj się albo dodaj klucz OpenAI w „Konta i klucze” i wybierz tutaj OpenAI, aby notatki były pisane."
+      "notesNeedSignInOrKeyAndChoose": "Zaloguj się albo dodaj klucz OpenAI w „Konta i klucze” i wybierz tutaj OpenAI, aby notatki były pisane.",
+      "speechNotUsed": "Tym razem nic nie jest czytane na głos: tłumaczenie widać tylko jako tekst.",
+      "speechHowToHear": "Aby było czytane, wybierz „słyszeć” w zdaniu powyżej."
     },
     "display": {
       "surface": "Który widok",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Zapisz (Enter)",
     "editCancelHint": "Anuluj (Esc)",
     "speakersHint": "Kliknij imię, aby zmienić nazwę mówcy. Aby przypisać jedno zdanie komuś innemu, użyj przycisku „Zmień mówcę” obok niego w transkrypcji.",
-    "sidePanel": "Panel boczny",
-    "openSidePanel": "Otwórz panel boczny",
-    "closeSidePanel": "Zamknij panel boczny",
+    "sidePanel": "Edycja",
+    "resizeNotes": "Zmień rozmiar notatek",
+    "resizeSidePanel": "Zmień rozmiar panelu edycji",
+    "openSidePanel": "Pokaż panel edycji",
+    "closeSidePanel": "Ukryj panel edycji",
     "selectRecords": "Zaznacz zapisy",
     "hideNotes": "Ukryj notatki",
     "showNotes": "Pokaż notatki"

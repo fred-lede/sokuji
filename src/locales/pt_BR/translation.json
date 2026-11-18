@@ -15,7 +15,10 @@
     "dismiss": "Dispensar",
     "none": "Nenhum",
     "retry": "Tentar novamente",
-    "topUp": "Recarregar"
+    "topUp": "Recarregar",
+    "translatedInto": "traduzido para",
+    "translatedFrom": "traduzido de",
+    "translatedBothWays": "traduzido nos dois sentidos"
   },
   "settings": {
     "title": "Configurações",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "eu falo",
       "iRead": "eu leio",
+      "theyReceiveHear": "eles {{verb}}",
+      "theyReceiveRead": "eles {{verb}}",
+      "theyHearVerb": "ouvem",
+      "theyReadVerb": "leem",
+      "iReceiveHear": "eu {{verb}}",
+      "iReceiveRead": "eu {{verb}}",
+      "iHearVerb": "ouço",
+      "iReadVerb": "leio",
       "iHear": "eu ouço",
       "theyHear": "eles ouvem",
       "theyRead": "eles leem",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "Nenhuma chave válida para {{region}}",
         "keyRefused": "Chave recusada",
         "keyNotVerified": "Chave não verificada",
-        "checkingKey": "Verificando a chave…"
+        "checkingKey": "Verificando a chave…",
+        "notUsed": "Não usado desta vez"
       },
       "speechModeHint": "Quando um trecho de fala vai para a tradução; fixo durante a sessão",
       "hint": "Qual serviço faz cada etapa",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "A OpenAI escreve as notas pela Kizuna AI, pagas com o seu saldo.",
       "notesOpenAiLine": "Escreve as notas com a sua própria chave da OpenAI.",
       "notesNeedSignInOrChoose": "Entre na sua conta, ou escolha a OpenAI aqui, para que as notas sejam escritas.",
-      "notesNeedSignInOrKeyAndChoose": "Entre na sua conta, ou adicione uma chave da OpenAI em “Contas e chaves” e escolha a OpenAI aqui, para que as notas sejam escritas."
+      "notesNeedSignInOrKeyAndChoose": "Entre na sua conta, ou adicione uma chave da OpenAI em “Contas e chaves” e escolha a OpenAI aqui, para que as notas sejam escritas.",
+      "speechNotUsed": "Desta vez nada é lido em voz alta: a tradução aparece só como texto.",
+      "speechHowToHear": "Para ouvi-la, escolha “ouvir” na frase acima."
     },
     "display": {
       "surface": "Qual exibição",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Salvar (Enter)",
     "editCancelHint": "Cancelar (Esc)",
     "speakersHint": "Clique em um nome para renomear o falante. Para passar uma frase para outra pessoa, use o botão “Trocar falante” ao lado dela na transcrição.",
-    "sidePanel": "Painel lateral",
-    "openSidePanel": "Abrir o painel lateral",
-    "closeSidePanel": "Fechar o painel lateral",
+    "sidePanel": "Editar",
+    "resizeNotes": "Redimensionar as notas",
+    "resizeSidePanel": "Redimensionar o painel de edição",
+    "openSidePanel": "Mostrar o painel de edição",
+    "closeSidePanel": "Ocultar o painel de edição",
     "selectRecords": "Selecionar registros",
     "hideNotes": "Ocultar as notas",
     "showNotes": "Mostrar as notas"

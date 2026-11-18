@@ -15,7 +15,10 @@
     "dismiss": "విస్మరించు",
     "none": "ఏదీ లేదు",
     "retry": "మళ్ళీ ప్రయత్నించండి",
-    "topUp": "టాప్ అప్"
+    "topUp": "టాప్ అప్",
+    "translatedInto": "అనువాద లక్ష్య భాష",
+    "translatedFrom": "అనువాద మూల భాష",
+    "translatedBothWays": "రెండు వైపులా అనువాదం"
   },
   "settings": {
     "title": "సెట్టింగ్స్",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "నేను మాట్లాడతాను",
       "iRead": "నేను చదువుతాను",
+      "theyReceiveHear": "వారు {{verb}}",
+      "theyReceiveRead": "వారు {{verb}}",
+      "theyHearVerb": "వింటారు",
+      "theyReadVerb": "చదువుతారు",
+      "iReceiveHear": "నేను {{verb}}",
+      "iReceiveRead": "నేను {{verb}}",
+      "iHearVerb": "వింటాను",
+      "iReadVerb": "చదువుతాను",
       "iHear": "నేను వింటాను",
       "theyHear": "వారు వింటారు",
       "theyRead": "వారు చదువుతారు",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "{{region}} కోసం పని చేసే కీ లేదు",
         "keyRefused": "కీ అంగీకరించబడలేదు",
         "keyNotVerified": "కీ ధృవీకరించబడలేదు",
-        "checkingKey": "కీని తనిఖీ చేస్తోంది…"
+        "checkingKey": "కీని తనిఖీ చేస్తోంది…",
+        "notUsed": "ఈసారి ఉపయోగించబడదు"
       },
       "speechModeHint": "మాటలోని ఒక భాగం ఎప్పుడు అనువాదానికి వెళ్తుంది; సెషన్ సమయంలో మారదు",
       "hint": "ప్రతి దశను ఏ సేవ చేస్తుంది",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "Kizuna AI ద్వారా OpenAI గమనికలు రాస్తుంది; మీ బ్యాలెన్స్ నుంచి చెల్లించబడుతుంది.",
       "notesOpenAiLine": "మీ సొంత OpenAI కీతో గమనికలు రాస్తుంది.",
       "notesNeedSignInOrChoose": "గమనికలు రాయించడానికి సైన్ ఇన్ చేయండి, లేదా ఇక్కడ OpenAIని ఎంచుకోండి.",
-      "notesNeedSignInOrKeyAndChoose": "గమనికలు రాయించడానికి సైన్ ఇన్ చేయండి, లేదా “ఖాతాలు, కీలు”లో OpenAI కీని జోడించి ఇక్కడ OpenAIని ఎంచుకోండి."
+      "notesNeedSignInOrKeyAndChoose": "గమనికలు రాయించడానికి సైన్ ఇన్ చేయండి, లేదా “ఖాతాలు, కీలు”లో OpenAI కీని జోడించి ఇక్కడ OpenAIని ఎంచుకోండి.",
+      "speechNotUsed": "ఈసారి ఏదీ బిగ్గరగా చదవబడదు: అనువాదం టెక్స్ట్‌గా మాత్రమే కనిపిస్తుంది.",
+      "speechHowToHear": "బిగ్గరగా వినాలంటే, పై వాక్యంలో “వినడం” ఎంచుకోండి."
     },
     "display": {
       "surface": "ఏ ప్రదర్శన",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "సేవ్ చేయండి (Enter)",
     "editCancelHint": "రద్దు చేయండి (Esc)",
     "speakersHint": "మాట్లాడేవారి పేరు మార్చడానికి పేరుపై క్లిక్ చేయండి. ఒక వాక్యాన్ని మరొకరికి ఇవ్వడానికి, ట్రాన్స్‌క్రిప్ట్‌లో దాని పక్కన ఉన్న “మాట్లాడేవారిని మార్చండి” బటన్‌ను ఉపయోగించండి.",
-    "sidePanel": "సైడ్ ప్యానెల్",
-    "openSidePanel": "సైడ్ ప్యానెల్ తెరవండి",
-    "closeSidePanel": "సైడ్ ప్యానెల్ మూసివేయండి",
+    "sidePanel": "సవరించు",
+    "resizeNotes": "గమనికల పరిమాణం మార్చు",
+    "resizeSidePanel": "సవరణ ప్యానెల్ పరిమాణం మార్చు",
+    "openSidePanel": "సవరణ ప్యానెల్ చూపించు",
+    "closeSidePanel": "సవరణ ప్యానెల్ దాచు",
     "selectRecords": "రికార్డులను ఎంచుకోండి",
     "hideNotes": "గమనికలను దాచండి",
     "showNotes": "గమనికలను చూపండి"

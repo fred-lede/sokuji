@@ -15,7 +15,10 @@
     "dismiss": "התעלם",
     "none": "ללא",
     "retry": "נסה שוב",
-    "topUp": "טעינת יתרה"
+    "topUp": "טעינת יתרה",
+    "translatedInto": "שפת היעד",
+    "translatedFrom": "שפת המקור",
+    "translatedBothWays": "תרגום דו־כיווני"
   },
   "settings": {
     "title": "הגדרות",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "אני מדבר",
       "iRead": "אני קורא",
+      "theyReceiveHear": "הם {{verb}}",
+      "theyReceiveRead": "הם {{verb}}",
+      "theyHearVerb": "שומעים",
+      "theyReadVerb": "קוראים",
+      "iReceiveHear": "אני {{verb}}",
+      "iReceiveRead": "אני {{verb}}",
+      "iHearVerb": "שומע",
+      "iReadVerb": "קורא",
       "iHear": "אני שומע",
       "theyHear": "הם שומעים",
       "theyRead": "הם קוראים",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "אין מפתח תקין עבור {{region}}",
         "keyRefused": "המפתח לא התקבל",
         "keyNotVerified": "המפתח לא אומת",
-        "checkingKey": "בודקים את המפתח…"
+        "checkingKey": "בודקים את המפתח…",
+        "notUsed": "לא בשימוש הפעם"
       },
       "speechModeHint": "מתי קטע דיבור נשלח לתרגום; קבוע במהלך הסשן",
       "hint": "איזה שירות מבצע כל שלב",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI כותבת את ההערות דרך Kizuna AI, בתשלום מהיתרה שלך.",
       "notesOpenAiLine": "כותב את ההערות עם מפתח OpenAI משלך.",
       "notesNeedSignInOrChoose": "כדי שייכתבו הערות, היכנסו לחשבון או בחרו כאן ב-OpenAI.",
-      "notesNeedSignInOrKeyAndChoose": "כדי שייכתבו הערות, היכנסו לחשבון או הוסיפו מפתח OpenAI ב„חשבונות ומפתחות” ובחרו כאן ב-OpenAI."
+      "notesNeedSignInOrKeyAndChoose": "כדי שייכתבו הערות, היכנסו לחשבון או הוסיפו מפתח OpenAI ב„חשבונות ומפתחות” ובחרו כאן ב-OpenAI.",
+      "speechNotUsed": "הפעם שום דבר לא מוקרא: התרגום מוצג כטקסט בלבד.",
+      "speechHowToHear": "כדי שיוקרא, בחר „לשמוע” במשפט שלמעלה."
     },
     "display": {
       "surface": "איזו תצוגה",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "שמירה (Enter)",
     "editCancelHint": "ביטול (Esc)",
     "speakersHint": "לחצו על שם כדי לשנות את שם הדובר. כדי להעביר משפט אחד למישהו אחר, השתמשו בכפתור „החלפת דובר” שלידו בתמלול.",
-    "sidePanel": "חלונית צד",
-    "openSidePanel": "פתיחת חלונית הצד",
-    "closeSidePanel": "סגירת חלונית הצד",
+    "sidePanel": "עריכה",
+    "resizeNotes": "שינוי גודל ההערות",
+    "resizeSidePanel": "שינוי גודל חלונית העריכה",
+    "openSidePanel": "הצגת חלונית העריכה",
+    "closeSidePanel": "הסתרת חלונית העריכה",
     "selectRecords": "בחירת רשומות",
     "hideNotes": "הסתרת ההערות",
     "showNotes": "הצגת ההערות"

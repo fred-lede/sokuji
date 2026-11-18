@@ -15,7 +15,10 @@
     "dismiss": "Скрыть",
     "none": "Нет",
     "retry": "Повторить",
-    "topUp": "Пополнить"
+    "topUp": "Пополнить",
+    "translatedInto": "перевод на",
+    "translatedFrom": "перевод с",
+    "translatedBothWays": "перевод в обе стороны"
   },
   "settings": {
     "title": "Настройки",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "я говорю на",
       "iRead": "я читаю",
+      "theyReceiveHear": "собеседник {{verb}}",
+      "theyReceiveRead": "собеседник {{verb}}",
+      "theyHearVerb": "слышит",
+      "theyReadVerb": "читает",
+      "iReceiveHear": "я {{verb}}",
+      "iReceiveRead": "я {{verb}}",
+      "iHearVerb": "слышу",
+      "iReadVerb": "читаю",
       "iHear": "я слышу",
       "theyHear": "собеседник слышит",
       "theyRead": "собеседник читает",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "Нет рабочего ключа для {{region}}",
         "keyRefused": "Ключ не принят",
         "keyNotVerified": "Ключ не проверен",
-        "checkingKey": "Проверяем ключ…"
+        "checkingKey": "Проверяем ключ…",
+        "notUsed": "В этот раз не используется"
       },
       "speechModeHint": "Когда фрагмент речи уходит на перевод; во время сеанса не меняется",
       "hint": "Какой сервис выполняет каждый этап",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI пишет заметки через Kizuna AI, оплата с вашего баланса.",
       "notesOpenAiLine": "Пишет заметки с вашим собственным ключом OpenAI.",
       "notesNeedSignInOrChoose": "Войдите в аккаунт или выберите здесь OpenAI, чтобы писались заметки.",
-      "notesNeedSignInOrKeyAndChoose": "Войдите в аккаунт или добавьте ключ OpenAI в разделе «Аккаунты и ключи» и выберите здесь OpenAI, чтобы писались заметки."
+      "notesNeedSignInOrKeyAndChoose": "Войдите в аккаунт или добавьте ключ OpenAI в разделе «Аккаунты и ключи» и выберите здесь OpenAI, чтобы писались заметки.",
+      "speechNotUsed": "В этот раз ничего не зачитывается: перевод показывается только текстом.",
+      "speechHowToHear": "Чтобы его зачитывали, выберите «слышать» в предложении выше."
     },
     "display": {
       "surface": "Какое отображение",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Сохранить (Enter)",
     "editCancelHint": "Отмена (Esc)",
     "speakersHint": "Нажмите на имя, чтобы переименовать говорящего. Чтобы отдать одну фразу другому, нажмите кнопку «Сменить говорящего» рядом с ней в расшифровке.",
-    "sidePanel": "Боковая панель",
-    "openSidePanel": "Открыть боковую панель",
-    "closeSidePanel": "Закрыть боковую панель",
+    "sidePanel": "Правка",
+    "resizeNotes": "Изменить размер заметок",
+    "resizeSidePanel": "Изменить размер панели правки",
+    "openSidePanel": "Показать панель правки",
+    "closeSidePanel": "Скрыть панель правки",
     "selectRecords": "Выбрать записи",
     "hideNotes": "Скрыть заметки",
     "showNotes": "Показать заметки"

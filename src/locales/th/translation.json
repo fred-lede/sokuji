@@ -15,7 +15,10 @@
     "dismiss": "ปิด",
     "none": "ไม่มี",
     "retry": "ลองใหม่",
-    "topUp": "เติมเงิน"
+    "topUp": "เติมเงิน",
+    "translatedInto": "แปลเป็น",
+    "translatedFrom": "แปลจาก",
+    "translatedBothWays": "แปลทั้งสองทาง"
   },
   "settings": {
     "title": "การตั้งค่า",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "ฉันพูด",
       "iRead": "ฉันอ่าน",
+      "theyReceiveHear": "พวกเขา{{verb}}",
+      "theyReceiveRead": "พวกเขา{{verb}}",
+      "theyHearVerb": "ได้ยิน",
+      "theyReadVerb": "อ่าน",
+      "iReceiveHear": "ฉัน{{verb}}",
+      "iReceiveRead": "ฉัน{{verb}}",
+      "iHearVerb": "ได้ยิน",
+      "iReadVerb": "อ่าน",
       "iHear": "ฉันได้ยิน",
       "theyHear": "พวกเขาได้ยิน",
       "theyRead": "พวกเขาอ่าน",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "ไม่มีคีย์ที่ใช้ได้สำหรับ{{region}}",
         "keyRefused": "คีย์ไม่ถูกยอมรับ",
         "keyNotVerified": "ยังไม่ได้ยืนยันคีย์",
-        "checkingKey": "กำลังตรวจสอบคีย์…"
+        "checkingKey": "กำลังตรวจสอบคีย์…",
+        "notUsed": "ครั้งนี้ไม่ได้ใช้"
       },
       "speechModeHint": "เมื่อไรที่คำพูดช่วงหนึ่งถูกส่งไปแปล เปลี่ยนไม่ได้ระหว่างเซสชัน",
       "hint": "บริการใดทำแต่ละขั้น",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI เขียนบันทึกผ่าน Kizuna AI ชำระจากยอดเงินของคุณ",
       "notesOpenAiLine": "เขียนบันทึกด้วยคีย์ OpenAI ของคุณเอง",
       "notesNeedSignInOrChoose": "ลงชื่อเข้าใช้ หรือเลือก OpenAI ที่นี่ เพื่อให้เขียนบันทึก",
-      "notesNeedSignInOrKeyAndChoose": "ลงชื่อเข้าใช้ หรือเพิ่มคีย์ OpenAI ใน “บัญชีและคีย์” แล้วเลือก OpenAI ที่นี่ เพื่อให้เขียนบันทึก"
+      "notesNeedSignInOrKeyAndChoose": "ลงชื่อเข้าใช้ หรือเพิ่มคีย์ OpenAI ใน “บัญชีและคีย์” แล้วเลือก OpenAI ที่นี่ เพื่อให้เขียนบันทึก",
+      "speechNotUsed": "ครั้งนี้ไม่มีการอ่านออกเสียง คำแปลแสดงเป็นข้อความอย่างเดียว",
+      "speechHowToHear": "ถ้าต้องการให้อ่านออกเสียง ให้เลือก “ได้ยิน” ในประโยคด้านบน"
     },
     "display": {
       "surface": "การแสดงผลใด",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "บันทึก (Enter)",
     "editCancelHint": "ยกเลิก (Esc)",
     "speakersHint": "คลิกชื่อเพื่อเปลี่ยนชื่อผู้พูด หากต้องการให้ประโยคหนึ่งเป็นของคนอื่น ให้ใช้ปุ่ม “เปลี่ยนผู้พูด” ข้างประโยคนั้นในบทถอดความ",
-    "sidePanel": "แผงด้านข้าง",
-    "openSidePanel": "เปิดแผงด้านข้าง",
-    "closeSidePanel": "ปิดแผงด้านข้าง",
+    "sidePanel": "แก้ไข",
+    "resizeNotes": "ปรับขนาดบันทึก",
+    "resizeSidePanel": "ปรับขนาดแผงแก้ไข",
+    "openSidePanel": "แสดงแผงแก้ไข",
+    "closeSidePanel": "ซ่อนแผงแก้ไข",
     "selectRecords": "เลือกรายการ",
     "hideNotes": "ซ่อนบันทึก",
     "showNotes": "แสดงบันทึก"

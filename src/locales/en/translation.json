@@ -15,7 +15,10 @@
     "dismiss": "Dismiss",
     "none": "None",
     "retry": "Retry",
-    "topUp": "Top up"
+    "topUp": "Top up",
+    "translatedInto": "translated into",
+    "translatedFrom": "translated from",
+    "translatedBothWays": "translated both ways"
   },
   "settings": {
     "title": "Settings",
@@ -338,6 +341,14 @@
     "langSentence": {
       "iSpeak": "I speak",
       "iRead": "I read",
+      "theyReceiveHear": "they {{verb}}",
+      "theyReceiveRead": "they {{verb}}",
+      "theyHearVerb": "hear",
+      "theyReadVerb": "read",
+      "iReceiveHear": "I {{verb}}",
+      "iReceiveRead": "I {{verb}}",
+      "iHearVerb": "hear",
+      "iReadVerb": "read",
       "iHear": "I hear",
       "theyHear": "they hear",
       "theyRead": "they read",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "No working key for {{region}}",
         "keyRefused": "Key not accepted",
         "keyNotVerified": "Key not verified",
-        "checkingKey": "Checking the key…"
+        "checkingKey": "Checking the key…",
+        "notUsed": "Not used this time"
       },
       "speechModeHint": "When a stretch of speech goes off to be translated; fixed during a session",
       "hint": "Which service does each stage",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI writes the notes through Kizuna AI, paid from your balance.",
       "notesOpenAiLine": "Writes the notes with your own OpenAI key.",
       "notesNeedSignInOrChoose": "Sign in, or choose OpenAI here, to have notes written.",
-      "notesNeedSignInOrKeyAndChoose": "Sign in, or add an OpenAI key in Accounts and keys and choose OpenAI here, to have notes written."
+      "notesNeedSignInOrKeyAndChoose": "Sign in, or add an OpenAI key in Accounts and keys and choose OpenAI here, to have notes written.",
+      "speechNotUsed": "Nothing is read aloud this time: the translation shows as text only.",
+      "speechHowToHear": "To have it read aloud, choose “hear” in the sentence above."
     },
     "display": {
       "surface": "Which display",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Save (Enter)",
     "editCancelHint": "Cancel (Esc)",
     "speakersHint": "Click a name to rename the speaker. To give one sentence to someone else, use the “Change speaker” button beside it in the transcript.",
-    "sidePanel": "Side panel",
-    "openSidePanel": "Open the side panel",
-    "closeSidePanel": "Close the side panel",
+    "sidePanel": "Edit",
+    "resizeNotes": "Resize the notes",
+    "resizeSidePanel": "Resize the edit panel",
+    "openSidePanel": "Show the edit panel",
+    "closeSidePanel": "Hide the edit panel",
     "selectRecords": "Select records",
     "hideNotes": "Hide the notes",
     "showNotes": "Show the notes"

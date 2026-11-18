@@ -15,7 +15,10 @@
     "dismiss": "تجاهل",
     "none": "بدون",
     "retry": "إعادة المحاولة",
-    "topUp": "شحن الرصيد"
+    "topUp": "شحن الرصيد",
+    "translatedInto": "الترجمة إلى",
+    "translatedFrom": "الترجمة من",
+    "translatedBothWays": "ترجمة في الاتجاهين"
   },
   "settings": {
     "title": "الإعدادات",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "أتحدث",
       "iRead": "أقرأ",
+      "theyReceiveHear": "{{verb}}",
+      "theyReceiveRead": "{{verb}}",
+      "theyHearVerb": "يسمعون",
+      "theyReadVerb": "يقرأون",
+      "iReceiveHear": "{{verb}}",
+      "iReceiveRead": "{{verb}}",
+      "iHearVerb": "أسمع",
+      "iReadVerb": "أقرأ",
       "iHear": "أسمع",
       "theyHear": "يسمعون",
       "theyRead": "يقرأون",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "لا يوجد مفتاح صالح لـ {{region}}",
         "keyRefused": "المفتاح غير مقبول",
         "keyNotVerified": "لم يُتحقَّق من المفتاح",
-        "checkingKey": "جارٍ التحقق من المفتاح…"
+        "checkingKey": "جارٍ التحقق من المفتاح…",
+        "notUsed": "غير مستخدم هذه المرة"
       },
       "speechModeHint": "متى يُرسَل مقطع من الكلام للترجمة؛ لا يتغير أثناء الجلسة",
       "hint": "أي خدمة تتولى كل مرحلة",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "تكتب OpenAI الملاحظات عبر Kizuna AI، وتُدفع من رصيدك.",
       "notesOpenAiLine": "يكتب الملاحظات بمفتاح OpenAI الخاص بك.",
       "notesNeedSignInOrChoose": "سجّل الدخول، أو اختر OpenAI هنا، لتُكتب الملاحظات.",
-      "notesNeedSignInOrKeyAndChoose": "سجّل الدخول، أو أضف مفتاح OpenAI في «الحسابات والمفاتيح» ثم اختر OpenAI هنا، لتُكتب الملاحظات."
+      "notesNeedSignInOrKeyAndChoose": "سجّل الدخول، أو أضف مفتاح OpenAI في «الحسابات والمفاتيح» ثم اختر OpenAI هنا، لتُكتب الملاحظات.",
+      "speechNotUsed": "لا يُقرأ شيء بصوت عالٍ هذه المرة: تظهر الترجمة نصًّا فقط.",
+      "speechHowToHear": "لتُقرأ بصوت عالٍ، اختر «السماع» في الجملة أعلاه."
     },
     "display": {
       "surface": "أي عرض",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "حفظ (Enter)",
     "editCancelHint": "إلغاء (Esc)",
     "speakersHint": "انقر اسمًا لإعادة تسمية المتحدث. لنقل جملة واحدة إلى شخص آخر، استخدم زر «تغيير المتحدث» بجانبها في النص المفرغ.",
-    "sidePanel": "اللوحة الجانبية",
-    "openSidePanel": "فتح اللوحة الجانبية",
-    "closeSidePanel": "إغلاق اللوحة الجانبية",
+    "sidePanel": "تحرير",
+    "resizeNotes": "تغيير حجم الملاحظات",
+    "resizeSidePanel": "تغيير حجم لوحة التحرير",
+    "openSidePanel": "إظهار لوحة التحرير",
+    "closeSidePanel": "إخفاء لوحة التحرير",
     "selectRecords": "تحديد السجلات",
     "hideNotes": "إخفاء الملاحظات",
     "showNotes": "إظهار الملاحظات"

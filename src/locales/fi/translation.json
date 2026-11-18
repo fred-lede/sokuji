@@ -15,7 +15,10 @@
     "dismiss": "Hylkää",
     "none": "Ei mitään",
     "retry": "Yritä uudelleen",
-    "topUp": "Lataa saldoa"
+    "topUp": "Lataa saldoa",
+    "translatedInto": "käännöksen kohdekieli",
+    "translatedFrom": "käännöksen lähdekieli",
+    "translatedBothWays": "käännös molempiin suuntiin"
   },
   "settings": {
     "title": "Asetukset",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "Puhun",
       "iRead": "Luen",
+      "theyReceiveHear": "he {{verb}}",
+      "theyReceiveRead": "he {{verb}}",
+      "theyHearVerb": "kuulevat",
+      "theyReadVerb": "lukevat",
+      "iReceiveHear": "{{verb}}",
+      "iReceiveRead": "{{verb}}",
+      "iHearVerb": "Kuulen",
+      "iReadVerb": "Luen",
       "iHear": "Kuulen",
       "theyHear": "he kuulevat",
       "theyRead": "he lukevat",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "Ei toimivaa avainta alueelle {{region}}",
         "keyRefused": "Avainta ei hyväksytty",
         "keyNotVerified": "Avainta ei tarkistettu",
-        "checkingKey": "Tarkistetaan avainta…"
+        "checkingKey": "Tarkistetaan avainta…",
+        "notUsed": "Ei käytössä tällä kertaa"
       },
       "speechModeHint": "Milloin puheen pätkä lähtee käännettäväksi; kiinteä istunnon aikana",
       "hint": "Mikä palvelu hoitaa kunkin vaiheen",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI kirjoittaa muistiinpanot Kizuna AI:n kautta, maksetaan saldostasi.",
       "notesOpenAiLine": "Kirjoittaa muistiinpanot omalla OpenAI-avaimellasi.",
       "notesNeedSignInOrChoose": "Kirjaudu sisään tai valitse tästä OpenAI, niin muistiinpanot kirjoitetaan.",
-      "notesNeedSignInOrKeyAndChoose": "Kirjaudu sisään tai lisää OpenAI-avain kohdassa ”Tilit ja avaimet” ja valitse tästä OpenAI, niin muistiinpanot kirjoitetaan."
+      "notesNeedSignInOrKeyAndChoose": "Kirjaudu sisään tai lisää OpenAI-avain kohdassa ”Tilit ja avaimet” ja valitse tästä OpenAI, niin muistiinpanot kirjoitetaan.",
+      "speechNotUsed": "Tällä kertaa mitään ei lueta ääneen: käännös näkyy vain tekstinä.",
+      "speechHowToHear": "Jos haluat sen luettavan, valitse yllä olevasta lauseesta ”kuulla”."
     },
     "display": {
       "surface": "Mikä näkymä",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Tallenna (Enter)",
     "editCancelHint": "Peruuta (Esc)",
     "speakersHint": "Nimeä puhuja uudelleen napsauttamalla nimeä. Jos haluat antaa yhden lauseen jollekulle toiselle, käytä litteroinnissa sen vieressä olevaa Vaihda puhuja -painiketta.",
-    "sidePanel": "Sivupaneeli",
-    "openSidePanel": "Avaa sivupaneeli",
-    "closeSidePanel": "Sulje sivupaneeli",
+    "sidePanel": "Muokkaa",
+    "resizeNotes": "Muuta muistiinpanojen kokoa",
+    "resizeSidePanel": "Muuta muokkauspaneelin kokoa",
+    "openSidePanel": "Näytä muokkauspaneeli",
+    "closeSidePanel": "Piilota muokkauspaneeli",
     "selectRecords": "Valitse tallenteita",
     "hideNotes": "Piilota muistiinpanot",
     "showNotes": "Näytä muistiinpanot"

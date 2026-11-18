@@ -8,7 +8,8 @@ vi.mock('../../utils/environment', async (importOriginal) => ({
 }));
 const baseSelect = vi.hoisted(() => ({ rich: false }));
 vi.mock('../../utils/supportsBaseSelect', () => ({ supportsBaseSelect: () => baseSelect.rich }));
-vi.mock('../providers/ProviderLanguages', () => ({ ProviderLanguages: ({ heading }: { heading?: boolean }) => <div id="languages-section" data-heading={String(heading)} /> }));
+const languagesProps = vi.hoisted(() => ({ last: null as null | { heading?: boolean; receive?: ReceiveChoices } }));
+vi.mock('../providers/ProviderLanguages', () => ({ ProviderLanguages: (props: { heading?: boolean }) => { languagesProps.last = props; return <div id="languages-section" data-heading={String(props.heading)} />; } }));
 vi.mock('../Settings/sections/SpeechSection', () => ({ SpeechSection: () => <div id="turn-detection-section" /> }));
 vi.mock('./EdgeVoices', () => ({ EdgeVoices: () => <div id="edge-voices-section" /> }));
 vi.mock('./LocalVoices', () => ({ LocalVoices: () => <div id="local-voices-section" /> }));
@@ -40,15 +41,19 @@ const tracked = vi.hoisted(() => [] as Array<[string, unknown]>);
 vi.mock('../../lib/analytics', () => ({ useAnalytics: () => ({ trackEvent: (name: string, props: unknown) => tracked.push([name, props]) }) }));
 
 import { LineUpCategory, stageInSentence } from './LineUpCategory';
+import type { ReceiveChoices } from '../providers/LanguagePairSection';
 import { useWordList } from '../../lib/words/list';
 import { useLineUpStore } from '../../stores/lineUpStore';
 import { useProviderStore } from '../../stores/providerStore';
 import useSettingsStore from '../../stores/settingsStore';
+import useAudioStore from '../../stores/audioStore';
+import { useRoutingStore } from '../../stores/routingStore';
 
 const soniox = { transcription: 'soniox', translation: 'soniox', speech: 'soniox', summarisation: null };
 const optionTexts = (name: string) => within(screen.getByRole('combobox', { name })).getAllByRole('option').map((o) => o.textContent ?? '');
 
 beforeEach(() => {
+  languagesProps.last = null;
   env.electron = true;
   authState.signedIn = true;
   notesPricing.value = null;
@@ -56,9 +61,120 @@ beforeEach(() => {
   tracked.length = 0;
   useProviderStore.setState({ selected: 'soniox', selectionLocked: false, entries: {}, readiness: {} });
   useLineUpStore.setState({ lineUp: soniox, stored: true });
-  useSettingsStore.setState({ settingsNavigationTarget: null });
+  useSettingsStore.setState({ settingsNavigationTarget: null, textOnly: false });
+  useAudioStore.setState({ mode: 'speaker' });
+  useRoutingStore.setState({ participantSpeech: null });
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
+
+// Owner, 2026-11-18 (design 1): the page opens with the translation mode, and a speech stage nothing will be read
+// aloud by this time says so instead of offering its models.
+describe('the translation mode and the speech stage', () => {
+  const local = { transcription: 'local_inference', translation: 'bing', speech: 'local_inference', summarisation: null };
+  const speechCard = () => screen.getByRole('combobox', { name: 'Speech' }).closest('.lineup-stage') as HTMLElement;
+
+  it('opens with the translation mode, above the languages', () => {
+    render(<LineUpCategory locked={false} />);
+    const modes = screen.getByRole('group', { name: 'Translation mode' });
+    expect(modes.compareDocumentPosition(document.getElementById('languages-section')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("says speech is not used this time when nothing is read aloud: the Other mode, Translation I hear off", () => {
+    useAudioStore.setState({ mode: 'participant' });
+    useRoutingStore.setState({ participantSpeech: false });
+    useProviderStore.setState({ selected: 'local_inference' });
+    useLineUpStore.setState({ lineUp: local, stored: true });
+    render(<LineUpCategory locked={false} />);
+    const card = speechCard();
+    expect(within(card).getByText('Not used this time')).toBeTruthy();
+    expect(within(card).queryByText(/options$/)).toBeNull();
+    expect(within(card).queryByText('Needs a model')).toBeNull();
+    // The choice stays, to be used again once something is read aloud.
+    expect((within(card).getByRole('combobox', { name: 'Speech' }) as HTMLSelectElement).value).toBe('local_inference');
+  });
+
+  it('keeps speech in use, with its options, while my translation is read to the other side', () => {
+    useAudioStore.setState({ mode: 'speaker' });
+    useSettingsStore.setState({ textOnly: false });
+    useProviderStore.setState({ selected: 'local_inference' });
+    useLineUpStore.setState({ lineUp: local, stored: true });
+    render(<LineUpCategory locked={false} />);
+    const card = speechCard();
+    expect(within(card).queryByText('Not used this time')).toBeNull();
+    expect(within(card).getByText(/options$/)).toBeTruthy();
+  });
+
+  it("says speech is not used this time in the Me mode when the other side reads", () => {
+    useAudioStore.setState({ mode: 'speaker' });
+    useSettingsStore.setState({ textOnly: true });
+    useProviderStore.setState({ selected: 'gemini' });
+    useLineUpStore.setState({ lineUp: { transcription: 'gemini', translation: 'gemini', speech: 'gemini', summarisation: null }, stored: true });
+    render(<LineUpCategory locked={false} />);
+    // One card for the three stages of one connection: only its speech part is not used, the others keep their state.
+    expect(screen.getAllByText('Not used this time')).toHaveLength(1);
+    const parts = [...document.querySelectorAll('.lineup-stage__part')].map((p) => p.querySelector('.lineup-stage__state')?.textContent);
+    expect(parts).toHaveLength(3);
+    expect(parts.filter((text) => text !== 'Not used this time')).toHaveLength(2);
+    // Review (PR #784): until the sentence's provider has loaded there is no sentence above to point to.
+    expect(screen.queryByText('To have it read aloud, choose “hear” in the sentence above.')).toBeNull();
+    act(() => useProviderStore.setState({ entries: { gemini: { settings: {}, credentials: {}, pair: { source: 'en', target: 'ja' } } } as never }));
+    // Gemini leaves speaking to the switch: the reason is the switch, so the note says how to hear.
+    expect(screen.getByText('To have it read aloud, choose “hear” in the sentence above.')).toBeTruthy();
+  });
+
+  it("the sentence's words are the audio page's switches: reading turns Translation the other side hears off", async () => {
+    useAudioStore.setState({ mode: 'speaker' });
+    render(<LineUpCategory locked={false} />);
+    const { theirs } = languagesProps.last!.receive!;
+    expect(theirs).toMatchObject({ hears: true, blocked: null });
+    await act(async () => { theirs!.onChange(false); });
+    expect(useSettingsStore.getState().textOnly).toBe(true);
+  });
+
+  it('a word that cannot change during a session says why, and the idle speech stage then says no way to hear', () => {
+    useAudioStore.setState({ mode: 'participant' });
+    render(<LineUpCategory locked />);
+    expect(languagesProps.last!.receive!.mine!.blocked).toBe('Fixed for this session; stop it to change.');
+    expect(screen.getByText('Not used this time')).toBeTruthy();
+    expect(screen.queryByText('To have it read aloud, choose “hear” in the sentence above.')).toBeNull();
+    cleanup();
+    useAudioStore.setState({ mode: 'both' });
+    render(<LineUpCategory locked />);
+    expect(languagesProps.last!.receive!.theirs!.blocked).toBe('Fixed for this session; stop it to change.');
+  });
+
+  it('Both: speech is used while either running leg is read aloud', () => {
+    useAudioStore.setState({ mode: 'both' });
+    useSettingsStore.setState({ textOnly: true });
+    render(<LineUpCategory locked={false} />);
+    expect(screen.getByText('Not used this time')).toBeTruthy();
+    cleanup();
+    useSettingsStore.setState({ textOnly: false });
+    render(<LineUpCategory locked={false} />);
+    expect(screen.queryByText('Not used this time')).toBeNull();
+    cleanup();
+    // Only the other side's leg read aloud (to me): still in use.
+    useSettingsStore.setState({ textOnly: true });
+    useRoutingStore.setState({ participantSpeech: true });
+    render(<LineUpCategory locked={false} />);
+    expect(languagesProps.last!.receive!.mine!.hears).toBe(true);
+    expect(screen.queryByText('Not used this time')).toBeNull();
+    cleanup();
+    // Both legs read aloud.
+    useSettingsStore.setState({ textOnly: false });
+    render(<LineUpCategory locked={false} />);
+    expect(screen.queryByText('Not used this time')).toBeNull();
+  });
+
+  it("each side's audio-settings link opens that side's switch", () => {
+    useAudioStore.setState({ mode: 'both' });
+    render(<LineUpCategory locked={false} />);
+    act(() => { languagesProps.last!.receive!.onOpenAudio!('theirs'); });
+    expect(useSettingsStore.getState().settingsNavigationTarget).toBe('speech-other-hears');
+    act(() => { languagesProps.last!.receive!.onOpenAudio!('mine'); });
+    expect(useSettingsStore.getState().settingsNavigationTarget).toBe('speech-i-hear');
+  });
+});
 
 describe('languages and line-up', () => {
   it('lists the providers that can serve each stage, each once, the hosted ones apart', () => {
@@ -430,19 +546,35 @@ describe('the notes card', () => {
     authState.signedIn = false;
     render(<LineUpCategory locked={false} />);
     expect(optionTexts('Notes')).toEqual(['Kizuna AI']);
-    expect(screen.getByRole('combobox', { name: 'Notes' })).toHaveValue('kizunaai');
+    expect(screen.getByRole('combobox', { name: 'Notes' })).toHaveValue('kizunaai_openai');
     const card = screen.getByRole('combobox', { name: 'Notes' }).closest('.lineup-stage') as HTMLElement;
     expect(within(card).getByText('Needs a sign-in')).toBeInTheDocument();
     expect(screen.getByText('Sign in, or add an OpenAI key in Accounts and keys, to have notes written.')).toBeInTheDocument();
+  });
+
+  // Owner, 2026-11-18: Kizuna AI's notes are written by OpenAI; its mark reads so, as the other hosted services' do: the
+  // Kizuna AI logo with OpenAI's mark as a corner badge.
+  it("draws Kizuna AI's notes as Kizuna AI with OpenAI's badge", () => {
+    baseSelect.rich = true;
+    try {
+      useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai_openai' }, stored: true });
+      render(<LineUpCategory locked={false} />);
+      const card = screen.getByRole('combobox', { name: 'Notes' }).closest('.lineup-stage') as HTMLElement;
+      const badge = card.querySelector('.hosted-provider-icon__badge');
+      expect(badge).not.toBeNull();
+      expect(badge!.querySelector('svg path')?.getAttribute('d')).toMatch(/^M9\.205 8\.658/);
+    } finally {
+      baseSelect.rich = false;
+    }
   });
 
   // Andrew's review of B-48: Kizuna AI can be the notes' service while signed out; its prices wait for a sign-in.
   it('shows no Kizuna AI prices signed out, though Kizuna AI writes the notes', () => {
     authState.signedIn = false;
     notesPricing.value = { liveUsdPerHour: 0.04, afterSessionUsdPerHour: 0.012 };
-    useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai' }, stored: true });
+    useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai_openai' }, stored: true });
     render(<LineUpCategory locked={false} />);
-    expect(screen.getByRole('combobox', { name: 'Notes' })).toHaveValue('kizunaai');
+    expect(screen.getByRole('combobox', { name: 'Notes' })).toHaveValue('kizunaai_openai');
     expect(screen.queryByText(/^Kizuna AI estimates/)).toBeNull();
   });
 
@@ -455,8 +587,8 @@ describe('the notes card', () => {
     // The owner, 2026-11-17: Kizuna AI's prices only where Kizuna AI writes the notes; not under OpenAI's own key.
     const price = 'Kizuna AI estimates: live notes about $0.04 an hour, notes after a session about $0.012 an hour, paid from the balance that pays for your sessions.';
     expect(screen.queryByText(price)).toBeNull();
-    fireEvent.change(screen.getByRole('combobox', { name: 'Notes' }), { target: { value: 'kizunaai' } });
-    await waitFor(() => expect(useLineUpStore.getState().lineUp).toEqual({ ...soniox, summarisation: 'kizunaai' }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Notes' }), { target: { value: 'kizunaai_openai' } });
+    await waitFor(() => expect(useLineUpStore.getState().lineUp).toEqual({ ...soniox, summarisation: 'kizunaai_openai' }));
     expect(await screen.findByText(price)).toBeInTheDocument();
     const card = screen.getByRole('combobox', { name: 'Notes' }).closest('.lineup-stage') as HTMLElement;
     expect(within(card).getByText('Ready')).toBeInTheDocument();
@@ -471,7 +603,7 @@ describe('the notes card', () => {
     render(<LineUpCategory locked={false} />);
     const card = () => screen.getByRole('combobox', { name: 'Notes' }).closest('.lineup-stage') as HTMLElement;
     expect(within(card()).getByRole('button', { name: 'Key not accepted' })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole('combobox', { name: 'Notes' }), { target: { value: 'kizunaai' } });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Notes' }), { target: { value: 'kizunaai_openai' } });
     await waitFor(() => expect(within(card()).getByText('Ready')).toBeInTheDocument());
     expect(within(card()).queryByRole('button', { name: /^Key / })).toBeNull();
     expect(within(card()).queryByText(/OpenAI key/)).toBeNull();
@@ -479,7 +611,7 @@ describe('the notes card', () => {
 
   it('keeps showing Kizuna AI while it is chosen, saying it needs a sign-in once signed out', () => {
     authState.signedIn = false;
-    useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai' }, stored: true });
+    useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai_openai' }, stored: true });
     render(<LineUpCategory locked={false} />);
     expect(optionTexts('Notes')).toEqual(['Kizuna AI']);
     const card = screen.getByRole('combobox', { name: 'Notes' }).closest('.lineup-stage') as HTMLElement;
@@ -592,7 +724,7 @@ describe('the notes card', () => {
   // Review: a Kizuna AI chosen on purpose is not changed by adding a key; the guidance says to choose OpenAI here too.
   it('with Kizuna AI chosen and signed out, says to sign in or to choose OpenAI here (adding a key first if need be)', () => {
     authState.signedIn = false;
-    useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai' }, stored: true });
+    useLineUpStore.setState({ lineUp: { ...soniox, summarisation: 'kizunaai_openai' }, stored: true });
     const { unmount } = render(<LineUpCategory locked={false} />);
     expect(screen.getByText('Sign in, or add an OpenAI key in Accounts and keys and choose OpenAI here, to have notes written.')).toBeInTheDocument();
     unmount();

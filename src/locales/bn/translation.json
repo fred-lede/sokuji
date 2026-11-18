@@ -15,7 +15,10 @@
     "dismiss": "বন্ধ করুন",
     "none": "কোনোটি নয়",
     "retry": "পুনরায় চেষ্টা করুন",
-    "topUp": "টপ আপ"
+    "topUp": "টপ আপ",
+    "translatedInto": "অনুবাদের লক্ষ্য ভাষা",
+    "translatedFrom": "অনুবাদের উৎস ভাষা",
+    "translatedBothWays": "উভয় দিকে অনুবাদ"
   },
   "settings": {
     "title": "সেটিংস",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "আমি বলি",
       "iRead": "আমি পড়ি",
+      "theyReceiveHear": "তারা {{verb}}",
+      "theyReceiveRead": "তারা {{verb}}",
+      "theyHearVerb": "শোনে",
+      "theyReadVerb": "পড়ে",
+      "iReceiveHear": "আমি {{verb}}",
+      "iReceiveRead": "আমি {{verb}}",
+      "iHearVerb": "শুনি",
+      "iReadVerb": "পড়ি",
       "iHear": "আমি শুনি",
       "theyHear": "তারা শোনে",
       "theyRead": "তারা পড়ে",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "{{region}}-এর জন্য কোনো কার্যকর কী নেই",
         "keyRefused": "কী গৃহীত হয়নি",
         "keyNotVerified": "কী যাচাই হয়নি",
-        "checkingKey": "কী যাচাই করা হচ্ছে…"
+        "checkingKey": "কী যাচাই করা হচ্ছে…",
+        "notUsed": "এবার ব্যবহার হবে না"
       },
       "speechModeHint": "কথার একটি অংশ কখন অনুবাদে যায়; সেশনের মধ্যে বদলানো যায় না",
       "hint": "প্রতিটি ধাপ কোন সেবা করে",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "Kizuna AI-এর মাধ্যমে OpenAI নোট লেখে, খরচ আপনার ব্যালান্স থেকে।",
       "notesOpenAiLine": "আপনার নিজের OpenAI কী দিয়ে নোট লেখে।",
       "notesNeedSignInOrChoose": "নোট লেখাতে সাইন ইন করুন, অথবা এখানে OpenAI বেছে নিন।",
-      "notesNeedSignInOrKeyAndChoose": "নোট লেখাতে সাইন ইন করুন, অথবা “অ্যাকাউন্ট ও কী”-তে একটি OpenAI কী যোগ করে এখানে OpenAI বেছে নিন।"
+      "notesNeedSignInOrKeyAndChoose": "নোট লেখাতে সাইন ইন করুন, অথবা “অ্যাকাউন্ট ও কী”-তে একটি OpenAI কী যোগ করে এখানে OpenAI বেছে নিন।",
+      "speechNotUsed": "এবার কিছুই জোরে পড়ে শোনানো হবে না: অনুবাদ শুধু লেখা হিসেবে দেখাবে।",
+      "speechHowToHear": "পড়ে শোনাতে চাইলে ওপরের বাক্যে “শোনা” বেছে নিন।"
     },
     "display": {
       "surface": "কোন প্রদর্শন",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "সংরক্ষণ (Enter)",
     "editCancelHint": "বাতিল (Esc)",
     "speakersHint": "বক্তার নাম বদলাতে নামে ক্লিক করুন। একটি বাক্য অন্য কাউকে দিতে, ট্রান্সক্রিপ্টে তার পাশের «বক্তা বদলান» বোতামটি ব্যবহার করুন।",
-    "sidePanel": "পার্শ্ব প্যানেল",
-    "openSidePanel": "পার্শ্ব প্যানেল খুলুন",
-    "closeSidePanel": "পার্শ্ব প্যানেল বন্ধ করুন",
+    "sidePanel": "সম্পাদনা",
+    "resizeNotes": "নোটের আকার পরিবর্তন করুন",
+    "resizeSidePanel": "সম্পাদনা প্যানেলের আকার পরিবর্তন করুন",
+    "openSidePanel": "সম্পাদনা প্যানেল দেখান",
+    "closeSidePanel": "সম্পাদনা প্যানেল লুকান",
     "selectRecords": "রেকর্ড বেছে নিন",
     "hideNotes": "নোট লুকান",
     "showNotes": "নোট দেখান"

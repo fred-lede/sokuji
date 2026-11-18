@@ -15,7 +15,10 @@
     "dismiss": "Avfärda",
     "none": "Ingen",
     "retry": "Försök igen",
-    "topUp": "Fyll på"
+    "topUp": "Fyll på",
+    "translatedInto": "översatt till",
+    "translatedFrom": "översatt från",
+    "translatedBothWays": "översatt åt båda hållen"
   },
   "settings": {
     "title": "Inställningar",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "Jag talar",
       "iRead": "Jag läser",
+      "theyReceiveHear": "de {{verb}}",
+      "theyReceiveRead": "de {{verb}}",
+      "theyHearVerb": "hör",
+      "theyReadVerb": "läser",
+      "iReceiveHear": "Jag {{verb}}",
+      "iReceiveRead": "Jag {{verb}}",
+      "iHearVerb": "hör",
+      "iReadVerb": "läser",
       "iHear": "Jag hör",
       "theyHear": "de hör",
       "theyRead": "de läser",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "Ingen fungerande nyckel för {{region}}",
         "keyRefused": "Nyckeln godtogs inte",
         "keyNotVerified": "Nyckeln inte kontrollerad",
-        "checkingKey": "Kontrollerar nyckeln…"
+        "checkingKey": "Kontrollerar nyckeln…",
+        "notUsed": "Används inte den här gången"
       },
       "speechModeHint": "När ett stycke tal skickas för översättning; fast under en session",
       "hint": "Vilken tjänst som gör varje steg",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI skriver anteckningarna via Kizuna AI, betalas från ditt saldo.",
       "notesOpenAiLine": "Skriver anteckningarna med din egen OpenAI-nyckel.",
       "notesNeedSignInOrChoose": "Logga in, eller välj OpenAI här, så skrivs anteckningar.",
-      "notesNeedSignInOrKeyAndChoose": "Logga in, eller lägg till en OpenAI-nyckel under ”Konton och nycklar” och välj OpenAI här, så skrivs anteckningar."
+      "notesNeedSignInOrKeyAndChoose": "Logga in, eller lägg till en OpenAI-nyckel under ”Konton och nycklar” och välj OpenAI här, så skrivs anteckningar.",
+      "speechNotUsed": "Den här gången läses inget upp: översättningen visas bara som text.",
+      "speechHowToHear": "Välj ”höra” i meningen ovan för att få den uppläst."
     },
     "display": {
       "surface": "Vilken visning",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Spara (Enter)",
     "editCancelHint": "Avbryt (Esc)",
     "speakersHint": "Klicka på ett namn för att byta namn på talaren. Om du vill ge en mening till någon annan använder du knappen ”Byt talare” bredvid den i transkriptionen.",
-    "sidePanel": "Sidopanel",
-    "openSidePanel": "Öppna sidopanelen",
-    "closeSidePanel": "Stäng sidopanelen",
+    "sidePanel": "Redigera",
+    "resizeNotes": "Ändra storlek på anteckningar",
+    "resizeSidePanel": "Ändra storlek på redigeringspanelen",
+    "openSidePanel": "Visa redigeringspanelen",
+    "closeSidePanel": "Dölj redigeringspanelen",
     "selectRecords": "Markera poster",
     "hideNotes": "Dölj anteckningarna",
     "showNotes": "Visa anteckningarna"

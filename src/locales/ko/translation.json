@@ -15,7 +15,10 @@
     "dismiss": "닫기",
     "none": "없음",
     "retry": "재시도",
-    "topUp": "충전"
+    "topUp": "충전",
+    "translatedInto": "번역 대상",
+    "translatedFrom": "번역 원본",
+    "translatedBothWays": "양방향 번역"
   },
   "settings": {
     "title": "설정",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "내가 말하는 언어",
       "iRead": "내가 읽는 언어",
+      "theyReceiveHear": "상대방이 {{verb}} 언어",
+      "theyReceiveRead": "상대방이 {{verb}} 언어",
+      "theyHearVerb": "듣는",
+      "theyReadVerb": "읽는",
+      "iReceiveHear": "내가 {{verb}} 언어",
+      "iReceiveRead": "내가 {{verb}} 언어",
+      "iHearVerb": "듣는",
+      "iReadVerb": "읽는",
       "iHear": "내가 듣는 언어",
       "theyHear": "상대방이 듣는 언어",
       "theyRead": "상대방이 읽는 언어",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "{{region}}에서 쓸 수 있는 키가 없음",
         "keyRefused": "키가 거부됨",
         "keyNotVerified": "키 확인 안 됨",
-        "checkingKey": "키 확인 중…"
+        "checkingKey": "키 확인 중…",
+        "notUsed": "이번에는 사용 안 함"
       },
       "speechModeHint": "말 한 토막을 언제 번역으로 보낼지; 세션 중에는 바꿀 수 없음",
       "hint": "각 단계를 어떤 서비스가 맡는지",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "Kizuna AI를 통해 OpenAI가 메모를 작성하며, 비용은 잔액에서 지불됩니다.",
       "notesOpenAiLine": "본인의 OpenAI 키로 메모를 작성합니다.",
       "notesNeedSignInOrChoose": "메모를 작성하려면 로그인하거나 여기에서 OpenAI를 선택하세요.",
-      "notesNeedSignInOrKeyAndChoose": "메모를 작성하려면 로그인하거나 ‘계정과 키’에서 OpenAI 키를 추가한 뒤 여기에서 OpenAI를 선택하세요."
+      "notesNeedSignInOrKeyAndChoose": "메모를 작성하려면 로그인하거나 ‘계정과 키’에서 OpenAI 키를 추가한 뒤 여기에서 OpenAI를 선택하세요.",
+      "speechNotUsed": "이번에는 번역을 읽어 주지 않고 글자로만 보여 줍니다.",
+      "speechHowToHear": "읽어 주게 하려면 위 문장에서 ‘듣는’을 고르세요."
     },
     "display": {
       "surface": "어느 화면",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "저장(Enter)",
     "editCancelHint": "취소(Esc)",
     "speakersHint": "이름을 클릭하면 화자 이름을 바꿀 수 있습니다. 한 문장을 다른 사람에게 옮기려면 전사에서 그 문장 옆의 ‘화자 변경’ 버튼을 사용하세요.",
-    "sidePanel": "사이드 패널",
-    "openSidePanel": "사이드 패널 열기",
-    "closeSidePanel": "사이드 패널 닫기",
+    "sidePanel": "편집",
+    "resizeNotes": "메모 크기 조절",
+    "resizeSidePanel": "편집 패널 크기 조절",
+    "openSidePanel": "편집 패널 표시",
+    "closeSidePanel": "편집 패널 숨기기",
     "selectRecords": "기록 선택",
     "hideNotes": "메모 숨기기",
     "showNotes": "메모 보기"

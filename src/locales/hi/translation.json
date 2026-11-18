@@ -15,7 +15,10 @@
     "dismiss": "खारिज करें",
     "none": "कोई नहीं",
     "retry": "पुनः प्रयास करें",
-    "topUp": "टॉप अप"
+    "topUp": "टॉप अप",
+    "translatedInto": "अनुवाद की लक्ष्य भाषा",
+    "translatedFrom": "अनुवाद की स्रोत भाषा",
+    "translatedBothWays": "दोनों ओर अनुवाद"
   },
   "settings": {
     "title": "सेटिंग्स",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "मैं बोलता/बोलती हूं",
       "iRead": "मैं पढ़ता/पढ़ती हूं",
+      "theyReceiveHear": "वे {{verb}} हैं",
+      "theyReceiveRead": "वे {{verb}} हैं",
+      "theyHearVerb": "सुनते",
+      "theyReadVerb": "पढ़ते",
+      "iReceiveHear": "मैं {{verb}} हूं",
+      "iReceiveRead": "मैं {{verb}} हूं",
+      "iHearVerb": "सुनता/सुनती",
+      "iReadVerb": "पढ़ता/पढ़ती",
       "iHear": "मैं सुनता/सुनती हूं",
       "theyHear": "वे सुनते हैं",
       "theyRead": "वे पढ़ते हैं",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "{{region}} के लिए कोई चालू कुंजी नहीं",
         "keyRefused": "कुंजी स्वीकार नहीं हुई",
         "keyNotVerified": "कुंजी सत्यापित नहीं",
-        "checkingKey": "कुंजी जाँची जा रही है…"
+        "checkingKey": "कुंजी जाँची जा रही है…",
+        "notUsed": "इस बार उपयोग नहीं"
       },
       "speechModeHint": "बोली का एक हिस्सा कब अनुवाद के लिए जाता है; सत्र के दौरान नहीं बदलता",
       "hint": "हर चरण कौन-सी सेवा करती है",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI, Kizuna AI के ज़रिए नोट्स लिखता है; भुगतान आपके बैलेंस से।",
       "notesOpenAiLine": "आपकी अपनी OpenAI कुंजी से नोट्स लिखता है।",
       "notesNeedSignInOrChoose": "नोट्स लिखवाने के लिए साइन इन करें, या यहाँ OpenAI चुनें।",
-      "notesNeedSignInOrKeyAndChoose": "नोट्स लिखवाने के लिए साइन इन करें, या “खाते और कुंजियाँ” में OpenAI कुंजी जोड़कर यहाँ OpenAI चुनें।"
+      "notesNeedSignInOrKeyAndChoose": "नोट्स लिखवाने के लिए साइन इन करें, या “खाते और कुंजियाँ” में OpenAI कुंजी जोड़कर यहाँ OpenAI चुनें।",
+      "speechNotUsed": "इस बार कुछ भी बोलकर नहीं पढ़ा जाएगा: अनुवाद सिर्फ़ टेक्स्ट में दिखेगा।",
+      "speechHowToHear": "बोलकर सुनने के लिए ऊपर के वाक्य में “सुनना” चुनें।"
     },
     "display": {
       "surface": "कौन-सा डिस्प्ले",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "सहेजें (Enter)",
     "editCancelHint": "रद्द करें (Esc)",
     "speakersHint": "वक्ता का नाम बदलने के लिए नाम पर क्लिक करें। कोई एक वाक्य किसी और को देने के लिए, ट्रांसक्रिप्ट में उसके पास का “वक्ता बदलें” बटन इस्तेमाल करें।",
-    "sidePanel": "साइड पैनल",
-    "openSidePanel": "साइड पैनल खोलें",
-    "closeSidePanel": "साइड पैनल बंद करें",
+    "sidePanel": "संपादन",
+    "resizeNotes": "नोट्स का आकार बदलें",
+    "resizeSidePanel": "संपादन पैनल का आकार बदलें",
+    "openSidePanel": "संपादन पैनल दिखाएँ",
+    "closeSidePanel": "संपादन पैनल छिपाएँ",
     "selectRecords": "रिकॉर्ड चुनें",
     "hideNotes": "नोट्स छिपाएँ",
     "showNotes": "नोट्स दिखाएँ"

@@ -197,17 +197,58 @@ describe('PanelFooter — language pair', () => {
       <PanelFooter {...baseProps(site, { pair: { source: 'ja', target: 'en' }, onLanguages })} />,
     );
     const el = container.querySelector('.language-pair') as HTMLElement;
-    expect(el.textContent).toBe(`${languageLabel('ja', 'en')} → ${languageLabel('en', 'en')}`);
+    expect([...el.querySelectorAll('bdi')].map((b) => b.textContent)).toEqual([languageLabel('ja', 'en'), languageLabel('en', 'en')]);
     fireEvent.click(el);
     expect(onLanguages).toHaveBeenCalledTimes(1);
   });
 
-  it.each(SITES)('%s: a bidirectional pair (source === target) is named once', (site) => {
+  // Owner, 2026-11-18: the languages stay where they are (mine first, as the pair is chosen); the arrow says which way
+  // the session translates. "Other" translates the other side into mine; "Both" and face to face, each way.
+  it.each(SITES)('%s: points the arrow the way the mode translates, mine always first', (site) => {
+    const ja = languageLabel('ja', 'en');
+    const zh = languageLabel('zh', 'en');
+    const shown = (over: Partial<PanelFooterProps>) => {
+      const { container } = render(<PanelFooter {...baseProps(site, { pair: { source: 'ja', target: 'zh' }, ...over })} />);
+      const el = container.querySelector('.language-pair') as HTMLElement;
+      const icon = [...(el.querySelector('svg.language-pair-text__arrow')?.classList ?? [])].find((c) => c.startsWith('lucide-'));
+      const result = { names: [...el.querySelectorAll('bdi')].map((b) => b.textContent), icon, said: el.querySelector('svg')?.getAttribute('aria-label') };
+      cleanup();
+      return result;
+    };
+    expect(shown({ mode: 'speaker' })).toEqual({ names: [ja, zh], icon: 'lucide-arrow-right', said: 'common.translatedInto' });
+    expect(shown({ mode: 'participant' })).toEqual({ names: [ja, zh], icon: 'lucide-arrow-left', said: 'common.translatedFrom' });
+    expect(shown({ mode: 'both' })).toEqual({ names: [ja, zh], icon: 'lucide-arrow-right-left', said: 'common.translatedBothWays' });
+    expect(shown({ mode: 'both', faceToFace: true })).toEqual({ names: [ja, zh], icon: 'lucide-arrow-right-left', said: 'common.translatedBothWays' });
+  });
+
+  // Owner, 2026-11-19: the arrow is drawn (LanguagePairText), not taken from a font that lacks it; mine stays first in a
+  // right-to-left script (review, 2026-11-18).
+  it.each(SITES)('%s: draws the arrow between the names, laid out left to right', (site) => {
+    const { container } = render(<PanelFooter {...baseProps(site, { pair: { source: 'ja', target: 'zh' }, mode: 'participant' })} />);
+    const pair = container.querySelector('.language-pair .language-pair-text') as HTMLElement;
+    expect(pair).toHaveAttribute('dir', 'ltr');
+    expect([...pair.querySelectorAll('bdi')].map((b) => b.textContent)).toEqual([languageLabel('ja', 'en'), languageLabel('zh', 'en')]);
+  });
+
+  // Review: the two languages of a bidirectional pair are named with the drawn arrow too, not the font's ⇄.
+  it.each(SITES)('%s: a bidirectional pair (source === target) is named once, its two languages each way', (site) => {
     const { container } = render(
       <PanelFooter {...baseProps(site, { pair: { source: 'zh+en', target: 'zh+en' } })} />,
     );
     const el = container.querySelector('.language-pair') as HTMLElement;
-    expect(el.textContent).toBe(languageLabel('zh+en', 'en'));
+    expect([...el.querySelectorAll('bdi')].map((b) => b.textContent)).toEqual([languageLabel('zh', 'en'), languageLabel('en', 'en')]);
+    expect(el.querySelector('svg')).toHaveClass('lucide-arrow-right-left');
+    expect(el.querySelector('svg')).toHaveAttribute('aria-label', 'common.translatedBothWays');
+    expect(el.textContent).not.toMatch(/⇄/);
+  });
+
+  it.each(SITES)('%s: one language on both ends is named once, without an arrow', (site) => {
+    const { container } = render(
+      <PanelFooter {...baseProps(site, { pair: { source: 'en', target: 'en' } })} />,
+    );
+    const el = container.querySelector('.language-pair') as HTMLElement;
+    expect(el.textContent).toBe(languageLabel('en', 'en'));
+    expect(el.querySelector('svg')).toBeNull();
   });
 });
 

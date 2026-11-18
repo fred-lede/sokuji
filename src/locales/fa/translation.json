@@ -15,7 +15,10 @@
     "dismiss": "بستن",
     "none": "هیچ‌کدام",
     "retry": "تلاش مجدد",
-    "topUp": "شارژ موجودی"
+    "topUp": "شارژ موجودی",
+    "translatedInto": "ترجمه به",
+    "translatedFrom": "ترجمه از",
+    "translatedBothWays": "ترجمهٔ دوطرفه"
   },
   "settings": {
     "title": "تنظیمات",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "صحبت می‌کنم",
       "iRead": "می‌خوانم",
+      "theyReceiveHear": "آن‌ها {{verb}}",
+      "theyReceiveRead": "آن‌ها {{verb}}",
+      "theyHearVerb": "می‌شنوند",
+      "theyReadVerb": "می‌خوانند",
+      "iReceiveHear": "{{verb}}",
+      "iReceiveRead": "{{verb}}",
+      "iHearVerb": "می‌شنوم",
+      "iReadVerb": "می‌خوانم",
       "iHear": "می‌شنوم",
       "theyHear": "آن‌ها می‌شنوند",
       "theyRead": "آن‌ها می‌خوانند",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "کلید معتبری برای {{region}} نیست",
         "keyRefused": "کلید پذیرفته نشد",
         "keyNotVerified": "کلید تأیید نشده",
-        "checkingKey": "در حال بررسی کلید…"
+        "checkingKey": "در حال بررسی کلید…",
+        "notUsed": "این بار استفاده نمی‌شود"
       },
       "speechModeHint": "یک تکه از گفتار کی برای ترجمه فرستاده می‌شود؛ در طول جلسه ثابت است",
       "hint": "هر مرحله را کدام سرویس انجام می‌دهد",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI از طریق Kizuna AI یادداشت‌ها را می‌نویسد و هزینه از موجودی شما کم می‌شود.",
       "notesOpenAiLine": "با کلید OpenAI خودتان یادداشت‌ها را می‌نویسد.",
       "notesNeedSignInOrChoose": "برای نوشتن یادداشت‌ها، وارد شوید یا همین‌جا OpenAI را انتخاب کنید.",
-      "notesNeedSignInOrKeyAndChoose": "برای نوشتن یادداشت‌ها، وارد شوید یا یک کلید OpenAI در «حساب‌ها و کلیدها» اضافه کنید و همین‌جا OpenAI را انتخاب کنید."
+      "notesNeedSignInOrKeyAndChoose": "برای نوشتن یادداشت‌ها، وارد شوید یا یک کلید OpenAI در «حساب‌ها و کلیدها» اضافه کنید و همین‌جا OpenAI را انتخاب کنید.",
+      "speechNotUsed": "این بار چیزی بلند خوانده نمی‌شود: ترجمه فقط به صورت متن نمایش داده می‌شود.",
+      "speechHowToHear": "برای خوانده شدن، در جملهٔ بالا «شنیدن» را انتخاب کنید."
     },
     "display": {
       "surface": "کدام نمایش",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "ذخیره (Enter)",
     "editCancelHint": "لغو (Esc)",
     "speakersHint": "برای تغییر نام گوینده روی نامش کلیک کنید. برای دادن یک جمله به شخص دیگری، در رونوشت از دکمهٔ «تغییر گوینده» کنار آن استفاده کنید.",
-    "sidePanel": "پنل کناری",
-    "openSidePanel": "باز کردن پنل کناری",
-    "closeSidePanel": "بستن پنل کناری",
+    "sidePanel": "ویرایش",
+    "resizeNotes": "تغییر اندازه یادداشت‌ها",
+    "resizeSidePanel": "تغییر اندازه پنل ویرایش",
+    "openSidePanel": "نمایش پنل ویرایش",
+    "closeSidePanel": "پنهان کردن پنل ویرایش",
     "selectRecords": "انتخاب رکوردها",
     "hideNotes": "پنهان کردن یادداشت",
     "showNotes": "نمایش یادداشت"

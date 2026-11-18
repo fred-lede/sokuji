@@ -15,7 +15,10 @@
     "dismiss": "Kapat",
     "none": "Yok",
     "retry": "Yeniden dene",
-    "topUp": "Bakiye yükle"
+    "topUp": "Bakiye yükle",
+    "translatedInto": "çeviri hedefi",
+    "translatedFrom": "çeviri kaynağı",
+    "translatedBothWays": "iki yönlü çeviri"
   },
   "settings": {
     "title": "Ayarlar",
@@ -322,6 +325,14 @@
     "langSentence": {
       "iSpeak": "Ben konuşuyorum",
       "iRead": "Ben okuyorum",
+      "theyReceiveHear": "onlar {{verb}}",
+      "theyReceiveRead": "onlar {{verb}}",
+      "theyHearVerb": "duyuyor",
+      "theyReadVerb": "okuyor",
+      "iReceiveHear": "Ben {{verb}}",
+      "iReceiveRead": "Ben {{verb}}",
+      "iHearVerb": "duyuyorum",
+      "iReadVerb": "okuyorum",
       "iHear": "Ben duyuyorum",
       "theyHear": "onlar duyuyor",
       "theyRead": "onlar okuyor",
@@ -1847,7 +1858,8 @@
         "noKeyForRegion": "{{region}} için çalışan anahtar yok",
         "keyRefused": "Anahtar kabul edilmedi",
         "keyNotVerified": "Anahtar doğrulanmadı",
-        "checkingKey": "Anahtar kontrol ediliyor…"
+        "checkingKey": "Anahtar kontrol ediliyor…",
+        "notUsed": "Bu sefer kullanılmıyor"
       },
       "speechModeHint": "Bir konuşma parçasının ne zaman çeviriye gideceği; oturum boyunca sabit",
       "hint": "Her aşamayı hangi hizmetin yaptığı",
@@ -1877,7 +1889,9 @@
       "notesKizunaLine": "OpenAI notları Kizuna AI üzerinden yazar; bakiyenizden ödenir.",
       "notesOpenAiLine": "Notları kendi OpenAI anahtarınızla yazar.",
       "notesNeedSignInOrChoose": "Notların yazılması için oturum açın veya burada OpenAI'ı seçin.",
-      "notesNeedSignInOrKeyAndChoose": "Notların yazılması için oturum açın veya “Hesaplar ve anahtarlar” bölümünde bir OpenAI anahtarı ekleyip burada OpenAI'ı seçin."
+      "notesNeedSignInOrKeyAndChoose": "Notların yazılması için oturum açın veya “Hesaplar ve anahtarlar” bölümünde bir OpenAI anahtarı ekleyip burada OpenAI'ı seçin.",
+      "speechNotUsed": "Bu sefer hiçbir şey sesli okunmuyor: çeviri yalnızca metin olarak görünür.",
+      "speechHowToHear": "Sesli okunması için yukarıdaki cümlede “duymak”ı seç."
     },
     "display": {
       "surface": "Hangi görünüm",
@@ -2187,9 +2201,11 @@
     "editSaveHint": "Kaydet (Enter)",
     "editCancelHint": "İptal (Esc)",
     "speakersHint": "Konuşmacının adını değiştirmek için ada tıklayın. Bir cümleyi başkasına vermek için dökümde yanındaki “Konuşmacıyı değiştir” düğmesini kullanın.",
-    "sidePanel": "Yan panel",
-    "openSidePanel": "Yan paneli aç",
-    "closeSidePanel": "Yan paneli kapat",
+    "sidePanel": "Düzenle",
+    "resizeNotes": "Notların boyutunu değiştir",
+    "resizeSidePanel": "Düzenleme panelinin boyutunu değiştir",
+    "openSidePanel": "Düzenleme panelini göster",
+    "closeSidePanel": "Düzenleme panelini gizle",
     "selectRecords": "Kayıtları seç",
     "hideNotes": "Notları gizle",
     "showNotes": "Notları göster"
