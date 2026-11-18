@@ -25,8 +25,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
     css: true,
-    // .claude/ holds gitignored worktree checkouts whose stale test copies
-    // would otherwise be collected alongside the real suite. native/build/
+    // .claude/ and .worktrees/ hold gitignored worktree checkouts whose stale
+    // test copies would otherwise be collected alongside the real suite.
+    // native/build/
     // is the same shape: a gitignored tree, but of the FETCHED UPSTREAMS --
     // building the native lane leaves transcribe.cpp's own node-binding
     // tests at native/build/<lane>/_deps/transcribe-src/bindings/typescript/,
@@ -38,6 +39,6 @@ export default defineConfig({
     // Anchored to the root on purpose: a src/**/mobile/ directory stays in.
     // The top-level e2e/ holds Playwright specs: they run through `npm run e2e`,
     // and Playwright's test() throws when another runner imports it.
-    exclude: [...configDefaults.exclude, '**/.claude/**', '**/native/build/**', 'mobile/**', 'e2e/**'],
+    exclude: [...configDefaults.exclude, '**/.claude/**', '**/.worktrees/**', '**/native/build/**', 'mobile/**', 'e2e/**'],
   },
 })
