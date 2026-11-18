@@ -45,7 +45,7 @@ import { closeCodeAction, createReconnector, refusalResult, reissueFailed, type 
 import { isVoiced } from '../../lib/session/turn';
 import type { DetectEndpoint, Detection } from './check';
 import type { QwenConfig } from './config';
-import type { EndpointId } from './endpoints';
+import { ENDPOINTS, type EndpointId } from './endpoints';
 import { QwenSegments } from './segments';
 import type { QwenCredentials } from './settings';
 import {
@@ -203,8 +203,10 @@ function seamRefusal(error: unknown, managed: boolean): unknown {
 }
 
 class QwenLeg implements AdapterSession {
-  /** Each leg is its own connection (split legs): never `shared`. */
-  readonly info = { transport: 'websocket' };
+  /** Each leg is its own connection (split legs): never `shared`. The region is the endpoint's, once the start has chosen it. */
+  get info(): AdapterSession['info'] {
+    return { transport: 'websocket', ...(this.endpoint ? { region: ENDPOINTS[this.endpoint].region } : {}) };
+  }
   private phase: Phase = 'opening';
   /** The connection in use once live. */
   private socket: WebSocket | null = null;
@@ -212,6 +214,8 @@ class QwenLeg implements AdapterSession {
   private letGoSession: () => void = () => {};
   /** Each connection's own: a reconnect's segments start afresh, their refs carrying on. */
   private segments: QwenSegments;
+  /** Which connection of the run this is, 1 for the first: speaker labels carry it (a reconnect numbers people from 1 again). */
+  private connection = 1;
   /** What the next connection dials with: the request's key or token, then each token the lease answers. */
   private apiKey: string;
   /** The endpoint the start dialled: every reconnect's too, never detected again. */
@@ -275,7 +279,7 @@ class QwenLeg implements AdapterSession {
     private readonly events: AdapterEvents,
     private readonly deps: QwenAdapterDeps,
   ) {
-    this.segments = new QwenSegments({ sink: events, person: request.config.person });
+    this.segments = new QwenSegments({ sink: events, person: request.config.person, connection: this.connection });
     this.apiKey = request.credentials.apiKey;
     // A dead connection that stays open is found by the probe or the commit's wait (`watchLiveness`, spec 2026-11-05 reconnect §4.2).
     this.reconnector = createReconnector({
@@ -988,7 +992,9 @@ class QwenLeg implements AdapterSession {
     this.latest = null;
     this.audioWent = false;
     this.segments.stop();
-    this.segments = new QwenSegments({ sink: this.events, person: this.request.config.person, firstRef: this.segments.nextRef });
+    // A new connection numbers people from 1 again: its labels carry its own number.
+    this.connection += 1;
+    this.segments = new QwenSegments({ sink: this.events, person: this.request.config.person, firstRef: this.segments.nextRef, connection: this.connection });
   }
 
   /**

@@ -30,6 +30,8 @@ export interface AnalyticsEvents extends ReconnectAnalyticsEvents {
     source_language: string;
     target_language: string;
     session_id: string;
+    /** The provider of each stage, from the stored line-up (provider ids only). */
+    stages?: { transcription: string; translation: string; speech: string };
     provider: string;
     model?: string;
     vad_mode?: string;
@@ -119,6 +121,14 @@ export interface AnalyticsEvents extends ReconnectAnalyticsEvents {
   };
   
   // Settings & Configuration
+  'region_recommendation': {
+    provider: 'kizunaai_soniox' | 'kizunaai_qwen';
+    medians: Record<string, number | null>;
+    current: string;
+    recommended: string | null;
+    outcome: 'switched' | 'kept' | 'no_change' | 'gave_up';
+    chosen: string;
+  };
   'settings_modified': { 
     setting_name: string;
     old_value?: any;
@@ -139,6 +149,14 @@ export interface AnalyticsEvents extends ReconnectAnalyticsEvents {
   'provider_switched': {
     from_provider: string;
     to_provider: string;
+    during_session: boolean;
+  };
+  /** A stage of the line-up changed on the settings page: provider ids, never content. */
+  'lineup_changed': {
+    stage: 'transcription' | 'translation' | 'speech' | 'summarisation';
+    from: string | null;
+    to: string | null;
+    moved: readonly ('transcription' | 'translation' | 'speech' | 'summarisation')[];
     during_session: boolean;
   };
   'api_key_validated': {
@@ -176,6 +194,8 @@ export interface AnalyticsEvents extends ReconnectAnalyticsEvents {
     source_language: string;
     target_language: string;
     credentials_pending: boolean;
+    /** The line-up Finish wrote: a provider id per stage. */
+    stages: { transcription: string; translation: string; speech: string };
   };
   'push_to_talk_used': {
     session_id: string;
@@ -410,12 +430,13 @@ export async function syncDistinctIdToBackground(posthogInstance?: any): Promise
       type: 'UPDATE_UNINSTALL_URL',
       distinct_id: distinctId
     }, (response: any) => {
-      if ((window as any).chrome.runtime.lastError) {
-        console.error('[Sokuji] [Analytics] Error syncing distinct_id to background:', (window as any).chrome.runtime.lastError);
+      const lastError = (window as any).chrome.runtime.lastError;
+      if (lastError) {
+        reportWarning('Analytics', `Failed to sync the analytics identity to the background: ${describeCause(lastError)}`, { cause: lastError, dedupeKey: 'analytics.syncDistinctId' });
       }
     });
   } catch (error) {
-    console.error('[Sokuji] [Analytics] Error syncing distinct_id to background:', error);
+    reportWarning('Analytics', `Failed to sync the analytics identity to the background: ${describeCause(error)}`, { cause: error, dedupeKey: 'analytics.syncDistinctId' });
   }
 }
 
@@ -458,7 +479,8 @@ export function useAnalytics() {
         }, 100);
       }
     } catch (error) {
-      console.error('[Sokuji] [Analytics] Analytics tracking error:', error);
+      // Every event passes through here, so a broken client would fail on each one.
+      reportWarning('Analytics', `Failed to track an analytics event: ${describeCause(error)}`, { cause: error, dedupeKey: 'analytics.trackEvent' });
     }
   };
 
@@ -480,7 +502,7 @@ export function useAnalytics() {
         }, 100);
       }
     } catch (error) {
-      console.error('[Sokuji] [Analytics] User identification error:', error);
+      reportWarning('Analytics', `Failed to identify the user for analytics: ${describeCause(error)}`, { cause: error });
     }
   };
 
@@ -522,7 +544,7 @@ export function useAnalytics() {
         posthog.identify(posthog.getDistinctId(), { $set: sanitizedProperties });
       }
     } catch (error) {
-      console.error('[Sokuji] [Analytics] Set user properties error:', error);
+      reportWarning('Analytics', `Failed to set analytics user properties: ${describeCause(error)}`, { cause: error });
     }
   };
 
@@ -553,7 +575,7 @@ export function useAnalytics() {
       }
       return null;
     } catch (error) {
-      console.error('[Sokuji] [Analytics] Error getting distinct_id:', error);
+      reportWarning('Analytics', `Failed to read the analytics identity: ${describeCause(error)}`, { cause: error });
       return null;
     }
   };

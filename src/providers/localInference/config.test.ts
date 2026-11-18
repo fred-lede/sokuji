@@ -54,6 +54,8 @@ vi.mock('../../lib/local-inference/modelManifest', () => ({
   },
 }));
 
+let mockStages: { translation: 'bing' | 'local'; speech: 'edge' | 'local' } | null = null;
+vi.mock('../../stores/lineUpStore', () => ({ storedLocalStages: () => mockStages }));
 import { buildLocalInference, describeLocalInference, admitLocalInference, type LocalInferenceConfig } from './config';
 import { LOCAL_INFERENCE_DEFAULTS, type LocalInferenceSettings } from './settings';
 
@@ -70,12 +72,13 @@ function settings(overrides: Partial<LocalInferenceSettings> = {}): LocalInferen
   return { ...LOCAL_INFERENCE_DEFAULTS, ...overrides };
 }
 
-function shared(overrides: { reversed?: boolean; segmentation?: SharedSettings['segmentation'] } = {}): SharedSettings {
+function shared(overrides: { reversed?: boolean; segmentation?: SharedSettings['segmentation']; words?: SharedSettings['words'] } = {}): SharedSettings {
   return {
     pauses: { sourceSeconds: 0, translationSeconds: 0 },
     reversed: () => overrides.reversed ?? false,
     segmentation: overrides.segmentation ?? { mode: 'off', sentencesPerRow: 0 },
     models: [],
+    ...(overrides.words ? { words: overrides.words } : {}),
   };
 }
 
@@ -121,6 +124,20 @@ describe('buildLocalInference', () => {
       jobSentences: 0,
     });
     expect((c as LocalInferenceConfig).translation).toMatchObject({ instructions: buildDefaultLocalPrompt('ja', 'en') });
+  });
+
+  it("adds the word list and the session background to the translator's prompt, leaving how the transcript is wrapped as it was", () => {
+    resolved({ 'ja>en': { asr: 'sherpa-ja', translation: 'opus-ja-en', tts: 'piper-en' } });
+    const words = { entries: [{ written: 'キズナAI', translation: 'Kizuna AI' }, { written: 'Sokuji' }], background: 'A weekly sync.' };
+    const c = buildLocalInference(ctx({ source: 'ja', target: 'en' }), settings({ useTemplateMode: true }), shared({ words })) as LocalInferenceConfig;
+    const t = c.translation as { instructions: string; wrapTranscript: boolean };
+    expect(t.wrapTranscript).toBe(true);
+    expect(t.instructions.startsWith(buildDefaultLocalPrompt('ja', 'en'))).toBe(true);
+    expect(t.instructions).toContain('Keep these names and terms as written: キズナAI, Sokuji.');
+    expect(t.instructions).toContain('Translate these as given: キズナAI → Kizuna AI.');
+    expect(t.instructions).toContain('About this session: A weekly sync.');
+    const plain = buildLocalInference(ctx({ source: 'ja', target: 'en' }), settings({ useTemplateMode: true }), shared()) as LocalInferenceConfig;
+    expect(plain.translation).toMatchObject({ instructions: buildDefaultLocalPrompt('ja', 'en') });
   });
 
   it('carries the stored sentences-per-row count into jobSentences', () => {
@@ -320,5 +337,15 @@ describe('describeLocalInference / admitLocalInference', () => {
     budget(1_000);
     sizes({ a: 500, t: 300, x: 300 });
     expect(admitLocalInference({ speaker: cfg({ asr: 'a', translation: 't', tts: 'x' }) })).toMatchObject({ code: 'memory_exceeded' });
+  });
+});
+
+describe('the stored line-up', () => {
+  it('passes its local stages to the resolver', () => {
+    mockStages = { translation: 'bing', speech: 'local' };
+    resolved({ 'ja>en': { asr: 'a', translation: 't' } });
+    buildLocalInference(ctx({ source: 'ja', target: 'en' }), settings(), shared());
+    expect(mockResolve).toHaveBeenCalledWith('ja', 'en', expect.anything(), { translation: 'bing', speech: 'local' });
+    mockStages = null;
   });
 });

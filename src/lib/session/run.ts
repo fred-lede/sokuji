@@ -94,6 +94,7 @@ export class Run {
   /** When each leg's degradation code last reached analytics: L1's window, applied to `api_error` too (ruling 8). */
   private readonly degradedTrackedAt = new Map<string, number>();
   private readonly controller = new AbortController();
+  private cancellationCause: RunEnd['reason'] | 'page-hidden' | undefined;
   private readonly host: RunHost;
   private readonly stack: ResourceStack;
   private readonly conversations = new Map<LegName, Conversation>();
@@ -299,6 +300,7 @@ export class Run {
     if (p.session?.acquire) {
       const resources = await p.session.acquire(shape, settings, {
         signal: this.signal,
+        cancellationCause: () => this.cancellationCause,
         clock: deps.clock,
         // `close()` sets `ending` before it aborts; an abort listener that
         // reacts by calling this must not re-end a run already ending.
@@ -338,7 +340,7 @@ export class Run {
     // can refuse the start: a refused lease leaves the last conversation on
     // screen (choice 3). A provider with neither a lease nor `startBoth` hands
     // them over before its legs open, as before.
-    host.conversations(this.conversations, { provider: this.shape.provider.id, models: this.models });
+    host.conversations(this.conversations, { provider: this.shape.provider.id, models: this.models, startedAt: this.startedAt });
 
     const requests = Object.fromEntries(shape.legs.map((leg) => [leg, {
       context: contexts[leg]!,
@@ -381,6 +383,7 @@ export class Run {
     this.ending = true;
     this.reconnectsCut(result, endedAt);
     if (this.turn?.close()) this.hold(false);
+    this.cancellationCause ??= result.reason;
     this.controller.abort(new Error('the run ended'));
     // A `start()` / `startBoth` / `openSource` / `acquire` still in flight
     // finishes (and defers its release) before we unwind, so every resource
@@ -428,6 +431,7 @@ export class Run {
   abandon(): void {
     this.ending = true;
     if (this.turn?.close()) this.hold(false);
+    this.cancellationCause ??= 'page-hidden';
     this.controller.abort(new Error('the page went away'));
     this.stack.abandon();
     // As `close()` does: a page restored from the back/forward cache must
@@ -588,6 +592,8 @@ export class Run {
       if (!this.turn?.isOpen) return;
       this.turn.add(pcm);
     }
+    // What goes to recognition is what History records (spec §5.3): after the key's gate, before the adapter.
+    this.deps.audioTap?.pcm(leg, pcm);
     // Per chunk: an adapter that throws is reported when it starts failing,
     // and the throw never reaches the source's delivery.
     try {
@@ -699,9 +705,16 @@ export class Run {
     return !this.sharedConnection || leg === 'speaker';
   }
 
-  /** What every reconnect event carries (spec 2026-11-05 reconnect §4.5). */
+  /**
+   * What every reconnect event carries (spec 2026-11-05 reconnect §4.5), and the region the leg's session says it
+   * dialled (`info.region`). None from a provider without regions, or for a drop before its leg's start settled.
+   */
   private reconnectEvent(leg: LegName, managed: boolean) {
-    return { session_id: this.id, provider: this.shape.provider.id, managed, channel: this.channel(leg), client: reconnectClient(this.deps.platform) };
+    const region = this.sessions.get(leg)?.info.region;
+    return {
+      session_id: this.id, provider: this.shape.provider.id, managed, channel: this.channel(leg), client: reconnectClient(this.deps.platform),
+      ...(region !== undefined ? { region } : {}),
+    };
   }
 
   /**

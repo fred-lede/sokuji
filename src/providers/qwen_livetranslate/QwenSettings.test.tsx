@@ -37,6 +37,12 @@ import nl from '../../locales/nl/translation.json';
 import type { SettingsProps } from '../../lib/provider/types';
 import type { CaptureSourceInfo } from '../../lib/screen/desktopFrames';
 import { useScreenContextStore, type PickedSource, type PickReason } from '../../stores/screenContextStore';
+import { useRegionLatencyStore } from '../../stores/regionLatencyStore';
+const requestRegionChange = vi.hoisted(() => vi.fn(async (_r: unknown) => true));
+vi.mock('../../lib/region/regionChange', () => ({ requestRegionChange }));
+const trackEvent = vi.hoisted(() => vi.fn());
+vi.mock('../../lib/analytics', () => ({ useAnalytics: () => ({ trackEvent }) }));
+
 import { KizunaQwenSettingsView, QwenSettingsView, QwenVoiceSummary } from './QwenSettings';
 import { QWEN_DEFAULTS, QWEN_VOICES, SPEAKER_CLONE, SPEAKER_CLONE_ONCE, type QwenSettings } from './settings';
 
@@ -62,20 +68,10 @@ describe('QwenSettingsView (spec §4, §7)', () => {
     expect(mine.selectedId).toBe('Tina');
   });
 
-  it('edits the preferred translations, one source=target per line, under Custom Vocabulary', () => {
-    const update = vi.fn();
-    const { container } = render(<QwenSettingsView {...props({ update, settings: { ...QWEN_DEFAULTS, hotwords: '实时翻译=LiveTranslate' } })} />);
-    expect(Array.from(container.querySelectorAll('.settings-section > h2')).map((h) => h.textContent)).toContain('Custom Vocabulary');
-    const field = screen.getByLabelText('Preferred Translations') as HTMLTextAreaElement;
-    expect(field.value).toBe('实时翻译=LiveTranslate');
-    expect(field.placeholder).toBe('One source=target per line');
-    fireEvent.change(field, { target: { value: '实时翻译=LiveTranslate\n交流=chat' } });
-    expect(update).toHaveBeenCalledWith({ hotwords: '实时翻译=LiveTranslate\n交流=chat' });
-  });
-
-  it('locks the vocabulary while a run is not idle', () => {
-    render(<QwenSettingsView {...props({ disabled: true })} />);
-    expect((screen.getByLabelText('Preferred Translations') as HTMLTextAreaElement).disabled).toBe(true);
+  it("has no vocabulary of its own: the preferred translations are the app's word list now", () => {
+    const { container } = render(<QwenSettingsView {...props()} />);
+    expect(Array.from(container.querySelectorAll('.settings-section > h2')).map((h) => h.textContent)).not.toContain('Custom Vocabulary');
+    expect(screen.queryByLabelText('Preferred Translations')).toBeNull();
   });
 
   it('writes my choice, the clone included', () => {
@@ -524,19 +520,32 @@ describe('Screen context — the area chosen in the settings (owner, 2026-10-22,
 
 describe('KizunaQwenSettingsView (the managed view, Beijing region spec §8)', () => {
   it('renders a Region select with Singapore and 北京 (Beijing), selected from the settings, above the shared view', () => {
+    act(() => useRegionLatencyStore.getState().fill('qwen', { sg: 80, cn: 150 }, Date.now()));
     const { container } = render(<KizunaQwenSettingsView {...props({ settings: { ...QWEN_DEFAULTS, region: 'cn' } })} />);
     const select = container.querySelector('#qwen-region-select') as HTMLSelectElement;
     expect(select.value).toBe('cn');
-    expect(Array.from(select.options).map((o) => [o.value, o.textContent])).toEqual([['sg', 'Singapore'], ['cn', '北京 (Beijing)']]);
+    expect(Array.from(select.options).map((o) => [o.value, o.textContent])).toEqual([['sg', 'Singapore — 80 ms'], ['cn', '北京 (Beijing) — 150 ms']]);
     expect(select.closest('.settings-section')?.querySelector('h2')?.textContent).toContain('Region');
     expect(library).toHaveLength(1);
   });
 
-  it('picking Beijing writes the region and nothing else', () => {
+  it('picking Beijing asks the region path and writes no region itself', () => {
     const update = vi.fn();
     const { container } = render(<KizunaQwenSettingsView {...props({ update })} />);
     fireEvent.change(container.querySelector('#qwen-region-select') as HTMLSelectElement, { target: { value: 'cn' } });
-    expect(update).toHaveBeenCalledWith({ region: 'cn' });
+    expect(requestRegionChange).toHaveBeenCalledWith({ providerId: 'kizunaai_qwen', to: 'cn', origin: 'select', auth: undefined, track: expect.any(Function) });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('hands the region path the analytics tracker, so following a pending hint from the select is reported', () => {
+    trackEvent.mockReset();
+    requestRegionChange.mockClear();
+    const { container } = render(<KizunaQwenSettingsView {...props()} />);
+    fireEvent.change(container.querySelector('#qwen-region-select') as HTMLSelectElement, { target: { value: 'cn' } });
+    const { track } = requestRegionChange.mock.calls[0][0] as { track: (e: unknown) => void };
+    const event = { provider: 'kizunaai_qwen', medians: {}, current: 'sg', recommended: 'cn', outcome: 'switched', chosen: 'cn' };
+    track(event);
+    expect(trackEvent).toHaveBeenCalledWith('region_recommendation', event);
   });
 
   it('locks the select while a run is not idle', () => {

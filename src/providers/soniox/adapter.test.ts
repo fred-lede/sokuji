@@ -136,7 +136,7 @@ describe('the Soniox adapter: one leg', () => {
   });
 
   it("sends the leg's direction: one_way to the target, both languages as hints (the source first), the context and the knobs; no diarization, no client reference", async () => {
-    const { stt } = await live({ settings: { vocabularyTerms: 'Sokuji', endpointMaxDelayMs: 3000 } });
+    const { stt } = await live({ settings: { endpointMaxDelayMs: 3000 }, shared: { ...SHARED, words: { entries: [{ written: 'Sokuji' }], background: '' } } });
     const config = stt().sentJson<Json>()[0];
     expect(stt().protocols).toEqual(['soniox-api-key', 'test-key']);
     expect(config).not.toHaveProperty('api_key');
@@ -167,6 +167,11 @@ describe('the Soniox adapter: one leg', () => {
     const { stt, tts } = await live({ credentials: { region: 'jp', stt: 'k', tts: 'k' } });
     expect(stt().url).toBe('wss://stt-rt.jp.soniox.com/transcribe-websocket');
     expect(tts().url).toBe('wss://tts-rt.jp.soniox.com/tts-websocket');
+  });
+
+  it("tells the run the region it dialled: the key's, which for a managed session is the grant's", async () => {
+    const { session } = await live({ credentials: { region: 'jp', stt: 'k', tts: 'k' } });
+    expect(session.info.region).toBe('jp');
   });
 
   it('opens no TTS socket for a leg that does not speak', async () => {

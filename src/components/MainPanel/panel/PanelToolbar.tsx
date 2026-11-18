@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AArrowDown, AArrowUp, ChevronsDownUp, ChevronsUpDown, Settings, Trash2 } from 'lucide-react';
+import { AArrowDown, AArrowUp, ChevronsDownUp, ChevronsUpDown, Columns2, MessageSquareText, NotebookText, Rows2, Settings, Trash2 } from 'lucide-react';
 import {
   useFloating,
   autoUpdate,
@@ -18,8 +18,12 @@ import DisplayModeButton from '../DisplayModeButton';
 import { ExportMenuButton } from '../ExportButton';
 import DisplaySettingsPopover from '../../Display/DisplaySettingsPopover';
 import CaptionShareButton from '../../CaptionShare/CaptionShareButton';
+import { HearingButton } from '../HearingButton';
 import { useReadingTargets } from '../../../lib/reading/useReadingTargets';
 import { isElectron } from '../../../utils/environment';
+import { useLiveNotes } from '../../../lib/notes/live/liveStore';
+import { NEXT_LAYOUT, useLiveNotesLayout, useLiveNotesPresent } from '../../../lib/notes/live/livePanel';
+import { useNarrowWindow } from '../../../lib/notes/live/useNarrowWindow';
 import {
   useSpeakerDisplayMode,
   useParticipantDisplayMode,
@@ -99,6 +103,23 @@ const PanelToolbar: React.FC<PanelToolbarProps> = ({ legs, exporter, hasConversa
     useRole(displayPopoverFloating.context, { role: 'dialog' }),
   ]);
 
+  const liveNotesPresent = useLiveNotesPresent();
+  const liveNotesLayout = useLiveNotesLayout((x) => x.layout);
+  const setLiveNotesLayout = useLiveNotesLayout((x) => x.setLayout);
+  const liveNotesRunning = useLiveNotes((x) => x.running);
+  // What a click does, going round side by side, the notes alone, the conversation alone (owner, 2026-11-18); hidden
+  // while the session runs, it says the notes are still being written.
+  let liveNotesSwitchTitle = t('liveNotes.show', 'Show live notes');
+  if (liveNotesLayout === 'both') liveNotesSwitchTitle = t('liveNotes.showAlone', 'Show only the live notes');
+  else if (liveNotesLayout === 'notes') liveNotesSwitchTitle = t('liveNotes.hide', 'Hide live notes');
+  else if (liveNotesRunning) liveNotesSwitchTitle = t('liveNotes.showWriting', 'Show live notes (still being written)');
+  // The icon draws what the area shows, one for each layout (owner, 2026-11-18): two columns, or two rows in a narrow
+  // window where the notes are above the conversation (MainPanel); the notes alone; the conversation alone.
+  const narrowWindow = useNarrowWindow();
+  let liveNotesIcon = narrowWindow ? <Rows2 size={14} aria-hidden="true" /> : <Columns2 size={14} aria-hidden="true" />;
+  if (liveNotesLayout === 'notes') liveNotesIcon = <NotebookText size={14} aria-hidden="true" />;
+  else if (liveNotesLayout === 'conversation') liveNotesIcon = <MessageSquareText size={14} aria-hidden="true" />;
+
   return (
     <>
       <div className="conversation-toolbar">
@@ -172,11 +193,16 @@ const PanelToolbar: React.FC<PanelToolbarProps> = ({ legs, exporter, hasConversa
             list. Handing it one would narrow the file with no way for the
             user to widen it back — and would drag the unrelated
             basic/advanced uiMode filter into the export as well. */}
-        <ExportMenuButton
-          exporter={exporter}
-          speakerMode={speakerDisplayMode}
-          participantMode={participantDisplayMode}
-        />
+        {/* On the desktop export lives in History; the extension keeps the menu here. */}
+        {!isElectron() && (
+          <ExportMenuButton
+            exporter={exporter}
+            speakerMode={speakerDisplayMode}
+            participantMode={participantDisplayMode}
+          />
+        )}
+        {/* What I hear, without opening the settings: hidden face to face and when nothing applies. */}
+        <HearingButton />
         {/* LAN caption sharing (spec 2026-10-04 §7.1): the desktop app only. */}
         {isElectron() && <CaptionShareButton />}
         <button
@@ -199,6 +225,21 @@ const PanelToolbar: React.FC<PanelToolbarProps> = ({ legs, exporter, hasConversa
         >
           <Trash2 size={14} />
         </button>
+        {/* The live notes in the conversation's area are shown beside it, alone or hidden here, the switch staying while
+            they are hidden; hiding does not stop them (owner and design review, 2026-11-17 and 2026-11-18; B-30, B-40). */}
+        {liveNotesPresent && (
+          <button
+            className="font-size-btn live-notes-switch"
+            onClick={() => setLiveNotesLayout(NEXT_LAYOUT[liveNotesLayout])}
+            title={liveNotesSwitchTitle}
+            aria-label={t('liveNotes.title', 'Live notes')}
+            aria-pressed={liveNotesLayout !== 'conversation'}
+            aria-controls="live-notes-panel"
+            type="button"
+          >
+            {liveNotesIcon}
+          </button>
+        )}
       </div>
       {displayPopoverOpen && (
         <FloatingPortal>

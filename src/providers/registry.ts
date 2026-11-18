@@ -22,7 +22,7 @@ import { sonioxProvider } from './soniox/provider';
 import { volcengineAst2Provider } from './volcengine_ast2/provider';
 
 /** Shipped providers, in UI order (Stage 2 Kizuna Soniox, ruling 6; Stage 2 Gemini, ruling 6; Stage 2 Volcengine AST2, ruling 5; Stage 2 OpenAI Translate, ruling 11; Stage 2 OpenAI Realtime, ruling 18; Stage 2 Palabra, ruling 14; Stage 2 OpenAI Live, ruling 9; Qwen LiveTranslate, spec 2026-10-13 §8; OpenAI Compatible, spec 2026-11-03): the managed Kizuna Soniox, the flagged managed Kizuna Qwen, the free LocalInference, then Gemini, Doubao AST 2.0, OpenAI Realtime, OpenAI Translate, OpenAI Live, OpenAI Compatible, Soniox, Qwen LiveTranslate and Palabra AI with your own key. */
-const RELEASED = [kizunaSonioxProvider, kizunaQwenProvider, localInferenceProvider, geminiProvider, volcengineAst2Provider, openaiProvider, openaiTranslateProvider, openaiLiveProvider, openaiCompatibleProvider, sonioxProvider, qwenLiveTranslateProvider, palabraProvider] as const;
+export const RELEASED = [kizunaSonioxProvider, kizunaQwenProvider, localInferenceProvider, geminiProvider, volcengineAst2Provider, openaiProvider, openaiTranslateProvider, openaiLiveProvider, openaiCompatibleProvider, sonioxProvider, qwenLiveTranslateProvider, palabraProvider] as const;
 /** Compiled into development builds only (D24): the fake, and the leased fake that carries the session hooks (Stage 2 foundation, choice 1). */
 const DEV_ONLY = [fakeProvider, fakeLeasedProvider] as const;
 
@@ -30,7 +30,10 @@ export type ProviderId = (typeof RELEASED)[number]['id'] | (typeof DEV_ONLY)[num
 
 // `import.meta.env.DEV` itself, not `isDevelopmentMode()`: the literal is what
 // a release build replaces with `false`, which drops the fake from the bundle.
-export const PROVIDERS: readonly AnyProvider[] = import.meta.env.DEV ? [...RELEASED, ...DEV_ONLY] : [...RELEASED];
+// The E2E build (`--mode e2e`) is a production bundle that keeps the fake: its
+// tests run sessions on it. `MODE` is a literal too, so a release build drops it.
+export const PROVIDERS: readonly AnyProvider[] =
+  (import.meta.env.DEV || import.meta.env.MODE === 'e2e') ? [...RELEASED, ...DEV_ONLY] : [...RELEASED];
 
 export function currentPresenceEnv(): PresenceEnv {
   return { platform: getEnvironment(), dev: isDevelopmentMode(), enabled: enabledProviderIds(), kizuna: isKizunaAIEnabled(), switchOn: debugSwitchOn };

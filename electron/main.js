@@ -1,17 +1,23 @@
-const { app, BrowserWindow, ipcMain, Menu, dialog, shell, session, systemPreferences, desktopCapturer, nativeTheme, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, dialog, shell, session, systemPreferences, desktopCapturer, nativeTheme, powerMonitor, protocol } = require('electron');
 const path = require('path');
 const { betterAuthAdapter, PACKAGED_ORIGIN } = require('./better-auth-adapter');
 const { setupSubtitleHandlers } = require('./subtitle-window.js');
 const { setupCaptionDoubleClick } = require('./window-caption-dblclick.js');
 const { setupCaptionContextMenu } = require('./window-caption-menu.js');
 const { setupPopoverWindowHandlers } = require('./popover-windows.js');
-const { setupTranscriptSaveHandler } = require('./transcript-save.js');
+const { setupHistoryHandlers, openHistoryAtLaunch } = require('./history-ipc.js');
+const { HISTORY_SCHEME, registerHistoryScheme, trackResponse } = require('./history-audio.js');
+
+// The player's way to a recording: privileged before the app is ready, as Electron requires.
+registerHistoryScheme(protocol);
 const { setupCaptionShare } = require('./caption-share.js');
 const { createCloseHandshake } = require('./close-handshake.js');
 const { registerOutputFormFactor } = require('./output-form-factor.js');
 const { createWsHeaderRules } = require('./ws-header-rules.js');
+const { registerSessionNetworkDiagnostics } = require('./session-network-diagnostics.js');
 const { applyLinuxGpuFlags } = require('./linux-gpu-flags');
 const { captureSourceMode, listCaptureSources, screenRecordingState, reaskScreenRecording, MAC_BUNDLE_ID } = require('./capture-sources');
+const { windowStateOf, watchWindowState } = require('./window-state');
 const { acquireSingleInstanceLock, createFocusRelay } = require('./single-instance');
 const { ignoreStdioErrors, createExitHandler } = require('./exit-handler');
 
@@ -34,6 +40,18 @@ if (process.platform === 'win32') {
   }
 }
 
+// The E2E build (`vite build --mode e2e`, see e2e/README.md) is a production
+// bundle that the test runner starts unpackaged with `electron .`. It must
+// behave like the packaged app -- load build/index.html, keep web security on,
+// no DevTools -- although app.isPackaged is false. A compile-time constant: a
+// release build folds it to false and drops every E2E branch.
+const IS_E2E = import.meta.env.MODE === 'e2e';
+const isDevBuild = () => !IS_E2E && (import.meta.env.MODE === 'development' || !app.isPackaged);
+// The test runner looks for this name in dist-electron/main.js before it starts the app: a release or
+// development build has no such line, and started by the tests it would clean and recreate the
+// system's virtual audio devices.
+if (IS_E2E) process.env.SOKUJI_E2E_BUILD = '1';
+
 const { UpdateManager } = require('./update-manager');
 const { NativeHostManager } = require('./native-host-manager');
 const nativeHost = new NativeHostManager();
@@ -47,7 +65,7 @@ const captionShare = setupCaptionShare({
   app,
   isTrustedSender: (sender) => sender === mainWindow?.webContents,
   getMainWindow: () => mainWindow,
-  isDev: import.meta.env.MODE === 'development' || !app.isPackaged,
+  isDev: isDevBuild(),
 });
 
 // Config utility no longer needed - using localStorage in renderer process
@@ -74,6 +92,20 @@ if (process.platform === 'linux') {
       console.log('[Sokuji] [Main] No orphaned devices to clean on this platform');
       return true;
     }
+  };
+}
+
+// The virtual devices are system-global (the PulseAudio modules are found and
+// unloaded by name, whoever made them), so an E2E run must neither create nor
+// clean them: a Sokuji the user has open on the same machine would lose its
+// audio. The app then reports the virtual microphone as unavailable, which is
+// what it does on a machine without PulseAudio.
+if (IS_E2E) {
+  audioUtils = {
+    ...audioUtils,
+    createVirtualAudioDevices: async () => false,
+    removeVirtualAudioDevices: () => {},
+    cleanupOrphanedDevices: async () => true,
   };
 }
 
@@ -170,6 +202,15 @@ const closeHandshake = createCloseHandshake({ quitApp: () => app.quit() });
 ipcMain.handle('app:close-ready', (event) => {
   if (event.sender !== mainWindow?.webContents) return;
   closeHandshake.ready();
+});
+// Notes being written when the app is closed: the page asks the user first, without a timeout, and may be told to stay.
+ipcMain.handle('app:close-asking', (event) => {
+  if (event.sender !== mainWindow?.webContents) return;
+  closeHandshake.asking();
+});
+ipcMain.handle('app:close-cancelled', (event) => {
+  if (event.sender !== mainWindow?.webContents) return;
+  closeHandshake.cancelled();
 });
 // Only a running or tearing-down session holds a close: anything else (the
 // setup wizard, a loading page) has nothing to save and may never answer.
@@ -428,7 +469,7 @@ function createWindow() {
     : path.join(__dirname, '../assets/icon.png');
 
   // Create the browser window
-  const isDev = import.meta.env.MODE === 'development' || !app.isPackaged;
+  const isDev = isDevBuild();
 
   // Build custom User Agent to identify Electron app
   // Use standard OS names so PostHog's regex-based $os detection works
@@ -473,9 +514,13 @@ function createWindow() {
   // and freezes the whole session — see the module for the measured details.
   // An Electron-drawn Minimize/Maximize/Close menu takes its place.
   setupCaptionContextMenu(mainWindow);
+  // The page draws the window's edge itself (no system frame does), but not while it is maximized or full screen.
+  watchWindowState(mainWindow);
   setupPopoverWindowHandlers(mainWindow);
   captionShare.attachWindow(mainWindow);
   closeHandshake.attachWindow(mainWindow);
+  // A reload keeps the window: a question the old page was asking will never be answered.
+  mainWindow.webContents.on('did-navigate', () => closeHandshake.pageReplaced());
   mainWindow.on('close', (event) => closeHandshake.onWindowClose(event));
 
   // Set custom User Agent for the window
@@ -533,6 +578,22 @@ function createWindow() {
 }
 
 // Create window when Electron is ready
+// History: the sessions kept on this computer (electron/history-store.js). Null while it could not be opened;
+// `historyUnavailable` then says why ('newer': written by a newer version of the app; 'error': anything else).
+let historyStore = null;
+let historyUnavailable = null;
+const HISTORY_PURGE_EVERY_MS = 24 * 60 * 60 * 1000;
+
+function openHistoryStore(dir) {
+  ({ store: historyStore, unavailable: historyUnavailable } = openHistoryAtLaunch({ dir }));
+}
+
+function closeHistoryStore() {
+  if (!historyStore) return;
+  try { historyStore.close(); } catch (error) { console.error('[Sokuji] [History] Closing failed:', error); }
+  historyStore = null;
+}
+
 app.whenReady().then(async () => {
   if (isDuplicateInstance) return;
   // Windows sandbox recovery (issue #352): if a prior run left a crash marker,
@@ -542,7 +603,7 @@ app.whenReady().then(async () => {
     return;
   }
 
-  const isDev = import.meta.env.MODE === 'development' || !app.isPackaged;
+  const isDev = isDevBuild();
 
   registerOutputFormFactor({ ipcMain, powerMonitor, app, getWindows: () => BrowserWindow.getAllWindows() });
 
@@ -553,9 +614,13 @@ app.whenReady().then(async () => {
 
     console.log(`[Sokuji] [Main] Initializing Better Auth adapter with backend: ${backendUrl}, origin: ${origin}`);
 
+    const networkDiagnostics = registerSessionNetworkDiagnostics({
+      ipcMain, webRequest: session.defaultSession.webRequest, backendUrl, getMainWindow: () => mainWindow,
+    });
     betterAuthAdapter({
       backendUrl,
       origin,
+      networkDiagnostics,
       onWebSocketResponse: (details) => wsHeaderRules.noteResponse(details.url, details.responseHeaders),
     });
     console.log('[Sokuji] [Main] Better Auth adapter initialized');
@@ -629,14 +694,24 @@ app.whenReady().then(async () => {
     }
   }
 
-  // Session-end auto-save writes straight into Downloads (no Save As dialog).
-  // The sender check reads mainWindow at call time: it does not exist yet,
-  // and it can be recreated.
-  setupTranscriptSaveHandler({
+  // History opens before the window, so the page finds it; the bin is emptied of what expired once a day.
+  // The sender check reads mainWindow at call time: it does not exist yet, and it can be recreated.
+  const historyDir = path.join(app.getPath('userData'), 'history');
+  openHistoryStore(historyDir);
+  setupHistoryHandlers({
     ipcMain,
-    getDownloadsDir: () => app.getPath('downloads'),
+    getStore: () => historyStore,
     isTrustedSender: (sender) => sender === mainWindow?.webContents,
+    dir: historyDir,
+    getUnavailableReason: () => historyUnavailable,
+    // Saving a recording: the system's Save dialog over the window, opening in Downloads.
+    showSaveDialog: (options) => (mainWindow ? dialog.showSaveDialog(mainWindow, options) : dialog.showSaveDialog(options)),
+    getDownloadsDir: () => app.getPath('downloads'),
   });
+  protocol.handle(HISTORY_SCHEME, (request) => (historyStore ? trackResponse(historyStore, request) : new Response(null, { status: 404 })));
+  setInterval(() => {
+    try { historyStore?.purgeExpired(); } catch (error) { console.error('[Sokuji] [History] Purging the bin failed:', error); }
+  }, HISTORY_PURGE_EVERY_MS).unref();
 
   createWindow();
 
@@ -646,7 +721,8 @@ app.whenReady().then(async () => {
   global.updateManager = new UpdateManager(mainWindow, {
     beforeInstall: (fn) => closeHandshake.endSessionThen(fn),
   });
-  global.updateManager.checkAfterDelay(5000);
+  // An E2E run never asks the release feed anything.
+  if (!IS_E2E) global.updateManager.checkAfterDelay(5000);
 
   // electron-audio-loopback handles setDisplayMediaRequestHandler automatically via initMain()
 });
@@ -657,6 +733,7 @@ const cleanupAndExit = () => {
   console.log('[Sokuji] [Main] Cleaning up virtual audio devices before exit...');
   removeVirtualAudioDevices();
   nativeHost.stop();
+  closeHistoryStore();
   console.log('[Sokuji] [Main] Virtual audio devices cleaned up successfully');
 };
 
@@ -808,6 +885,16 @@ ipcMain.handle('sidecar-bundle:cancel', () => {
   _bundleAbort?.abort();
   return { ok: true };
 });
+// What the installed engine takes on disk (B-19: the "On-device engine" row in Models and storage).
+ipcMain.handle('sidecar-bundle:usage', async () => {
+  const sku = _currentSku();
+  if (sku === null) return { ok: false, error: 'unsupported platform' };
+  try {
+    return { ok: true, bytes: await sidecarBundle.installedBytes(app.getPath('userData'), sku) };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+});
 ipcMain.handle('sidecar-bundle:remove', () => {
   const sku = _currentSku();
   if (sku === null) return { ok: false, error: 'unsupported platform' };
@@ -838,6 +925,8 @@ ipcMain.handle('window:maximize-toggle', () => {
 ipcMain.handle('window:close', () => {
   if (mainWindow) mainWindow.close();
 });
+// Whether the window is maximized or full screen now; later changes arrive as 'window:state' (window-state.js).
+ipcMain.handle('window:get-state', () => (mainWindow ? windowStateOf(mainWindow) : null));
 
 // IPC handlers for audio functionality
 ipcMain.handle('check-audio-system', async () => {

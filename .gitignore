@@ -146,3 +146,7 @@ native/python/*.egg-info/
 # that matter live in the benchmark note instead.
 benchmark/punctuation-restoration/tools/*.out.txt
 .worktrees/
+
+# E2E (Playwright) output
+/e2e/test-results/
+/e2e/report/

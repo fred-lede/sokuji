@@ -2,10 +2,12 @@
  * The provider definition: one object per provider, and the only thing
  * generic code knows about it (spec: "The provider definition"). Types only.
  */
+import type { WordEntry } from '../words/list';
 import type { ComponentType } from 'react';
 import type { PreviewClip } from '../audio/playback';
 import type { Adapter, SessionContext } from '../contract/adapter';
 import type { LegName } from '../conversation/types';
+import type { RunStage } from '../lineup/types';
 import type { SessionHooks } from '../session/types';
 import type { WireTable } from '../language/wire';
 
@@ -139,6 +141,14 @@ export interface SharedSettings {
   speaks?: boolean;
   /** The models this run's own readiness check found (F2): the list its settings component was shown, for the same effective-model function. */
   models: readonly ModelOption[];
+  /** The app's word list and session background, read at start (spec §9): each builder sends what `wordsFor` gives its service. Absent: none. */
+  words?: SessionWords;
+}
+
+/** The word list as a run reads it at start. */
+export interface SessionWords {
+  entries: readonly WordEntry[];
+  background: string;
 }
 
 /** The voice-preview route (spec, "Playback — Routing": voice preview, the real device, a fixed route): one clip at its own rate; `play` resolves when it ends or is stopped. */
@@ -210,6 +220,19 @@ export interface ProviderRefusal {
  * is the sign-in (`managed.ts`), its `K` the lease's per-leg keys (Stage 2
  * Kizuna Soniox, choice 1).
  */
+/** What a provider's file recognition needs: which service runs it, with which key, in which of its regions. */
+export interface FileRecognitionSpec {
+  service: string;
+  apiKey: string;
+  region?: string;
+  /** The service's code for an app language code, or null when it has none (the hint is then not sent). */
+  languageHint?: (code: string) => string | null;
+  /** The languages, as app codes, it transcribes a file in and translates it into: the choices offered. */
+  languages: readonly string[];
+  /** The word list in the service's context shape, sent with every file; absent when there is nothing to send. */
+  context?: object;
+}
+
 export interface Provider<S, K extends { missing?: never } & object, C extends { refused?: never } & object, R extends { missing?: never } & object = K> {
   // identity and presence
   /** Persisted as the selected provider; never renamed. */
@@ -252,6 +275,12 @@ export interface Provider<S, K extends { missing?: never } & object, C extends {
     migrate?(stored: Readonly<Record<string, unknown>>, inputs: MigrationInputs): S;
   };
   Settings: ComponentType<SettingsProps<S>>;
+  /**
+   * The stage sets its options act on (mock v19): one per kind of `StagePart` in `Settings` (and the `Engine`'s
+   * slots), from `src/lib/lineup/types.ts`. The line-up page reads it to know which stage cards have options and
+   * where a setting acting on several stages is shown. Absent: every option shows in the provider's first card.
+   */
+  optionStages?: readonly (readonly RunStage[])[];
   /** Model management, the local engines only: pushed from the summary in Simple mode, inline on Advanced's Provider tab. */
   Engine?: ComponentType<EngineProps<S>>;
   /** The `Engine`'s summary under the picker: its slot chips and memory estimate — Simple mode's way in, and drawn before `Engine` on Advanced's Provider tab (ruling 15). */
@@ -306,6 +335,12 @@ export interface Provider<S, K extends { missing?: never } & object, C extends {
     read(values: CredentialValues, auth: AuthContext): R | CredentialsMissing;
     /** A setting that picks which fields show, drawn by the credential form above them (F4). */
     choice?: CredentialChoice;
+    /**
+     * Where the credentials are stored when several providers share one key (the three OpenAI
+     * providers, owner 2026-11-15): read from `settings.<key>.<field>`, else the first non-empty
+     * `settings.<fallback>.<field>`; always written to `settings.<key>.<field>`.
+     */
+    storedAt?: { key: string; fallbacks: readonly string[] };
   };
   /**
    * Can this provider start now: a network validation, model readiness, or
@@ -385,6 +420,12 @@ export interface Provider<S, K extends { missing?: never } & object, C extends {
    * when its switch is on.
    */
   participantSpeech?: boolean;
+  /**
+   * File recognition: History's import and "transcribe again" ask the line-up's recognition provider what a recognition
+   * of a saved recording needs, from its own settings and credentials. Absent when it cannot transcribe files. The
+   * main process runs the job by `service` (electron/file-recognition.js); every service answers in one word shape.
+   */
+  fileRecognition?: (settings: S, credentials: K, words?: SessionWords) => FileRecognitionSpec | { missing: 'no-key' };
   /**
    * Whether Both may run face-to-face (spec 2026-10-08, slice 3): two people
    * at one microphone, attributed by speaker label and language on one

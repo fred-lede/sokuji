@@ -68,6 +68,8 @@ export const INVOKE_CHANNELS = [
   'relaunch-app',
   // Linux: fix PipeWire monitor source volume after loopback capture starts
   'fix-monitor-volume',
+  // Opt-in managed session-service transport diagnostics
+  'session-network:set-enabled',
   // WebSocket header injection (renderer → main)
   'ws-headers-set',
   'ws-headers-clear',
@@ -81,6 +83,7 @@ export const INVOKE_CHANNELS = [
   'sidecar-bundle:cancel',
   'sidecar-bundle:manifest',
   'sidecar-bundle:remove',
+  'sidecar-bundle:usage',
   // Auto-update
   'update-check',
   'update-download',
@@ -91,6 +94,8 @@ export const INVOKE_CHANNELS = [
   'window:minimize',
   'window:maximize-toggle',
   'window:close',
+  // Whether the window is maximized or full screen, for the edge the page draws (electron/window-state.js)
+  'window:get-state',
   // Appearance: the renderer's setting, so nativeTheme (menus, dialogs) agrees with the window
   'theme:set',
   // Subtitle mode
@@ -102,11 +107,11 @@ export const INVOKE_CHANNELS = [
   'subtitle:get-screen-bounds',
   // Popover child-window visibility (see popover-windows.js)
   'popover-window:set-visible',
-  // Session-end auto-save: the renderer hands over the text, main names and
-  // writes the file into Downloads.
-  'transcript:save',
   // Window-close handshake: the renderer has ended its session.
   'app:close-ready',
+  // Window-close handshake: the page asks the user first (notes being written), or the user chose to stay.
+  'app:close-asking',
+  'app:close-cancelled',
   // Window-close handshake: whether a session is running or tearing down.
   'app:session-busy',
   // LAN caption sharing (electron/caption-share.js)
@@ -118,6 +123,40 @@ export const INVOKE_CHANNELS = [
   'caption-share:select-address',
   'caption-share:set-wifi',
   'caption-share:present',
+  // History (electron/history-ipc.js)
+  'history:status',
+  'history:open-record',
+  'history:close-record',
+  'history:get-record',
+  'history:list-records',
+  'history:rename-record',
+  'history:put-leg',
+  'history:put-segments',
+  'history:put-notices',
+  'history:get-legs',
+  'history:create-transcript',
+  'history:delete-transcript',
+  'history:append-sentences',
+  'history:revise-sentences',
+  'history:get-sentences',
+  'history:rename-speaker',
+  'history:reassign-sentence',
+  'history:get-speakers',
+  'history:save-notes',
+  'history:list-notes',
+  'history:get-notes',
+  'history:update-notes-names',
+  'history:search',
+  'history:bin-records',
+  'history:restore-records',
+  'history:purge-records',
+  'history:drop-track',
+  'history:usage',
+  'history:append-track',
+  'history:save-track',
+  'history:recognize',
+  'history:recognize-cancel',
+  'history:recognize-status',
   // Externally-registered (electron-audio-loopback)
   ...EXTERNAL_INVOKE_CHANNELS,
 ];

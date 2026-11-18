@@ -21,6 +21,10 @@ export type Ref = number;
 /** UTF-16 code-unit offsets into a segment's text: [start, end). */
 export type TextRange = [number, number];
 export interface SegmentTiming { startMs: number; endMs: number }
+/** `text[at, at + len)` was heard from `startAt` to `endAt`, on the run's clock (the clock `openedAt` is on). */
+export interface HeardPiece { at: number; len: number; startAt: number; endAt: number }
+/** When a segment's words were heard. `stableLen`: the first `stableLen` characters of the text will not change any more. */
+export interface Heard { pieces: readonly HeardPiece[]; stableLen: number }
 
 export interface SessionContext {
   direction: { source: Lang; target: Lang };
@@ -101,8 +105,10 @@ export interface AdapterSession {
   /**
    * What the started session actually used, for telemetry. `shared`: true when this session's legs share one
    * provider connection (shared Both, face-to-face), so a reconnect event arrives once per leg for one connection.
+   * `region`: the region it dialled, from a provider that runs in more than one (Soniox, Qwen); the reconnect
+   * events carry it.
    */
-  readonly info: { transport?: string; shared?: boolean };
+  readonly info: { transport?: string; shared?: boolean; region?: string };
 }
 
 /** One protocol frame an adapter reported (spec D8): what the Logs panel lists. Never audio, never a credential. */
@@ -116,7 +122,8 @@ export interface AdapterEvents {
   /** `person`: who said it, an adapter-scoped label (diarization), the same on a source and its translation. Absent: the adapter cannot tell. */
   segmentOpened(e: { ref: Ref; side: Side; origin?: string; person?: string }): void;
   /** Always the whole text; a snapshot, never a delta. A defined `person` replaces the segment's. */
-  segmentText(e: { ref: Ref; text: string; timing?: SegmentTiming; language?: string; person?: string }): void;
+  /** `heard`: when its words were heard, if the adapter knows; a defined one replaces the segment's. */
+  segmentText(e: { ref: Ref; text: string; timing?: SegmentTiming; language?: string; person?: string; heard?: Heard }): void;
   segmentClosed(e: { ref: Ref; origin?: string }): void;
   /** `ref` absent: attributable to no segment (plays, pairs with nothing).
    *  `range` absent: this segment's audio, which characters unknown.

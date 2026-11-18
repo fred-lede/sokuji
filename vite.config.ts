@@ -6,6 +6,7 @@ import fs from 'fs'
 import { fileURLToPath } from 'url'
 import pkg from './package.json' with { type: 'json' }
 import { dropDuplicateOrtWasm } from './vite.drop-duplicate-ort-wasm'
+import { reactGrabDev } from './vite.react-grab'
 import { workerManualChunks } from './vite.worker-chunks'
 
 /**
@@ -25,7 +26,7 @@ function serveModelPacks(): Plugin {
         if (!stat.isFile()) return next()
         // Manual pipe bypasses server.headers — set isolation headers here too.
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
-        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+        res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
         res.setHeader('Content-Length', stat.size)
         if (filePath.endsWith('.json')) res.setHeader('Content-Type', 'application/json')
         else res.setHeader('Content-Type', 'application/octet-stream')
@@ -76,7 +77,7 @@ function serveOrtWasm(): Plugin {
         // multi-threaded and loads its threaded runtime .mjs as nested pthread
         // worker scripts (need COEP); the .wasm needs CORP. Set both here.
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
-        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+        res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
         res.setHeader('Content-Length', stat.size)
         if (filename.endsWith('.mjs') || filename.endsWith('.js'))
           res.setHeader('Content-Type', 'application/javascript')
@@ -108,7 +109,7 @@ function crossOriginIsolationHeaders(): Plugin {
     configureServer(server) {
       server.middlewares.use((_req, res, next) => {
         res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
-        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+        res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
         next()
       })
@@ -130,12 +131,15 @@ export default defineConfig(({ command, mode }) => {
       isServe && serveModelPacks(),
       isServe && serveOrtWasm(),
       react(),
+      // Development builds only: React Grab on each React page, for UI bug reports (task #83).
+      reactGrabDev('/src/dev/reactGrab.ts'),
       dropDuplicateOrtWasm(),
       electron({
         main: {
           // Entry points for the main process
           entry: {
             'better-auth-adapter': 'electron/better-auth-adapter.js',
+            'session-network-diagnostics': 'electron/session-network-diagnostics.js',
             'caption-share': 'electron/caption-share.js',
             'caption-share-core': 'electron/caption-share-core.js',
             'caption-share-net': 'electron/caption-share-net.js',
@@ -148,6 +152,7 @@ export default defineConfig(({ command, mode }) => {
             'sidecar-sku': 'electron/sidecar-sku.js',
             'sidecar-bundle': 'electron/sidecar-bundle.js',
             'pulseaudio-utils': 'electron/pulseaudio-utils.js',
+            'window-state': 'electron/window-state.js',
             'pipewire-app-audio': 'electron/pipewire-app-audio.js',
             'linux-window-titles': 'electron/linux-window-titles.js',
             'linux-gpu-flags': 'electron/linux-gpu-flags.js',
@@ -166,7 +171,12 @@ export default defineConfig(({ command, mode }) => {
             'topmost-level': 'electron/topmost-level.js',
             'subtitle-window': 'electron/subtitle-window.js',
             'popover-windows': 'electron/popover-windows.js',
-            'transcript-save': 'electron/transcript-save.js',
+            'history-db': 'electron/history-db.js',
+            'history-schema': 'electron/history-schema.js',
+            'history-store': 'electron/history-store.js',
+            'history-ipc': 'electron/history-ipc.js',
+            'history-audio': 'electron/history-audio.js',
+            'file-recognition': 'electron/file-recognition.js',
             'close-handshake': 'electron/close-handshake.js',
             'exit-handler': 'electron/exit-handler.js',
             'update-install-windows': 'electron/update-install-windows.js',
@@ -276,7 +286,7 @@ export default defineConfig(({ command, mode }) => {
       // (The crossOriginIsolationHeaders plugin covers responses this misses.)
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Cross-Origin-Embedder-Policy': 'credentialless',
         'Cross-Origin-Resource-Policy': 'cross-origin',
       },
     },

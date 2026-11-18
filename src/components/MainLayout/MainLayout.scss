@@ -8,6 +8,16 @@
   background-color: vars.$bg-page; /* opaque background so window body looks normal */
   color: vars.$text-primary;
   overflow: hidden; /* Prevent overflow from causing scrollbars on the body */
+
+  /* The settings page in place of the conversation (desktop): it takes the whole area. */
+  .settings-page-container,
+  .history-page-container {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
   
   /* Narrow viewports: stack vertically. When a side panel (Settings/Logs) is
      open, the panel takes the space and MainPanel collapses to its control
@@ -16,7 +26,7 @@
      See docs/superpowers/specs/2026-05-29-narrow-layout-panel-design.md.
 
      CONTRACT: the rules below reach into MainPanel's class names
-     (.conversation-toolbar, .conversation-display, .text-input-section) to hide
+     (.conversation-toolbar, .conversation-area, .text-input-section) to hide
      the transcript. If those names change in MainPanel, update them here too —
      a stale selector silently matches nothing (this is exactly what broke the
      previous version). */
@@ -67,9 +77,10 @@
       /* Hide the transcript while a panel is open. MainPanel stays mounted
          (display:none, NOT unmounted) so the active session survives. The
          .control-footer is intentionally left untouched — it renders exactly
-         as in the normal layout and adapts via its own @container styles. */
+         as in the normal layout and adapts via its own @container styles.
+         The live notes, in the transcript's area, go with it (their loop runs on). */
       .conversation-toolbar,
-      .conversation-display,
+      .conversation-area,
       .text-input-section {
         display: none;
       }
@@ -90,6 +101,7 @@
   
   .main-panel-container {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden; // Prevent content from overflowing

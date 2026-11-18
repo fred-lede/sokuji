@@ -150,6 +150,11 @@ describe('the Qwen LiveTranslate adapter: the start (spec §6)', () => {
     expect(h.socket().url).toBe('wss://maas.qianwenaiapi.com/api-ws/v1/realtime?model=qwen3.8-livetranslate-flash-realtime');
   });
 
+  it("tells the run the region of the endpoint it dialled: Beijing's for a Beijing key", async () => {
+    const { session } = await qwenSession({ shared: { ...SHARED, models: [{ id: 'cn' }] } });
+    expect(session.info.region).toBe('cn');
+  });
+
   it("sends nothing until session.created, then its one update; resolves on session.updated with nothing but frames and no timer but the keepalive's and the liveness probe's", async () => {
     const h = await openQwen();
     expect(h.sent()).toEqual([]);
@@ -161,7 +166,7 @@ describe('the Qwen LiveTranslate adapter: the start (spec §6)', () => {
     expect(resolved).toBe(false);
     h.socket().receive(SERVER.updated());
     const session = await h.starting;
-    expect(session.info).toEqual({ transport: 'websocket' });
+    expect(session.info).toEqual({ transport: 'websocket', region: 'sg' });
     expect(h.frames('session.update')).toEqual([sessionUpdate(h.config, { video: false }).session]);
     expect(h.content()).toEqual([]);
     expect(h.timers()).toBe(2);
@@ -304,7 +309,7 @@ describe('the Qwen LiveTranslate adapter: the session (spec §6)', () => {
     const h = await qwenSession({ context: PARTICIPANT_CTX });
     for (const frame of turn(1, { source: 'Hello', translation: '你好', speaker: 2 })) h.socket().receive(frame);
     const persons = h.content().filter((e) => e.kind === 'segmentOpened').map((e) => (e.payload as { person?: string }).person);
-    expect(persons).toEqual(['2', '2']);
+    expect(persons).toEqual(['1.2', '1.2']);
   });
 
   it('a leg that does not speak takes the text events and plays nothing', async () => {

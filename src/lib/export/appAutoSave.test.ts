@@ -42,7 +42,7 @@ const participantLeg: Leg = {
     seg({ id: 'r:participant:2', side: 'translation', text: 'こんにちは。', origin: 'p1', openedAt: 1_700_000_010_400 }),
   ],
 };
-const info = { provider: 'fake', models: { asrModel: 'fake' } };
+const info = { provider: 'fake', models: { asrModel: 'fake' }, startedAt: 0 };
 const invoke = vi.fn();
 const note = vi.fn();
 
@@ -60,7 +60,7 @@ describe('autoSaveConversation', () => {
   it('saves the whole conversation, header first, one block per exchange', async () => {
     expect(await autoSaveConversation(legs, info, { note })).toBe('saved');
     const [content, filename, mime] = downloadFile.mock.calls[0];
-    expect(content).toMatch(/^Sokuji conversation export\nGenerated: /);
+    expect(content).toMatch(/^Sokuji conversation export\nSession started: .+\nExported: /);
     expect(content).toContain('Provider: fake\nModels: asr=fake\n');
     expect(content).toMatch(/\[\d{2}:\d{2}:\d{2}\] Me\n  今日は天気がいいですね。公園に行きましょう。\n  → 今天天气很好。我们去公园吧。\n/);
     expect(filename).toMatch(/^sokuji-conversation-\d{8}-\d{6}\.txt$/);
@@ -85,17 +85,16 @@ describe('autoSaveConversation', () => {
     expect(downloadFile).not.toHaveBeenCalled();
   });
 
-  it("desktop: hands the text to the main process and offers the folder, as today's auto-save does", async () => {
+  it('desktop: saves nothing, whatever the switch says: History keeps every session', async () => {
     electron = true;
-    invoke.mockResolvedValueOnce({ ok: true, path: '/home/u/Downloads/sokuji-conversation-20260924-100100.txt', dir: '/home/u/Downloads' });
-    expect(await autoSaveConversation(legs, info, { note })).toBe('saved');
-    expect(invoke).toHaveBeenCalledWith('transcript:save', { content: expect.stringContaining('今天天气很好。我们去公园吧。') });
-    expect(note.mock.calls[0][0]).toMatchObject({ code: 'autosave_saved', params: { filename: 'sokuji-conversation-20260924-100100.txt' } });
+    expect(await autoSaveConversation(legs, info, { note })).toBe('disabled');
+    expect(invoke).not.toHaveBeenCalled();
+    expect(downloadFile).not.toHaveBeenCalled();
+    expect(note).not.toHaveBeenCalled();
   });
 
   it('reports a failed save and tells the user how to save by hand', async () => {
-    electron = true;
-    invoke.mockResolvedValueOnce({ ok: false, error: 'disk full' });
+    downloadFile.mockImplementationOnce(() => { throw new Error('Blocked'); });
     expect(await autoSaveConversation(legs, info, { note })).toBe('failed');
     expect(reportError).toHaveBeenCalledTimes(1);
     expect(note.mock.calls[0][0]).toMatchObject({ severity: 'warning', code: 'autosave_failed' });

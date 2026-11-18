@@ -1,7 +1,7 @@
 {
   "name": "sokuji",
   "productName": "Sokuji",
-  "version": "0.50.1",
+  "version": "0.50.4",
   "sidecarVersion": "0.4.0",
   "private": true,
   "main": "dist-electron/main.js",
@@ -145,6 +145,7 @@
     "@google/genai": "^2.16.0",
     "@huggingface/tokenizers": "0.1.3",
     "@huggingface/transformers": "^4.3.1",
+    "@playwright/test": "^1.65.1",
     "@ricky0123/vad-web": "^0.0.30",
     "@sapphi-red/web-noise-suppressor": "^0.3.5",
     "@testing-library/dom": "^10.4.1",
@@ -169,6 +170,7 @@
     "jsdom": "^24.0.0",
     "lindera-wasm": "6.2.0",
     "lucide-react": "^0.515.0",
+    "mediabunny": "1.64.0",
     "mpg123-decoder": "^1.0.3",
     "nosleep.js": "^0.12.0",
     "onnxruntime-web": "1.31.0-dev.20260914-8d85527a0",
@@ -179,6 +181,7 @@
     "protobufjs-cli": "^2.6.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-grab": "^0.2.0",
     "react-i18next": "^15.5.2",
     "react-icons": "^5.6.0",
     "react-router-dom": "^7.18.1",
@@ -201,7 +204,6 @@
     "build:audio-host": "node scripts/build-audio-host.js",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui",
     "electron:dev": "vite",
     "electron:build": "npm run build && npm run make",
     "electron:start": "electron .",
@@ -211,7 +213,11 @@
     "postinstall": "electron-rebuild && bash scripts/copy-ort-wasm.sh",
     "extension:build": "cd extension && npx vite build",
     "extension:dev": "cd extension && npx vite build --watch --mode development",
-    "sidecar:setup": "bash sidecar/setup.sh"
+    "sidecar:setup": "bash sidecar/setup.sh",
+    "e2e:build": "vite build --mode e2e",
+    "e2e": "playwright test -c e2e/playwright.config.ts --grep-invert \"@long|@real\"",
+    "e2e:long": "playwright test -c e2e/playwright.config.ts --grep @long",
+    "e2e:real": "playwright test -c e2e/playwright.config.ts --grep @real"
   },
   "eslintConfig": {
     "extends": [

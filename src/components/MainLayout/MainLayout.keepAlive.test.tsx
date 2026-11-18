@@ -17,6 +17,7 @@ const CounterStub = ({ label }: { label: string }) => {
 vi.mock('../MainPanel/MainPanel', () => ({ default: () => null }));
 vi.mock('../Tour/TourOverlay', () => ({ default: () => null }));
 vi.mock('../VbCable/VbCableIntro', () => ({ default: () => <div data-testid="vbcable-intro" /> }));
+vi.mock('../Region/RegionRecommendation', () => ({ default: () => <div data-testid="region-recommendation" /> }));
 vi.mock('../Subtitle/SubtitleTakeover', () => ({ SubtitleTakeover: () => <div data-testid="subtitle-takeover" /> }));
 vi.mock('../SetupWizard/SetupWizard', () => ({ default: () => null }));
 vi.mock('./PanelResizer', () => ({ default: () => null }));
@@ -24,8 +25,8 @@ vi.mock('./PanelResizer', () => ({ default: () => null }));
 vi.mock('../LogsPanel/LogsPanel', () => ({
   default: () => <CounterStub label="logs" />,
 }));
-vi.mock('../Settings', () => ({
-  Settings: () => <CounterStub label="settings" />,
+vi.mock('../SettingsPage/SettingsPage', () => ({
+  SettingsPage: () => <CounterStub label="settings" />,
 }));
 
 // TitleBar: just the two toggle buttons MainLayout wires up.
@@ -42,7 +43,6 @@ vi.mock('../TitleBar/TitleBar', () => ({
 
 vi.mock('../../lib/analytics', () => ({ useAnalytics: () => ({ trackEvent: vi.fn() }) }));
 vi.mock('../../lib/auth/hooks', () => ({ useAuth: () => ({ isSignedIn: false }) }));
-vi.mock('./useSignInProviderSwitch', () => ({ useSignInProviderSwitch: () => {} }));
 vi.mock('../../stores/setupStore', () => ({ useSetupLoaded: () => true, useSetupComplete: () => true }));
 vi.mock('../../stores/layoutStore', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../stores/layoutStore')>()),
@@ -58,10 +58,9 @@ vi.mock('../../utils/environment', async (importOriginal) => ({
   isKizunaAIEnabled: () => false,
 }));
 // MainLayout itself no longer reads a provider or a UI mode setter — only
-// the three exports it still uses. The sign-in switch reads uiMode too, but
-// it lives in its own hook (useSignInProviderSwitch, mocked above), so this
-// file mocks settingsStore whole rather than growing this list to cover it.
+// the three exports it still uses; this file mocks settingsStore whole.
 vi.mock('../../stores/settingsStore', () => ({
+  useLiveNotesSetting: () => false, useNotesAfterSession: () => false,
   useSettingsNavigationTarget: () => null,
   useSubtitleModeActive: () => false,
   // The logs button exists only while diagnostic logs are on, and these tests

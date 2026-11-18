@@ -2,17 +2,23 @@ import type { ComponentType } from 'react';
 import { CircleHelp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TtsSpeedControl } from '../../components/Settings/sections/LocalSettingsControls';
-import { LinesField } from '../../components/providers/fields/LinesField';
 import { VoicePreviewContext } from '../../components/providers/VoicePreviewContext';
 import Tooltip from '../../components/Tooltip/Tooltip';
+import { useAnalytics } from '../../lib/analytics';
 import type { SettingsProps } from '../../lib/provider/types';
+import { regionOptionLabel, useRegionLatencies } from '../../components/Region/regionLatency';
+import { requestRegionChange } from '../../lib/region/regionChange';
 import { asSonioxRegion, SONIOX_REGION_LABELS, SONIOX_REGIONS } from '../../lib/soniox/regions';
 import { SonioxVoiceField, useByokVoiceSource, type VoiceSourceHook } from './SonioxVoiceField';
 import { sonioxSharedBoth, type SonioxSettings as S } from './settings';
+import { ALL_STAGES, SP, TR, TR_TL } from '../../lib/lineup/types';
+import { StagePart } from '../../components/providers/stageParts';
 
 const helpIcon = <CircleHelp className="tooltip-trigger" size={14} style={{ marginLeft: '8px' }} />;
 
 export interface SonioxSettingsFlavour {
+  /** The provider this view belongs to: the region change path keys its question and "chose manually" on it. */
+  providerId: 'soniox' | 'kizunaai_soniox';
   /** Kizuna Soniox (Plan B): the managed copy — the region tooltip, the split's cost note, the voice library's variant. */
   managed: boolean;
   useVoiceSource: VoiceSourceHook;
@@ -27,10 +33,12 @@ export interface SonioxSettingsFlavour {
  * off. The endpoint knobs are its `TurnDetection`. A
  * factory, so the managed twin reuses it with its own voice source (choice 12).
  */
-export function createSonioxSettingsView({ managed, useVoiceSource }: SonioxSettingsFlavour): ComponentType<SettingsProps<S>> {
+export function createSonioxSettingsView({ providerId, managed, useVoiceSource }: SonioxSettingsFlavour): ComponentType<SettingsProps<S>> {
   return function SonioxSettingsView({ settings, update, disabled = false, pair, account, legs, participantSpeaks, faceToFace, preview }: SettingsProps<S>) {
     const { t } = useTranslation();
+    const { trackEvent } = useAnalytics();
     const region = asSonioxRegion(settings.region);
+    const latencies = useRegionLatencies('soniox', !disabled);
     const inBoth = legs?.length === 2;
     const shared = sonioxSharedBoth(faceToFace === true, settings);
     // Split Both asks for no agent text (`startSplit`), so the setting shows off there.
@@ -47,6 +55,8 @@ export function createSonioxSettingsView({ managed, useVoiceSource }: SonioxSett
     const labelsPeople = !faceToFace && legs?.includes('participant') === true;
     return (
       <VoicePreviewContext.Provider value={preview ?? null}>
+        {/* Each part names the stages it acts on, for the line-up page's stage cards (mock v19). */}
+        <StagePart stages={ALL_STAGES}>
         <div className="settings-section" id="soniox-region-section">
           <h2>
             {t('settings.sonioxRegion', 'Region')}
@@ -66,56 +76,22 @@ export function createSonioxSettingsView({ managed, useVoiceSource }: SonioxSett
               aria-label={t('settings.sonioxRegion', 'Region')}
               value={region}
               disabled={disabled}
-              onChange={(e) => update({ region: asSonioxRegion(e.target.value) })}
+              onChange={(e) => { void requestRegionChange({ providerId, to: e.target.value, origin: 'select', auth: account?.auth, track: (ev) => trackEvent('region_recommendation', ev) }); }}
             >
-              {SONIOX_REGIONS.map((r) => <option key={r} value={r}>{SONIOX_REGION_LABELS[r]}</option>)}
+              {SONIOX_REGIONS.map((r) => <option key={r} value={r}>{regionOptionLabel(t, SONIOX_REGION_LABELS[r], latencies?.[r])}</option>)}
             </select>
           </div>
         </div>
 
+        </StagePart>
+
+        <StagePart stages={SP}>
         <SonioxVoiceField settings={settings} update={update} disabled={disabled} target={pair?.target ?? 'en'} pairSource={pair?.source} participantSpeaks={participantSpeaks} account={account} managed={managed} useVoiceSource={useVoiceSource} />
 
         <TtsSpeedControl value={settings.ttsSpeed} onChange={(ttsSpeed) => update({ ttsSpeed })} disabled={disabled} min={0.7} max={1.3} step={0.05} />
+        </StagePart>
 
-        <div className="settings-section" id="soniox-vocabulary-section">
-          <h2>
-            {t('settings.sonioxVocabulary', 'Custom Vocabulary')}
-            <Tooltip content={t('settings.sonioxVocabularyTooltip', 'Bias recognition toward important names and jargon, and steer how specific terms are translated. Applies from the next session.')} position="top">{helpIcon}</Tooltip>
-          </h2>
-          <LinesField
-            id="soniox-vocabulary-terms"
-            label={t('settings.sonioxVocabularyTerms', 'Terms')}
-            tooltip={t('settings.sonioxVocabularyTermsTooltip', 'Improves recognition of uncommon words — names, jargon, product names.')}
-            placeholder={t('settings.sonioxVocabularyTermsPlaceholder', 'One term per line')}
-            value={settings.vocabularyTerms}
-            onChange={(vocabularyTerms) => update({ vocabularyTerms })}
-            disabled={disabled}
-          />
-          <LinesField
-            id="soniox-vocabulary-translations"
-            label={t('settings.sonioxVocabularyTranslations', 'Preferred Translations')}
-            tooltip={t('settings.sonioxVocabularyTranslationsTooltip', "Biases how specific terms are translated — a preference, not a guaranteed replacement: names with an established rendering work best, while common words may keep the model's own wording. Entries are directional; the reverse direction only exists in Both mode, where you can add a reverse line.")}
-            placeholder={t('settings.sonioxVocabularyTranslationsPlaceholder', 'One source=target per line')}
-            value={settings.vocabularyTranslations}
-            onChange={(vocabularyTranslations) => update({ vocabularyTranslations })}
-            disabled={disabled}
-          />
-        </div>
-
-        <div className="settings-section" id="soniox-background-section">
-          <h2>
-            {t('settings.sonioxBackground', 'Session Background')}
-            <Tooltip content={t('settings.sonioxBackgroundTooltip', 'Free-form background for the next session — agenda, topic, or reference notes. Helps recognition and translation follow the domain. Trimmed first if the combined context exceeds the size limit.')} position="top">{helpIcon}</Tooltip>
-          </h2>
-          <LinesField
-            id="soniox-context-text"
-            ariaLabel={t('settings.sonioxBackground', 'Session Background')}
-            placeholder={t('settings.sonioxBackgroundPlaceholder', 'Paste an agenda, topic, or background notes (optional)')}
-            value={settings.contextText}
-            onChange={(contextText) => update({ contextText })}
-            disabled={disabled}
-          />
-        </div>
+        <StagePart stages={TR_TL}>
 
         <div className="settings-section" id="soniox-settings-section">
           <h2>
@@ -143,6 +119,9 @@ export function createSonioxSettingsView({ managed, useVoiceSource }: SonioxSett
         </div>
 
         {/* Agent text (spec 2026-11-05 §4.4), read at Start. Split Both sends none (§4.1): there it shows off and locked, the stored value kept. */}
+        </StagePart>
+
+        <StagePart stages={TR}>
         <div className="settings-section" id="soniox-agent-text-section">
           <h2>
             {t('settings.sonioxAgentText', 'Use the read-aloud text to improve recognition')}
@@ -178,10 +157,11 @@ export function createSonioxSettingsView({ managed, useVoiceSource }: SonioxSett
             </div>
           </div>
         )}
+        </StagePart>
       </VoicePreviewContext.Provider>
     );
   };
 }
 
 /** An own key's settings. */
-export const SonioxSettingsView = createSonioxSettingsView({ managed: false, useVoiceSource: useByokVoiceSource });
+export const SonioxSettingsView = createSonioxSettingsView({ providerId: 'soniox', managed: false, useVoiceSource: useByokVoiceSource });

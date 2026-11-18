@@ -8,7 +8,7 @@
 // nothing to registration.
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User } from 'lucide-react';
+import { Building2, User } from 'lucide-react';
 import { useAuth, useUser } from '../../lib/auth/hooks';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { isKizunaAIEnabled } from '../../utils/environment';
@@ -17,8 +17,8 @@ import {
   useSetAccountPopoverRequested,
 } from '../../stores/settingsStore';
 import { payerDisplayBalance } from '../../lib/session/orgNotice';
-import { useAccountPayer } from '../../lib/session/payerChoice';
 import { useRunState } from '../../app/useRun';
+import { useShownPayer } from '../../app/useShownPayer';
 import type { AccountState, Payer } from '../../lib/session/types';
 import { useAccountStore } from '../../stores/accountStore';
 import { compactBalanceLabel } from './compactBalance';
@@ -44,12 +44,9 @@ const AccountButton: React.FC = () => {
   // The start gate's own answer for the selected provider (Stage 2 Kizuna Soniox, choice 9).
   const lowBalance = useBalanceShortfall();
   const account = useAccountStore((s) => s.account);
-  // Which wallet the title bar shows. Idle: the switch. Running: the payer the
-  // session was started with — another window can flip the switch, and a
-  // running session keeps what it was granted.
-  const livePayer = useAccountPayer(account);
+  // Which wallet the title bar shows: the same rule as Accounts and keys (useShownPayer).
+  const payer = useShownPayer(account);
   const run = useRunState();
-  const payer = run.phase === 'idle' ? livePayer : run.payer;
   const [open, setOpen] = useState(false);
   // The popover anchors to the button's own element, so the anchor never
   // travels between components. It is null on the first render and set by the
@@ -92,6 +89,8 @@ const AccountButton: React.FC = () => {
   // plus a popover from each branch would mount the popover twice.
   let label: string;
   let content: React.ReactNode;
+  /** Who pays, for the button's name: heard by a screen reader whether the payer shows as a name or an icon. */
+  let payerHeard: string | null = null;
 
   if (!isSignedIn || !user) {
     // Labelled, like every neighbour in this bar. A bare glyph between two
@@ -108,16 +107,18 @@ const AccountButton: React.FC = () => {
     );
   } else {
     const initial = (user.name?.[0] ?? user.email[0] ?? '?').toUpperCase();
-    // Who pays, spelled out rather than inferred from a missing prefix: a session
-    // started before the choice existed has no payer, and that must not look
-    // like the personal wallet.
-    const payerName: string | null = account?.status === 'known' && account.organization
+    // Who pays, spelled out rather than inferred from a missing prefix: the organization's name or "Personal"; where
+    // the title bar has no room for it, an icon instead (a building, a person) named in its tooltip (owner,
+    // 2026-11-17). A session that carries no payer gets no mark at all, which does not look like either wallet.
+    const payerMark: { kind: Payer; name: string } | null = account?.status === 'known' && account.organization
       ? payer === 'organization'
-        ? account.organization.name
+        ? { kind: 'organization', name: account.organization.name }
         : payer === 'personal'
-          ? t('titleBar.account.personal', 'Personal')
-          : t('titleBar.account.payerUnknown', 'Account')
+          ? { kind: 'personal', name: t('titleBar.account.personal', 'Personal') }
+          : null
       : null;
+    const PayerIcon = payerMark?.kind === 'organization' ? Building2 : User;
+    payerHeard = payerMark?.name ?? null;
     // The balance of the wallet the next Start spends: the organization's, or the member's own with the switch on.
     const balance = shownBalance(account, payer, quota);
 
@@ -148,8 +149,12 @@ const AccountButton: React.FC = () => {
     content = (
       <>
         <span className="account-button__initial" aria-hidden="true">{initial}</span>
-        {payerName !== null && payerName !== '' && (
-          <span className="account-button__payer" title={payerName}>{payerName}</span>
+        {payerMark && (
+          // The name, or, where the title bar has no room for it, the icon (the bar says which: TitleBar's data-fit).
+          <span className="account-button__payer" data-payer={payerMark.kind} title={payerMark.name}>
+            <span className="account-button__payer-name">{payerMark.name}</span>
+            <PayerIcon size={14} aria-hidden="true" className="account-button__payer-icon" />
+          </span>
         )}
         {balanceLabel !== null && (
           <span className="title-bar__action-label">{balanceLabel}</span>
@@ -167,7 +172,7 @@ const AccountButton: React.FC = () => {
         data-tour="account-button"
         className="title-bar__action account-button"
         title={label}
-        aria-label={label}
+        aria-label={payerHeard ? `${label} (${payerHeard})` : label}
         // The button is not floating-ui's managed reference in this split, so
         // useRole cannot wire these two for us — they are written by hand.
         aria-haspopup="dialog"
@@ -181,7 +186,7 @@ const AccountButton: React.FC = () => {
         anchorEl={btnRef.current}
         onClose={() => setOpen(false)}
         idle={run.phase === 'idle'}
-        runPayer={run.phase === 'idle' ? undefined : run.payer}
+        runPayer={run.phase === 'idle' ? undefined : payer}
       />
     </>
   );

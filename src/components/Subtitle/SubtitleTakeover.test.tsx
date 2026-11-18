@@ -134,11 +134,11 @@ function lastControls(): SubtitleControls {
 }
 
 describe('SubtitleTakeover', () => {
-  it("draws the electron surface with the root session's state and an exporter", () => {
+  it("draws the electron surface with the root session's state and no export (it lives in History)", () => {
     render(<SubtitleTakeover />);
     const last = captured[captured.length - 1];
     expect(last.surface).toBe('electron');
-    expect(last.exporter).toBeTruthy();
+    expect(last.exporter).toBeUndefined();
     expect((last.model as { session: unknown }).session).toBe(getAppSession().subtitle.get());
   });
 
@@ -266,7 +266,8 @@ describe('SubtitleTakeover', () => {
       const voice = noticeAction(l1('voice_fallback'));
       expect(voice?.label).toBe('settings.title');
       act(() => { voice!.run(); });
-      expect(order).toEqual(['exit', 'navigate:provider']);
+      // The voices are the provider's own options in the line-up.
+      expect(order).toEqual(['exit', 'navigate:provider-options']);
       expect(noticeAction(l1('insufficient_balance'))).toBeNull();
       // The engine-slot kind (#619): subtitle mode is left first, then the TTS slot opens.
       openTts.mockImplementation(() => { order.push('slot'); });

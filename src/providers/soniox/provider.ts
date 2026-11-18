@@ -2,11 +2,15 @@ import { SonioxIcon } from '../../components/Icons/ProviderIcons';
 import type { Provider } from '../../lib/provider/types';
 import { createSonioxAdapter } from './adapter';
 import { checkSoniox } from './check';
-import { buildSoniox, describeSoniox, type SonioxConfig } from './config';
+import { buildSoniox, describeSoniox, sonioxContext, type SonioxConfig } from './config';
 import { SonioxSettingsView } from './SonioxSettings';
 import { SonioxVoiceSummary } from './SonioxVoiceSummary';
 import { SonioxTurnDetectionControls, SonioxTurnDetectionSummary } from './SonioxTurnDetection';
-import { migrateSonioxSettings, SONIOX_DEFAULTS, sonioxCredentials, sonioxLanguages, type SonioxCredentials, type SonioxSettings } from './settings';
+import { migrateSonioxSettings, SONIOX_DEFAULTS, sonioxCredentials, sonioxKeyField, sonioxLanguages, type SonioxCredentials, type SonioxSettings } from './settings';
+import { asSonioxRegion } from '../../lib/soniox/regions';
+import { SONIOX_LANGUAGES, sonioxWire } from './languages';
+import { AUTO } from '../../lib/provider/languages';
+import { ALL_STAGES, SP, TR, TR_TL } from '../../lib/lineup/types';
 
 const adapter = createSonioxAdapter();
 
@@ -21,6 +25,23 @@ const adapter = createSonioxAdapter();
 export const sonioxProvider: Provider<SonioxSettings, SonioxCredentials, SonioxConfig> & { id: 'soniox' } = {
   id: 'soniox',
   kind: 'own-key',
+  // A saved recording through Soniox's file recognition, in the project of the region the settings name.
+  fileRecognition(settings, credentials, words) {
+    const region = asSonioxRegion(settings.region);
+    const apiKey = String((credentials as unknown as Record<string, unknown>)[sonioxKeyField(region)] ?? '').trim();
+    if (!apiKey) return { missing: 'no-key' };
+    const languageHint = (code: string): string | null => {
+      // "Automatic" is no language to hint or translate into.
+      if (code === AUTO) return null;
+      try {
+        return sonioxWire.toWire(code);
+      } catch {
+        return null;
+      }
+    };
+    const context = sonioxContext(words);
+    return { service: 'soniox', apiKey, region, languageHint, languages: SONIOX_LANGUAGES.map((l) => l.value), ...(context ? { context } : {}) };
+  },
   platforms: ['electron', 'extension', 'web'],
   icon: SonioxIcon,
   // Today's TUTORIAL_URLS value, as a literal (LocalInference's rule: no import from src/services).
@@ -28,6 +49,9 @@ export const sonioxProvider: Provider<SonioxSettings, SonioxCredentials, SonioxC
 
   settings: { key: 'soniox', defaults: SONIOX_DEFAULTS, migrate: migrateSonioxSettings },
   Settings: SonioxSettingsView,
+  // The region on every stage, the voices on speech, the vocabulary, background and shared session on transcription
+  // and translation, the read-aloud text and speaker labels on transcription (mock v19).
+  optionStages: [ALL_STAGES, SP, TR_TL, TR],
   // The endpoint knobs: summarized in the Speech section under Auto, drawn on Advanced's Provider tab.
   TurnDetection: { Summary: SonioxTurnDetectionSummary, Controls: SonioxTurnDetectionControls },
   // Each spoken leg's voice, under its Speech row.

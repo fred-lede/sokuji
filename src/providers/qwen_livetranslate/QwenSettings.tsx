@@ -15,7 +15,7 @@ import {
   useRole,
 } from '@floating-ui/react';
 import { ScreenContextPicture } from '../../components/MainPanel/panel/ScreenContextChip';
-import { LinesField } from '../../components/providers/fields/LinesField';
+import { useAnalytics } from '../../lib/analytics';
 import { PresetVoiceField, presetVoice } from '../../components/providers/fields/PresetVoiceField';
 import type { VoiceEntry } from '../../components/Settings/sections/VoiceLibrarySection';
 import SettingRow from '../../components/Settings/shared/SettingRow';
@@ -25,8 +25,12 @@ import type { CaptureSourceInfo } from '../../lib/screen/desktopFrames';
 import { useScreenContextStore, type PickedSource } from '../../stores/screenContextStore';
 import { isElectron } from '../../utils/environment';
 import { ENDPOINTS, isEndpointId } from './endpoints';
-import { asQwenRegion, QWEN_REGION_LABELS, QWEN_REGIONS } from './regions';
+import { regionOptionLabel, useRegionLatencies } from '../../components/Region/regionLatency';
+import { requestRegionChange } from '../../lib/region/regionChange';
+import { QWEN_REGION_LABELS, QWEN_REGIONS } from './regions';
 import { QWEN_VOICES, qwenParticipantVoice, qwenSpeakerVoice, SPEAKER_CLONE, SPEAKER_CLONE_ONCE, type QwenSettings as S } from './settings';
+import { ALL_STAGES, SP, TR, TR_TL } from '../../lib/lineup/types';
+import { StagePart } from '../../components/providers/stageParts';
 
 /** The voice a spoken leg reads in, for the Speech rows, as its run resolves it: a preset's name, or whose own voice is cloned. */
 export function QwenVoiceSummary({ settings, leg }: VoiceSummaryProps<S>) {
@@ -62,6 +66,7 @@ export function QwenSettingsView({ settings, update, disabled = false, participa
   const endpoint = models[0]?.id;
   return (
     <>
+      <StagePart stages={TR}>
       {isEndpointId(endpoint) && (
         <div className="settings-section">
           <div className="models-info">
@@ -69,26 +74,19 @@ export function QwenSettingsView({ settings, update, disabled = false, participa
           </div>
         </div>
       )}
+      </StagePart>
+      <StagePart stages={SP}>
       <PresetVoiceField
         voices={voices} value={settings.voice} onChange={(voice) => update({ voice })} preview={preview} disabled={disabled}
         participant={participantSpeaks ? { value: settings.participantVoice, effective: qwenParticipantVoice(settings), onChange: (participantVoice) => update({ participantVoice }) } : undefined}
       />
+      </StagePart>
+      <StagePart stages={TR_TL}>
       <div className="settings-section" id="qwen-screen-context-section" data-testid="qwen-screen-context">
         <ScreenContextRow on={settings.screenContext} update={update} disabled={disabled} />
       </div>
-      <div className="settings-section" id="qwen-vocabulary-section">
-        {/* No heading tooltip: Soniox's speaks of recognition too, which Qwen's corpus does not touch; the field's own explains it. */}
-        <h2>{t('providers.qwen_livetranslate.vocabulary', 'Custom Vocabulary')}</h2>
-        <LinesField
-          id="qwen-vocabulary-translations"
-          label={t('providers.qwen_livetranslate.vocabularyTranslations', 'Preferred Translations')}
-          tooltip={t('providers.qwen_livetranslate.vocabularyTranslationsTooltip', "Biases how specific terms are translated — a preference, not a guaranteed replacement: names with an established rendering work best, while common words may keep the model's own wording. Entries are directional; the reverse direction only exists in Both mode, where you can add a reverse line.")}
-          placeholder={t('providers.qwen_livetranslate.vocabularyTranslationsPlaceholder', 'One source=target per line')}
-          value={settings.hotwords}
-          onChange={(hotwords) => update({ hotwords })}
-          disabled={disabled}
-        />
-      </div>
+      </StagePart>
+      <StagePart stages={TR}>
       {legs?.includes('participant') === true && (
         <div className="settings-section" id="qwen-speaker-labels-section">
           <h2>
@@ -112,6 +110,7 @@ export function QwenSettingsView({ settings, update, disabled = false, participa
           </div>
         </div>
       )}
+      </StagePart>
     </>
   );
 }
@@ -265,9 +264,12 @@ function PickedSourceChip({ source, disabled, onChoose }: { source: CaptureSourc
  */
 export function KizunaQwenSettingsView(props: SettingsProps<S>) {
   const { t } = useTranslation();
-  const { settings, update, disabled = false } = props;
+  const { trackEvent } = useAnalytics();
+  const { settings, disabled = false, account } = props;
+  const latencies = useRegionLatencies('qwen', !disabled);
   return (
     <>
+      <StagePart stages={ALL_STAGES}>
       <div className="settings-section" id="qwen-region-section">
         <h2>
           {t('settings.qwenRegion', 'Region')}
@@ -285,9 +287,9 @@ export function KizunaQwenSettingsView(props: SettingsProps<S>) {
             aria-label={t('settings.qwenRegion', 'Region')}
             value={settings.region}
             disabled={disabled}
-            onChange={(e) => update({ region: asQwenRegion(e.target.value) })}
+            onChange={(e) => { void requestRegionChange({ providerId: 'kizunaai_qwen', to: e.target.value, origin: 'select', auth: account?.auth, track: (ev) => trackEvent('region_recommendation', ev) }); }}
           >
-            {QWEN_REGIONS.map((r) => <option key={r} value={r}>{QWEN_REGION_LABELS[r]}</option>)}
+            {QWEN_REGIONS.map((r) => <option key={r} value={r}>{regionOptionLabel(t, QWEN_REGION_LABELS[r], latencies?.[r])}</option>)}
           </select>
           {settings.region === 'cn' && (
             <div className="setting-description" id="qwen-region-note">
@@ -296,6 +298,7 @@ export function KizunaQwenSettingsView(props: SettingsProps<S>) {
           )}
         </div>
       </div>
+      </StagePart>
       <QwenSettingsView {...props} />
     </>
   );

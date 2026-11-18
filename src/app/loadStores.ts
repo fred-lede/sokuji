@@ -5,6 +5,7 @@
  * stored selection is applied in memory, and the turn mode migrated once —
  * its one write, a key the old path never reads (plan 1e-3b-1 ruling 9).
  */
+import { useWordList } from '../lib/words/list';
 import { describeCause, reportWarning } from '../lib/diagnostics/report';
 import type { AnyProvider } from '../lib/provider/types';
 import { legacyTurnModeKey, migrateTurnMode, selectionFromStored } from '../lib/session/storedSettings';
@@ -12,6 +13,7 @@ import { presentProviders } from '../providers/registry';
 import type { ISettingsService } from '../services/interfaces/ISettingsService';
 import { ServiceFactory } from '../services/ServiceFactory';
 import { useProviderStore } from '../stores/providerStore';
+import { useLineUpStore } from '../stores/lineUpStore';
 import { useRoutingStore } from '../stores/routingStore';
 import { useSegmentationStore } from '../stores/segmentationStore';
 import { useTurnModeStore } from '../stores/turnModeStore';
@@ -61,4 +63,15 @@ export async function loadSessionStores(): Promise<void> {
       reportWarning('AppSession', `Loading the ${what} failed: ${describeCause(error)}`, { cause: error, dedupeKey: `load:${what}` });
     }
   }));
+  try {
+    await useWordList.getState().load();
+  } catch (error) {
+    reportWarning('AppSession', `Loading the word list failed: ${describeCause(error)}`, { cause: error, dedupeKey: 'load:words' });
+  }
+  // The line-up after the selected provider: when none is stored it is worked out from that provider (the one migration).
+  try {
+    await useLineUpStore.getState().load();
+  } catch (error) {
+    reportWarning('AppSession', `Loading the line-up failed: ${describeCause(error)}`, { cause: error, dedupeKey: 'load:line-up' });
+  }
 }

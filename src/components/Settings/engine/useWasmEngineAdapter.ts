@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import { useStoredLocalStages } from '../../../stores/lineUpStore';
 import {
-  useModelStore, useModelStatuses, useWebGPUAvailable, useDeviceFeatures, useStorageUsedMb,
+  useModelStore, useModelStatuses, useWebGPUAvailable, useDeviceFeatures,
 } from '../../../stores/modelStore';
 import { wasmCandidates } from '../../../lib/local-inference/selection/candidates.wasm';
 import { directionKey, emptyDirection, type Stage } from '../../../lib/local-inference/selection/types';
@@ -30,16 +31,17 @@ export function useWasmEngineAdapter(isSessionActive: boolean, override: WasmEng
   const modelStatuses = useModelStatuses();
   const webgpuAvailable = useWebGPUAvailable();
   const deviceFeatures = useDeviceFeatures();
-  const storageUsedMb = useStorageUsedMb();
 
   const sourceLanguage = override.pair.source;
   const targetLanguage = override.pair.target;
   const selections = override.settings.selections;
+  // A stored line-up gives Bing and Edge stages of their own: the local list and its automatic picks leave them out.
+  const stages = useStoredLocalStages();
 
   return useMemo<EngineAdapter>(() => {
     const speaker = directionKey(sourceLanguage, targetLanguage);
     const participant = directionKey(targetLanguage, sourceLanguage);
-    const source = wasmCandidates({ modelStatuses, webgpuAvailable, deviceFeatures });
+    const source = wasmCandidates({ modelStatuses, webgpuAvailable, deviceFeatures, withCloud: stages === null });
     const split = (dir: string): [string, string] => {
       const i = dir.indexOf('→');
       return [dir.slice(0, i), dir.slice(i + 1)];
@@ -51,7 +53,7 @@ export function useWasmEngineAdapter(isSessionActive: boolean, override: WasmEng
       ],
       resolved: (slot) => {
         const [src, tgt] = split(slot.dir);
-        return useModelStore.getState().resolve(src, tgt, selections)[slot.stage];
+        return useModelStore.getState().resolve(src, tgt, selections, stages)[slot.stage];
       },
       autoPick: (slot) => {
         const [src, tgt] = split(slot.dir);
@@ -62,7 +64,7 @@ export function useWasmEngineAdapter(isSessionActive: boolean, override: WasmEng
           ...selections,
           [slot.dir]: { ...(selections[slot.dir] ?? emptyDirection()), [slot.stage]: { modelId: '' } },
         };
-        return useModelStore.getState().resolve(src, tgt, masked)[slot.stage]?.modelId ?? null;
+        return useModelStore.getState().resolve(src, tgt, masked, stages)[slot.stage]?.modelId ?? null;
       },
       // Short names on the engine surface (2026-08-23): full names stay in
       // the Library/Storage cards.
@@ -101,10 +103,9 @@ export function useWasmEngineAdapter(isSessionActive: boolean, override: WasmEng
         }
         await override.update({ selections: next });
       },
-      storageSummary: `${storageUsedMb} MB`,
       // The participant direction's TTS slot shows only while that leg speaks (#619).
       stagesFor: (_dir, isSpeaker): Stage[] => (isSpeaker || override.participantSpeaks ? ['asr', 'translation', 'tts'] : ['asr', 'translation']),
       disabled: isSessionActive,
     };
-  }, [sourceLanguage, targetLanguage, selections, modelStatuses, webgpuAvailable, deviceFeatures, storageUsedMb, override, isSessionActive]);
+  }, [sourceLanguage, targetLanguage, selections, modelStatuses, webgpuAvailable, deviceFeatures, override, isSessionActive, stages]);
 }
