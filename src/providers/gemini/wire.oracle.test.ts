@@ -111,6 +111,12 @@ describe("the wire against the SDK's own converter", () => {
     session.sendRealtimeInput({ text: 'hello' });
     session.close();
     // socket.sent[0] is the setup frame; the four realtime-input sends follow it, in order.
-    expect(socket.sent.slice(1)).toEqual([audioFrame(pcm), ACTIVITY_START, ACTIVITY_END, textFrame('hello')]);
+    // Compare parsed objects to avoid JSON key ordering differences across Node versions.
+    expect(socket.sent.slice(1).map(JSON.parse)).toEqual([
+      JSON.parse(audioFrame(pcm)),
+      JSON.parse(ACTIVITY_START),
+      JSON.parse(ACTIVITY_END),
+      JSON.parse(textFrame('hello')),
+    ]);
   });
 });
