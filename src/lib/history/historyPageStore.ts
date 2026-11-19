@@ -7,9 +7,13 @@ import { createStore, type StoreApi } from 'zustand/vanilla';
 import type { Clock } from '../contract/clock';
 import type { Leg } from '../conversation/types';
 import type { NotesLanguage, NotesRunner } from '../notes/runner';
+import { payerBalance } from '../session/orgNotice';
+import { accountPayer } from '../session/payerChoice';
+import type { AccountState } from '../session/types';
+import { fitsHosted, hostedEstimateMicroUsd, hostedEstimateUsd, type HostedFileTerms, type TrackSize } from './file/hostedFile';
 import type { ImportPhase, ImportResult } from './file/importFile';
 import type { FileRecognitionMissing, FileRecognitionService } from './file/service';
-import type { TranscribePhase } from './file/transcribe';
+import { trackTranslation, transcribedTracks, type TranscribePhase } from './file/transcribe';
 import type { HistoryPort } from './port';
 import type {
   FileTranscriptionOptions,
@@ -45,11 +49,32 @@ export interface FileJob {
   /** The imported file's name. */
   name: string | null;
   phase: ImportPhase;
+  /**
+   * Through Kizuna AI's service, which charges the account: set once the job knows its service (false until then).
+   * Cancelled once Soniox is transcribing, such a job is still charged.
+   */
+  hosted: boolean;
 }
 
-/** Why a file job cannot start now. */
-/** `unchecked`: the line-up's recognition service could not be looked up. */
-export type FileJobBlock = FileRecognitionMissing['missing'] | 'session' | 'busy' | 'unchecked';
+/**
+ * Why a file job cannot start now. `unchecked`: the line-up's recognition service, or Kizuna AI's terms for a file job,
+ * could not be looked up. Through Kizuna AI: `hosted-unavailable`, its service has no file jobs (yet); `wallet-frozen`,
+ * the paying wallet is frozen; `hosted-too-long`, a kept track is longer or larger than the service takes;
+ * `no-balance`, the paying wallet (not an organization's: the service judges that one) holds less than the estimate,
+ * or nothing at all for an import.
+ */
+export type FileJobBlock = FileRecognitionMissing['missing'] | 'session' | 'busy' | 'unchecked'
+  | 'hosted-unavailable' | 'wallet-frozen' | 'hosted-too-long' | 'no-balance';
+
+/**
+ * What a panel shows before Start, read once: why the job cannot start (null when it can), whether Kizuna AI's service
+ * would run it, and the longest track that service takes, in ms (null unless its terms were read).
+ */
+export interface FileJobCheck {
+  blocked: FileJobBlock | null;
+  hosted: boolean;
+  maxAudioMs: number | null;
+}
 
 /** The running file job and how the last one ended: kept outside any page, so a job outlives the page that began it. */
 export interface FileJobState {
@@ -67,6 +92,15 @@ export interface FileJobs {
   /** Shared by every page (the app keeps one); a page makes its own when none is given. */
   state?: StoreApi<FileJobState>;
   service(): Promise<FileRecognitionService | FileRecognitionMissing>;
+  /** Kizuna AI's terms for a file job (`fetchHostedFileTerms`): asked for a hosted service only. */
+  hostedTerms(): Promise<HostedFileTerms | null>;
+  /** The Kizuna AI account as the app last read it: which wallet pays a hosted job, what it holds, whether it is frozen. */
+  account(): AccountState | null;
+  /**
+   * Reads the Kizuna AI account again: resolves once `account()` answers what was read, rejects when it could not be
+   * read. Asked before a hosted job is refused for money, and after one ends.
+   */
+  refreshAccount(): Promise<void>;
   /** A session is running: importing waits (decoding is heavy). */
   sessionRunning(): boolean;
   importFile(o: {
@@ -145,8 +179,20 @@ export interface HistoryPageActions {
   reassign(n: number, speaker: string | null): Promise<void>;
   /** Shows another transcript of the open record, with its own notes. */
   showTranscript(id: number): Promise<void>;
-  /** Why an import or a transcription cannot start now, or null. */
+  /**
+   * Why an import or a transcription cannot start now, through which service, and the longest track it takes: from one
+   * read of the service (and, through Kizuna AI, of its terms). A read that fails answers `unchecked`.
+   */
+  fileJobCheck(kind: 'import' | 'transcribe'): Promise<FileJobCheck>;
+  /** Why an import or a transcription cannot start now, or null: `fileJobCheck`'s block. */
   fileJobBlocked(kind: 'import' | 'transcribe'): Promise<FileJobBlock | null>;
+  /**
+   * What transcribing the open record as `options` say is estimated to cost through Kizuna AI, in USD; null with the
+   * user's own key (no price is shown), for an import (its length is not known before it is read), or without the terms.
+   */
+  fileEstimate(kind: 'import' | 'transcribe', options: FileTranscriptionOptions): Promise<number | null>;
+  /** Kizuna AI's terms for a file job (what it takes at most); null without file jobs, or when it has none or they cannot be read. */
+  hostedTerms(): Promise<HostedFileTerms | null>;
   /** The languages a file can be transcribed in and translated into: the file service's; none without one; null when the service could not be asked. */
   fileLanguages(): Promise<readonly string[] | null>;
   /** Imports a file as a new record, transcribed as `options` say: one job at a time. */
@@ -163,6 +209,33 @@ const codeOf = (error: unknown): string => {
   const code = (error as { code?: unknown } | null)?.code;
   return typeof code === 'string' ? code : 'LOCAL';
 };
+
+/**
+ * Why a job through Kizuna AI cannot start for this account (its wallet read as the main panel's balance gate reads it)
+ * or for these tracks: the paying wallet frozen, a track longer or larger than the service takes, or a balance short of
+ * the job; null when none of these. An account not known, or still loading, blocks nothing: the service decides.
+ */
+function hostedBlock(
+  kind: 'import' | 'transcribe', account: AccountState | null, tracks: readonly TrackSize[], terms: HostedFileTerms,
+): FileJobBlock | null {
+  const known = account?.status === 'known' ? account : null;
+  const payer = known ? accountPayer(known) : undefined;
+  const wallet = known ? payerBalance(known, payer) : null;
+  if (wallet?.frozen) return 'wallet-frozen';
+  if (!fitsHosted(tracks, terms)) return 'hosted-too-long';
+  // An organization that pays is not refused for its balance, as the main panel's gate does not refuse it: what the
+  // page holds can be minutes old and cannot tell money held by colleagues' running jobs from an empty wallet, so the
+  // service answers precisely. Its frozen wallet is refused above.
+  const organizationPays = payer === 'organization' && known?.organization !== undefined;
+  if (!wallet || wallet.microUsd === undefined || organizationPays) return null;
+  // An import costs more than nothing, whatever its length. A transcription costs at least its untranslated price (the
+  // translation is not chosen yet when the panel asks), in whole micro-USD as the service counts.
+  const short = kind === 'import' ? wallet.microUsd <= 0 : wallet.microUsd < hostedEstimateMicroUsd(tracks, false, terms);
+  return short ? 'no-balance' : null;
+}
+
+/** How long the account is waited for when it is read again before a refusal for money: past this, it is not. */
+export const ACCOUNT_REFRESH_MS = 3000;
 
 /** Search runs this long after the last keystroke. */
 export const SEARCH_DELAY_MS = 250;
@@ -196,10 +269,36 @@ export function createHistoryPageStore(
   const jobs = files?.state ?? createFileJobState();
   /** Unsubscribes from the file job. */
   let offJobs: (() => void) | null = null;
-  const setJobPhase = (phase: ImportPhase) => {
+  /** The page's reading again after the last file job ended: the action that began the job waits for it. */
+  let afterJob: Promise<void> | null = null;
+  const changeJob = (change: Partial<FileJob>) => {
     const job = jobs.getState().job;
-    if (job) jobs.setState({ job: { ...job, phase } });
+    if (job) jobs.setState({ job: { ...job, ...change } });
   };
+  const setJobPhase = (phase: ImportPhase) => changeJob({ phase });
+  /**
+   * The record a transcription is reading now. Its recording is not deleted under it, nor is the record moved to the
+   * bin (from where it could be deleted for good): a recording gone before its upload began quits the app (the upload's
+   * read of the file fails where nothing can catch it).
+   */
+  const beingTranscribed = (): string | null => {
+    const job = jobs.getState().job;
+    return job?.kind === 'transcribe' ? job.recordId : null;
+  };
+  /**
+   * A job through Kizuna AI has ended here, however it ended: the account is read again through the file jobs, as after
+   * a refused session start. After a cancel this can run before the service has ended the job, so the balance read may
+   * still count what the job held.
+   */
+  const refreshBalance = () => { void files?.refreshAccount().catch(() => {}); };
+  /**
+   * The account read again through `from`, waited for at most ACCOUNT_REFRESH_MS: a reading that fails, or has not
+   * settled by then, is not waited for (the account at hand is then decided on).
+   */
+  const readAccountAgain = (from: FileJobs): Promise<void> => new Promise((resolve) => {
+    const cancel = clock.setTimeout(resolve, ACCOUNT_REFRESH_MS);
+    void from.refreshAccount().catch(() => {}).finally(() => { cancel(); resolve(); });
+  });
 
   const store = createStore<HistoryPageState & HistoryPageActions>()((set, get) => {
     /** One action: busy while it runs, a rejection shown and nothing else changed. */
@@ -328,9 +427,11 @@ export function createHistoryPageStore(
       clearSelection: () => set({ selected: new Set() }),
 
       binSelected: () => act(async () => {
-        // A record still being written stays out of the bin until its session ends.
+        // A record still being written stays out of the bin until its session ends, one being transcribed until its
+        // transcription ends.
         const open = new Set(get().rows.filter((r) => r.state === 'open').map((r) => r.id));
-        const ids = [...get().selected].filter((id) => !open.has(id));
+        const reading = beingTranscribed();
+        const ids = [...get().selected].filter((id) => !open.has(id) && id !== reading);
         if (ids.length > 0) await port.binRecords({ ids });
         set({ selected: new Set() });
         await reload();
@@ -339,7 +440,7 @@ export function createHistoryPageStore(
       binRecord: (id) => act(async () => {
         const open = get().open;
         const record = open?.record.id === id ? open.record : get().rows.find((r) => r.id === id);
-        if (!record || record.state === 'open') return;
+        if (!record || record.state === 'open' || id === beingTranscribed()) return;
         await port.binRecords({ ids: [id] });
         // Closed like any closing: a read of it still on its way is not shown.
         if (get().open?.record.id === id) get().closeRecord();
@@ -379,7 +480,7 @@ export function createHistoryPageStore(
 
       dropRecording: () => act(async () => {
         const open = get().open;
-        if (!open) return;
+        if (!open || open.record.id === beingTranscribed()) return;
         for (const t of open.record.tracks) {
           if (t.goneAt === null) await port.dropTrack({ recordId: open.record.id, source: t.source });
         }
@@ -450,9 +551,22 @@ export function createHistoryPageStore(
       }),
 
       follow() {
-        // The file job as this page shows it.
+        // The file job as this page shows it. A job that ends shows itself on the page shown then, which is not the
+        // page that began it when History was closed and opened again meanwhile: after an import, ended either way
+        // (a failed one may keep its record), the list is read again; after a transcription that made a transcript,
+        // the record, when it is the one open, shows it (the newest), and the list is read again.
         if (!offJobs) {
-          const shown = (j: ReturnType<typeof jobs.getState>) => set({ job: j.job, jobFailure: j.jobFailure, jobKept: j.jobKept });
+          const shown = (j: FileJobState, before?: FileJobState) => {
+            set({ job: j.job, jobFailure: j.jobFailure, jobKept: j.jobKept });
+            const ended = before?.job && !j.job ? before.job : null;
+            if (!ended) return;
+            if (ended.kind === 'transcribe' && j.jobFailure !== null) { afterJob = null; return; }
+            afterJob = act(async () => {
+              const { recordId } = ended;
+              if (ended.kind === 'transcribe' && recordId && get().open?.record.id === recordId) await fetchRecord(recordId, null, null);
+              await reload();
+            });
+          };
           offJobs = jobs.subscribe(shown);
           shown(jobs.getState());
         }
@@ -504,19 +618,74 @@ export function createHistoryPageStore(
         if (open) await fetchRecord(open.record.id, null, id);
       }),
 
-      async fileJobBlocked(kind) {
-        if (!files) return 'no-file-service';
+      async fileJobCheck(kind) {
+        const check = (blocked: FileJobBlock | null, hosted = false, maxAudioMs: number | null = null): FileJobCheck => ({ blocked, hosted, maxAudioMs });
+        if (!files) return check('no-file-service');
         let service: Awaited<ReturnType<FileJobs['service']>>;
         try {
           service = await files.service();
         } catch {
-          return 'unchecked';
+          return check('unchecked');
         }
         // What the line-up cannot do comes first: "busy" would let the panel name a service that cannot do the job.
-        if ('missing' in service) return service.missing;
-        if (jobs.getState().job) return 'busy';
-        if (kind === 'import' && files.sessionRunning()) return 'session';
-        return null;
+        if ('missing' in service) return check(service.missing);
+        const hosted = 'hosted' in service;
+        // The service could do the job: the panel names it beside these.
+        if (jobs.getState().job) return check('busy', hosted);
+        if (kind === 'import' && files.sessionRunning()) return check('session', hosted);
+        if (!hosted) return check(null);
+        // Through Kizuna AI, nothing starts without its terms: they say how long a recording may be.
+        let terms: HostedFileTerms | null;
+        try {
+          terms = await files.hostedTerms();
+        } catch {
+          return check('unchecked');
+        }
+        if (!terms) return check('hosted-unavailable', true);
+        // A transcription sends the open record's kept tracks. An import's length is not known until the file is read
+        // (it is checked then).
+        const open = get().open;
+        const tracks = kind === 'transcribe' && open ? transcribedTracks(open.record) : [];
+        let reason = hostedBlock(kind, files.account(), tracks, terms);
+        // The account as last read can be minutes old (topped up, unfrozen since): a refusal for money is decided on the
+        // account read again, or on the one at hand when it cannot be read again in time.
+        if (reason === 'wallet-frozen' || reason === 'no-balance') {
+          await readAccountAgain(files);
+          reason = hostedBlock(kind, files.account(), tracks, terms);
+        }
+        return check(reason, true, terms.maxAudioMs);
+      },
+
+      async fileJobBlocked(kind) {
+        return (await get().fileJobCheck(kind)).blocked;
+      },
+
+      async fileEstimate(kind, options) {
+        const open = get().open;
+        if (!files || kind !== 'transcribe' || !open) return null;
+        const tracks = transcribedTracks(open.record);
+        if (tracks.length === 0) return null;
+        try {
+          const service = await files.service();
+          // With the user's own key no price is shown (owner, 2026-11-16).
+          if ('missing' in service || !('hosted' in service)) return null;
+          const terms = await files.hostedTerms();
+          if (!terms) return null;
+          // Each track priced as the job will send it: translated exactly when a translation is asked for it.
+          const translated = tracks.map((t) => trackTranslation(open.record, t.source, options, service) !== null);
+          return hostedEstimateUsd(tracks, translated, terms);
+        } catch {
+          return null;
+        }
+      },
+
+      async hostedTerms() {
+        if (!files) return null;
+        try {
+          return await files.hostedTerms();
+        } catch {
+          return null;
+        }
       },
 
       async fileLanguages() {
@@ -533,10 +702,13 @@ export function createHistoryPageStore(
         // The job is taken before anything is awaited: a second start finds it.
         if (!files || jobs.getState().job) return;
         const controller = new AbortController();
-        jobs.setState({ job: { kind: 'import', recordId: null, name: file.name, phase: 'reading' }, jobFailure: null, jobKept: false, controller });
+        jobs.setState({ job: { kind: 'import', recordId: null, name: file.name, phase: 'reading', hosted: false }, jobFailure: null, jobKept: false, controller });
+        let hosted = false;
         try {
           const service = await files.service();
           if ('missing' in service) { jobs.setState({ jobFailure: service.missing }); return; }
+          hosted = 'hosted' in service;
+          changeJob({ hosted });
           const result = await files.importFile({
             file, options: o.options, myLanguage: o.myLanguage, service, signal: controller.signal, onProgress: (p) => setJobPhase(p.phase),
           });
@@ -545,9 +717,11 @@ export function createHistoryPageStore(
         } catch (error) {
           jobs.setState({ jobFailure: codeOf(error) });
         } finally {
+          // The page shown now (this one, or the next if History was closed meanwhile) reads the list again.
           jobs.setState({ job: null, controller: null });
+          if (hosted) refreshBalance();
         }
-        await act(reload);
+        await afterJob;
       },
 
       async transcribeOpen(options) {
@@ -555,26 +729,26 @@ export function createHistoryPageStore(
         if (!files || jobs.getState().job || !open) return;
         const recordId = open.record.id;
         const controller = new AbortController();
-        jobs.setState({ job: { kind: 'transcribe', recordId, name: null, phase: 'uploading' }, jobFailure: null, jobKept: false, controller });
-        let made: number | null = null;
+        jobs.setState({ job: { kind: 'transcribe', recordId, name: null, phase: 'uploading', hosted: false }, jobFailure: null, jobKept: false, controller });
+        let hosted = false;
         try {
           const service = await files.service();
           if ('missing' in service) { jobs.setState({ jobFailure: service.missing }); return; }
-          ({ transcriptId: made } = await files.transcribe({
+          hosted = 'hosted' in service;
+          changeJob({ hosted });
+          await files.transcribe({
             recordId, options, service, signal: controller.signal, onProgress: (p) => setJobPhase(p.phase),
-          }));
+          });
         } catch (error) {
           // Too long for the service: the record's recording, not a file, is what is too long.
           const code = codeOf(error);
           jobs.setState({ jobFailure: code === 'TOO_LONG' ? 'RECORD_TOO_LONG' : code });
         } finally {
+          // The page shown now shows the new transcript (see follow()).
           jobs.setState({ job: null, controller: null });
+          if (hosted) refreshBalance();
         }
-        if (made === null) return;
-        await act(async () => {
-          if (get().open?.record.id === recordId) await fetchRecord(recordId, null, made);
-          await reload();
-        });
+        await afterJob;
       },
 
       cancelJob() {
